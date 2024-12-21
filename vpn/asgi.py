@@ -10,7 +10,13 @@ https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
 import os
 
 from django.core.asgi import get_asgi_application
+from decouple import config
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'vpn.settings')
+debug_mode = config('DEBUG', cast=bool, default=False)
+
+if debug_mode:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'vpn.envs.development')
+else:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'vpn.envs.production')
 
 application = get_asgi_application()
