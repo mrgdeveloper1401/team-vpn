@@ -3,10 +3,17 @@
 import os
 import sys
 
+from decouple import config
+
+debug_mode = config('DEBUG', default=False, cast=bool)
+
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'vpn.settings')
+    if debug_mode:
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'vpn.envs.development')
+    else:
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'vpn.envs.production')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
