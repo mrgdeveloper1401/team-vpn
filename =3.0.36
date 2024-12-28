@@ -1,0 +1,3 @@
+Requirement already satisfied: prompt-toolkit in /home/mg/Desktop/learning_django/practiceDjango/.venv/vpn/lib/python3.12/site-packages (2.0.9)
+Requirement already satisfied: six>=1.9.0 in /home/mg/Desktop/learning_django/practiceDjango/.venv/vpn/lib/python3.12/site-packages (from prompt-toolkit) (1.17.0)
+Requirement already satisfied: wcwidth in /home/mg/Desktop/learning_django/practiceDjango/.venv/vpn/lib/python3.12/site-packages (from prompt-toolkit) (0.2.13)
