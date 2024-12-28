@@ -12,7 +12,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     REQUIRED_FIELDS = ['mobile_phone']
 
     class Meta:
-        db_table = 'user'
+        db_table = 'auth_user'
         ordering = ('mobile_phone',)
 
 

@@ -16,4 +16,4 @@ RUN pip install --upgrade pip && \
 
 EXPOSE 8000
 
-ENTRYPOINT = ["./start.sh"]
+ENTRYPOINT  ["./start.sh"]

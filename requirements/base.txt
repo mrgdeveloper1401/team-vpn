@@ -7,3 +7,4 @@ django-redis
 celery
 psycopg2-binary
 drf-spectacular
+django-import-export

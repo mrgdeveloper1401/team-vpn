@@ -1,16 +1,16 @@
-FROM python:3.12-alpine
+FROM python:3.12-slim
 
 WORKDIR /home/app
 
 COPY . .
 #COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 
-RUN apk update && \
-    apk upgrade && \
-    apk add python3 && \
-    apk add postgresql && \
-    apk add py3-pip && \
-    apk add nginx
+RUN apt update  -y && \
+    apt upgrade -y && \
+    apt install python3 -y && \
+    apt install postgresql -y && \
+    apt install nginx -y &&\
+    apt install python3-pip -y
 
 RUN pip install --upgrade pip && \
     pip install -r ./requirements/production.txt
