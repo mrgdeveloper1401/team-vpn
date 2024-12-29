@@ -254,3 +254,5 @@ cython_debug/
 #.idea/
 
 .env
+staticfiles
+vpn.zip
