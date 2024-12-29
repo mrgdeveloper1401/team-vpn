@@ -45,3 +45,7 @@ class Images(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = 'images'
+
+    def save(self, *args, **kwargs):
+        self.image_size = self.image.size
+        return super().save(*args, **kwargs)

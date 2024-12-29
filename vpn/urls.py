@@ -16,11 +16,17 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.template.defaulttags import url
 from django.urls import path, include
-from jet_django.urls import jet_urls
+# from jet_django.urls import jet_urls
+from debug_toolbar.toolbar import debug_toolbar_urls
+from vpn.settings import DEBUG, MEDIA_URL, MEDIA_ROOT
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('jet_api/', include(jet_urls)),
+    # path('jet_api/', include(jet_urls)),
 ]
+urlpatterns += debug_toolbar_urls()
+
+if DEBUG:
+    urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

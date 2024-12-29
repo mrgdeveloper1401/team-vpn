@@ -21,6 +21,7 @@ class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):
     ip_address = models.GenericIPAddressField()
     last_connect = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='user_device')
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.device_name
@@ -29,14 +30,16 @@ class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):
         db_table = 'content_device'
 
 
-class RequestLog(CreateMixin, UpdateMixin, SoftDeleteMixin):
-    user = models.ForeignKey("accounts.User", on_delete=models.DO_NOTHING, related_name='request_log')
-    path = models.CharField(max_length=255)
-    method = models.CharField(max_length=10)
-    logs = models.JSONField()
-
-    class Meta:
-        db_table = 'request_log'
+# class RequestLog(CreateMixin, UpdateMixin, SoftDeleteMixin):
+#     user = models.CharField(editable=False, max_length=255)
+#     path = models.CharField(max_length=255, editable=False)
+#     method = models.CharField(max_length=10, editable=False)
+#     status_code = models.BooleanField(editable=False)
+#     template_name = models.CharField(editable=False)
+#     logs = models.JSONField(editable=False)
+#
+#     class Meta:
+#         db_table = 'request_log'
 
 
 class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):

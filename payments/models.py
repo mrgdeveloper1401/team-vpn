@@ -8,8 +8,8 @@ from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):
     user = models.ForeignKey('accounts.User', on_delete=models.DO_NOTHING, related_name="user_order")
     plan = models.ForeignKey('configs.Plan', on_delete=models.DO_NOTHING, related_name="plan_order")
-    is_paid = models.BooleanField(default=False)
-    order_number = models.CharField(max_length=255, unique=True)
+    is_paid = models.BooleanField(default=False, editable=False)
+    order_number = models.CharField(max_length=255, unique=True, editable=False)
 
     @property
     def generate_order_number(self):
