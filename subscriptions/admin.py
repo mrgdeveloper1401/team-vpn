@@ -15,11 +15,11 @@ class DiscountAdmin(admin.ModelAdmin):
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ['user', "plan", "volume_usage", "is_active"]
+    list_display = ['user', "plan", "config", "volume_usage", "is_active"]
     list_filter = ['is_active']
     list_editable = ['is_active']
-    raw_id_fields = ['user', "plan"]
-    list_select_related = ['plan', "user"]
+    raw_id_fields = ['user', "plan", "config"]
+    list_select_related = ['plan', "user", "config"]
 
 
 @admin.register(Coupon)

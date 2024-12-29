@@ -10,6 +10,7 @@ from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 class Subscription(CreateMixin, UpdateMixin, SoftDeleteMixin):
     user = models.ForeignKey("accounts.User", on_delete=models.DO_NOTHING, related_name="user_subscription")
     plan = models.ForeignKey("configs.Plan", on_delete=models.DO_NOTHING, related_name="plan_subscription")
+    config = models.ForeignKey('configs.Config', on_delete=models.DO_NOTHING, related_name="config_subscription")
     volume_usage = models.PositiveIntegerField(default=0, editable=False)
     is_active = models.BooleanField(default=True)
 

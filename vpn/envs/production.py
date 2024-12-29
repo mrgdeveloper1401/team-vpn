@@ -6,7 +6,8 @@ SECRET_KEY = config("PROD_SECRET_KEY", cast=str)
 
 
 INSTALLED_APPS += [
-    "corsheaders"
+    "corsheaders",
+    "storages",
 ]
 
 MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware", )
@@ -16,6 +17,9 @@ STORAGES = {
     # ...
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
     },
 }
 
@@ -56,3 +60,12 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 SECURE_REFERRER_POLICY = "strict-origin"
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# aws config
+AWS_ACCESS_KEY_ID = config("ARVAN_ACCESS_KEY", cast=str)
+AWS_SECRET_ACCESS_KEY = config("ARVAN_SECRET_KET", cast=str)
+AWS_STORAGE_BUCKET_NAME = config("ARVAN_STORAGE_BUCKET_NAME", cast=str)
+AWS_S3_FILE_OVERWRITE = False
+AWS_SERVICE_NAME = 's3'
+AWS_S3_REGION_NAME = 'us-east-1'
+AWS_S3_CUSTOM_DOMAIN = config("AWS_S3_DOMAIN", cast=str)

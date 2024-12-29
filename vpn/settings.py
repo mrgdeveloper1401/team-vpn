@@ -176,3 +176,6 @@ LOGGING = {
         }
     }
 }
+
+# JET_PROJECT = 'vpn_4'
+# JET_TOKEN = config("JET_TOKEN")
