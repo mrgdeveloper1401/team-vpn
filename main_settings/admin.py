@@ -13,7 +13,7 @@ class UtilsAppsAdmin(admin.ModelAdmin):
 
 @admin.register(PublicNotification)
 class PublicNotificationAdmin(admin.ModelAdmin):
-    list_display = ['title', "file", "is_active"]
+    list_display = ['title', "is_active"]
     list_editable = ['is_active']
     list_filter = ['is_active']
     search_fields = ['title']

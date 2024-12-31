@@ -8,7 +8,8 @@ RUN apt update -y && \
     apt install -y python3 && \
     apt install postgresql -y && \
     apt install nginx -y && \
-    apt install python3-pip -y
+    apt install python3-pip -y && \
+    apt install vim -y
 
 RUN pip install --upgrade pip && \
     pip install -r ./requirements/production.txt
