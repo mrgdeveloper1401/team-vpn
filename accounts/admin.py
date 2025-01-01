@@ -2,9 +2,21 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from .models import User, ContentDevice, PrivateNotification
+from subscriptions.models import UserConfig
 from import_export.admin import ImportExportModelAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 # Register your models here.
+
+
+class ContentDeviceInline(admin.TabularInline):
+    model = ContentDevice
+    extra = 1
+
+
+class UserConfigInline(admin.TabularInline):
+    model = UserConfig
+    extra = 1
+    raw_id_fields = ('config',)
 
 
 @admin.register(User)
@@ -22,7 +34,8 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
     )
     fieldsets = (
         (None, {"fields": ("username", "password")}),
-        (_("Personal info"), {"fields": ("first_name", "last_name", "email", "mobile_phone")}),
+        (_("Personal info"), {"fields": ("first_name", "last_name", "email", "mobile_phone", "account_type",
+                                         "accounts_status")}),
         (
             _("Permissions"),
             {
@@ -37,11 +50,12 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
         ),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
+    inlines = [ContentDeviceInline, UserConfigInline]
 
 
 @admin.register(ContentDevice)
 class ContentDeviceAdmin(ImportExportModelAdmin):
-    list_display = ['user', "ip_address", "device_name", "connected_at", "is_blocked", "created_at"]
+    list_display = ['user', "ip_address", "device_model", "connected_at", "is_blocked", "created_at"]
     raw_id_fields = ['user']
     list_select_related = ['user']
     list_filter = ['is_blocked']

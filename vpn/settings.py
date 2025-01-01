@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os.path
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from decouple import config
 
@@ -36,6 +36,9 @@ INSTALLED_APPS = [
 
     'import_export',
     # "jet_django",
+    "rest_framework",
+    "rest_framework_simplejwt",
+
     "accounts.apps.AccountsConfig",
     "configs.apps.ConfigsConfig",
     "cores.apps.CoresConfig",
@@ -179,3 +182,16 @@ LOGGING = {
 
 # JET_PROJECT = 'vpn_4'
 # JET_TOKEN = config("JET_TOKEN")
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+
+}

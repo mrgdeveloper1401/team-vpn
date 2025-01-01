@@ -22,10 +22,15 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 from vpn.settings import DEBUG, MEDIA_URL, MEDIA_ROOT
 from django.conf.urls.static import static
 
+
+api_url = [
+    path('auth/', include("api.v1.accounts.urls", namespace='accounts'))
+]
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('jet_api/', include('jet_django.urls')),
-]
+] + api_url
 
 
 if DEBUG:
