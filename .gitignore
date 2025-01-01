@@ -254,3 +254,6 @@ cython_debug/
 #.idea/
 
 .env
+staticfiles
+vpn.zip
+general_log_django

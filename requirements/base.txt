@@ -8,3 +8,4 @@ celery
 psycopg2-binary
 drf-spectacular
 django-import-export
+colorlog

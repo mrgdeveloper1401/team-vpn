@@ -1,10 +1,41 @@
 from django.contrib import admin
 
-from .models import Plan, Country, Domain, Config
-# Register your models here.
+from . import models
 
 
-admin.site.register(Plan)
-admin.site.register(Country)
-admin.site.register(Domain)
-admin.site.register(Config)
+# @admin.register(models.Plan)
+# class PlanAdmin(admin.ModelAdmin):
+#     list_display = ['plan_name', "duration", "volume", "price", "max_connect_device", "is_active"]
+#     list_filter = ['is_active']
+#     raw_id_fields = ['image']
+#     list_select_related = ['image']
+#     list_editable = ['is_active', "max_connect_device"]
+#     search_fields = ['plan_name']
+
+
+@admin.register(models.Country)
+class CountryAdmin(admin.ModelAdmin):
+    list_display = ['country_name', "ir_country_name", "is_active"]
+    # raw_id_fields = ['country_image']
+    # list_select_related = ['country_image']
+    list_editable = ['is_active']
+    list_filter = ['is_active']
+    search_fields = ['country_name', "ir_country_name"]
+
+
+@admin.register(models.Config)
+class ConfigAdmin(admin.ModelAdmin):
+    list_display = ["country", "is_free", "is_active", "created_at", "price"]
+    raw_id_fields = ["country"]
+    list_select_related = ["country"]
+    list_editable = ['is_free', "is_active", "price"]
+    list_filter = ['is_free', "is_active"]
+    search_fields = ['country__country_name']
+
+
+# @admin.register(models.Domain)
+# class DomainAdmin(admin.ModelAdmin):
+#     list_display = ['domain', "is_blocked", "is_active", "created_at"]
+#     list_editable = ['is_active', "is_blocked"]
+#     list_filter = ['is_blocked', "is_active"]
+#     search_fields = ['domain']

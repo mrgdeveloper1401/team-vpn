@@ -1,4 +1,4 @@
-from django.db.models import QuerySet, Manager
+from django.db.models import QuerySet, Manager, Q
 from django.utils import timezone
 
 
@@ -9,4 +9,4 @@ class SoftQuerySet(QuerySet):
 
 class SoftManager(Manager):
     def get_queryset(self):
-        return SoftQuerySet(self.model, using=self._db).filter(is_deleted=False, is_deleted_at=None)
+        return SoftQuerySet(self.model, using=self._db).filter(Q(is_deleted=False) | Q(deleted_at=None))

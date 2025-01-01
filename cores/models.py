@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from django.db import models
 
@@ -24,7 +25,7 @@ class UpdateMixin(models.Model):
 
 class SoftDeleteMixin(models.Model):
     deleted_at = models.DateTimeField(null=True, blank=True, editable=False)
-    is_deleted = models.BooleanField(null=True, default=False, editable=False)
+    is_deleted = models.BooleanField(null=True, blank=True, editable=False)
 
     def delete(self, using=None, keep_parents=False):
         self.deleted_at = timezone.now()
@@ -37,11 +38,16 @@ class SoftDeleteMixin(models.Model):
         abstract = True
 
 
-class Images(CreateMixin, UpdateMixin, SoftDeleteMixin):
-    image = models.ImageField(upload_to='images/%Y/%m/%d', height_field="image_height", width_field="image_width")
-    image_size = models.PositiveIntegerField(null=True, blank=True)
-    image_width = models.PositiveIntegerField(null=True, blank=True)
-    image_height = models.PositiveIntegerField(null=True, blank=True)
-
-    class Meta:
-        db_table = 'images'
+# class Images(CreateMixin, UpdateMixin, SoftDeleteMixin):
+#     image = models.ImageField(upload_to='images/%Y/%m/%d', height_field="image_height", width_field="image_width")
+#     image_alt = models.CharField(max_length=255, help_text=_("توضیحی برای تصویر خود بگذارید"), blank=True, null=True)
+#     image_size = models.PositiveIntegerField(null=True, blank=True)
+#     image_width = models.PositiveIntegerField(null=True, blank=True)
+#     image_height = models.PositiveIntegerField(null=True, blank=True)
+#
+#     class Meta:
+#         db_table = 'images'
+#
+#     def save(self, *args, **kwargs):
+#         self.image_size = self.image.size
+#         return super().save(*args, **kwargs)

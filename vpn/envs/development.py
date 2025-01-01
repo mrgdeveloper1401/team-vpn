@@ -28,4 +28,20 @@ DATABASES = {
     }
 }
 
-JET_TOKEN = config("JET_TOKEN", cast=str)
+# JET_TOKEN = config("JET_TOKEN", cast=str)
+
+INSTALLED_APPS += [
+    "debug_toolbar",
+]
+
+MIDDLEWARE += [
+    #     debug toolbar middlewere
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+]
+
+# The Debug Toolbar is shown only if your IP address is listed in Django’s INTERNAL_IPS setting.
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]

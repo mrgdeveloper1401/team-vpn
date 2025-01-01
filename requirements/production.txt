@@ -3,3 +3,5 @@
 gunicorn
 django-cors-headers
 whitenoise
+boto3
+django-storages

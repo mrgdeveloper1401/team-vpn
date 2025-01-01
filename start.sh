@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #python manage.py check_database
 python manage.py collectstatic --noinput

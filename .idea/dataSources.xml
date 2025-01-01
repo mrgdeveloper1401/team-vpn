@@ -8,11 +8,11 @@
       <jdbc-url>jdbc:postgresql://212.80.20.179:31210/db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="db.sqlite3" uuid="d06a882e-46b4-47c4-81d7-bbe63597f38c">
-      <driver-ref>sqlite.xerial</driver-ref>
+    <data-source source="LOCAL" name="vpndb@localhost" uuid="36b62b67-f9ea-4b97-98d1-68df985d4237">
+      <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/db.sqlite3</jdbc-url>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/vpndb</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
