@@ -13,6 +13,8 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     account_type = models.CharField(max_length=15, choices=AccountType.choices, default=AccountType.normal_user)
     accounts_status = models.CharField(max_length=15, choices=AccountStatus.choices, default=AccountStatus.NOTHING)
     REQUIRED_FIELDS = ['mobile_phone']
+    volume = models.PositiveIntegerField(blank=True, null=True)
+    volume_usage = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
         db_table = 'auth_user'

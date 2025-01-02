@@ -15,7 +15,7 @@ from .models import UserConfig
 
 @admin.register(UserConfig)
 class UserConfigAdmin(admin.ModelAdmin):
-    list_display = ['user', "config", "volume_usage", "is_active"]
+    list_display = ['user', "config", "is_active"]
     list_filter = ['is_active']
     list_editable = ['is_active']
     raw_id_fields = ['user', "config"]

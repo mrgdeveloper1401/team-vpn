@@ -36,8 +36,10 @@ INSTALLED_APPS = [
 
     'import_export',
     # "jet_django",
+    "axes",
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
 
     "accounts.apps.AccountsConfig",
     "configs.apps.ConfigsConfig",
@@ -56,6 +58,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # "accounts.middleware.LogMiddleware"
+    'axes.middleware.AxesMiddleware',
+
 ]
 
 ROOT_URLCONF = 'vpn.urls'
@@ -193,5 +197,19 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "AUTH_HEADER_TYPES": ("Bearer",),
-
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True
 }
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AXES_FAILURE_LIMIT = 3
+AXES_LOCK_OUT_FAILURE = True
+AXES_LOCKOUT_TIME = timedelta(hours=1)
+AXES_COOLOFF_TIME = timedelta(minutes=10)
+AXES_CACHE = 'default'
+# AXES_LOCKOUT_CALLABLE = 'api.v1.accounts.views.show_block'
+AXES_LOCKOUT_TEMPLATE = None

@@ -10,12 +10,12 @@ from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 class UserConfig(CreateMixin, UpdateMixin, SoftDeleteMixin):
     user = models.ForeignKey("accounts.User", on_delete=models.DO_NOTHING, related_name="user_subscription")
     config = models.ForeignKey('configs.Config', on_delete=models.DO_NOTHING, related_name="config_subscription")
-    volume_usage = models.PositiveIntegerField(default=0)
+    # volume_usage = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    volume = models.PositiveIntegerField()
+    # volume = models.PositiveIntegerField()
 
     def __str__(self):
-        return f'{self.volume_usage} {self.is_active}'
+        return f'{self.config} {self.is_active}'
 
     class Meta:
         db_table = "subscriptions"

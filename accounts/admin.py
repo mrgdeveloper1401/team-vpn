@@ -21,7 +21,8 @@ class UserConfigInline(admin.TabularInline):
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
-    list_display = ("username", "email", "first_name", "last_name", "is_staff", "date_joined")
+    list_display = ("username", "email", "first_name", "last_name", "is_staff", "is_active", "is_superuser",
+                    "date_joined", "account_type", "accounts_status")
     ordering = ('-date_joined',)
     add_fieldsets = (
         (
@@ -35,7 +36,7 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "email", "mobile_phone", "account_type",
-                                         "accounts_status")}),
+                                         "accounts_status", "volume", "volume_usage")}),
         (
             _("Permissions"),
             {
@@ -51,6 +52,7 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
     inlines = [ContentDeviceInline, UserConfigInline]
+    list_filter = ['is_active', "is_staff", "is_superuser", "account_type", "accounts_status"]
 
 
 @admin.register(ContentDevice)

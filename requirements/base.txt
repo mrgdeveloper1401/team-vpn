@@ -10,3 +10,5 @@ drf-spectacular
 django-import-export
 colorlog
 djangorestframework
+django-axes
+django-ratelimit

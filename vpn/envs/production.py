@@ -45,6 +45,7 @@ DATABASES = {
 #     }
 # }
 
+# django cors header settings
 CORS_ALLOW_ALL_ORIGINS = True
 
 # ssl config
@@ -61,6 +62,7 @@ SECURE_REFERRER_POLICY = "strict-origin"
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+
 # aws config
 # AWS_ACCESS_KEY_ID = config("ARVAN_ACCESS_KEY", cast=str)
 # AWS_SECRET_ACCESS_KEY = config("ARVAN_SECRET_KET", cast=str)
@@ -69,3 +71,5 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # AWS_SERVICE_NAME = 's3'
 # AWS_S3_REGION_NAME = 'us-east-1'
 # AWS_S3_ENDPOINT_URL = config("AWS_S3_DOMAIN", cast=str)
+
+SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
