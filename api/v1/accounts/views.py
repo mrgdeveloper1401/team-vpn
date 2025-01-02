@@ -25,7 +25,7 @@ class UserProfileViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixin
                          mixins.DestroyModelMixin, viewsets.GenericViewSet):
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated]
-    serializer_class = serializers.AdminUserProfileSerializer
+    # serializer_class = serializers.AdminUserProfileSerializer
 
     # pagination_class = AdminUserProfilePagination
 
@@ -70,9 +70,3 @@ class LoginApiView(views.APIView):
             )
             return response
         return Response({"detail": "invalid input"}, status=status.HTTP_400_BAD_REQUEST)
-
-
-# show message django axes, When the user repeats too much
-def show_block(request, credentials, *args, **kwargs):
-    return JsonResponse({"message": "you blocked, please try agin after ten minute"},
-                        status=status.HTTP_403_FORBIDDEN)

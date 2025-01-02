@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'import_export',
     # "jet_django",
     "axes",
+    "drf_spectacular",
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
@@ -191,6 +192,8 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
 }
 
 SIMPLE_JWT = {
@@ -201,12 +204,20 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True
 }
 
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'vpn project',
+    'DESCRIPTION': 'vpn project',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
+
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesStandaloneBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-AXES_FAILURE_LIMIT = 3
+AXES_FAILURE_LIMIT = 10
 AXES_LOCK_OUT_FAILURE = True
 AXES_LOCKOUT_TIME = timedelta(hours=1)
 AXES_COOLOFF_TIME = timedelta(minutes=10)

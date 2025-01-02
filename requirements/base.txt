@@ -12,3 +12,4 @@ colorlog
 djangorestframework
 django-axes
 django-ratelimit
+drf-spectacular

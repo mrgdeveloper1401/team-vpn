@@ -21,16 +21,27 @@ from django.urls import path, include
 from debug_toolbar.toolbar import debug_toolbar_urls
 from vpn.settings import DEBUG, MEDIA_URL, MEDIA_ROOT
 from django.conf.urls.static import static
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 
 api_url = [
-    path('auth/', include("api.v1.accounts.urls", namespace='accounts'))
+    path('auth/', include("api.v1.accounts.urls", namespace='accounts')),
+    path('config/', include("api.v1.configs.urls", namespace='configs')),
+]
+
+swagger_urls = [
+    # YOUR PATTERNS
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # Optional UI:
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc')
 ]
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('jet_api/', include('jet_django.urls')),
-] + api_url
+
+] + api_url + swagger_urls
 
 
 if DEBUG:
