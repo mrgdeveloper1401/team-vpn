@@ -8,6 +8,20 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 # Register your models here.
 
 
+class NumberOfDaysFilter(admin.SimpleListFilter):
+    title = _("Number of days")
+    parameter_name = 'number_of_days'
+
+    def lookups(self, request, model_admin):
+        return [
+            ("false", _("number of days is false"))
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == 'false':
+            return queryset.filter(number_of_days__isnull=False)
+
+
 class ContentDeviceInline(admin.TabularInline):
     model = ContentDevice
     extra = 1
@@ -36,7 +50,7 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "email", "mobile_phone", "account_type",
-                                         "accounts_status", "volume", "volume_usage")}),
+                                         "accounts_status", "volume", "volume_usage", "number_of_days")}),
         (
             _("Permissions"),
             {
@@ -49,10 +63,10 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
                 ),
             },
         ),
-        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
+        (_("Important dates"), {"fields": ("last_login", "date_joined", "start_premium")}),
     )
     inlines = [ContentDeviceInline, UserConfigInline]
-    list_filter = ['is_active', "is_staff", "is_superuser", "account_type", "accounts_status"]
+    list_filter = ['is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter]
 
 
 @admin.register(ContentDevice)

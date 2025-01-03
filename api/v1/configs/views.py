@@ -1,7 +1,8 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, mixins
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 from configs.models import Country, Config
+from vpn.utils.paginations import CommonPagination
 from .serializers import CountrySerializer, ConfigSerializer
 
 
@@ -30,3 +31,9 @@ class ConfigViewSet(viewsets.ModelViewSet):
         if "country_pk" in self.kwargs:
             return Config.objects.filter(country_id=self.kwargs["country_pk"])
         return super().get_queryset()
+
+
+class FreeConfigViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    queryset = Config.objects.filter(is_free=True)
+    serializer_class = ConfigSerializer
+    # pagination_class = CommonPagination

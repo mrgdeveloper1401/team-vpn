@@ -12,7 +12,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os.path
 from datetime import datetime, timedelta
 from pathlib import Path
+
+from celery.schedules import crontab
 from decouple import config
+from vpn.celery import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,6 +39,7 @@ INSTALLED_APPS = [
 
     'import_export',
     # "jet_django",
+    "django_celery_beat",
     "axes",
     "drf_spectacular",
     "rest_framework",
@@ -204,7 +208,6 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True
 }
 
-
 SPECTACULAR_SETTINGS = {
     'TITLE': 'vpn project',
     'DESCRIPTION': 'vpn project',
@@ -224,3 +227,5 @@ AXES_COOLOFF_TIME = timedelta(minutes=10)
 AXES_CACHE = 'default'
 # AXES_LOCKOUT_CALLABLE = 'api.v1.accounts.views.show_block'
 AXES_LOCKOUT_TEMPLATE = None
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'

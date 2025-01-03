@@ -15,6 +15,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     REQUIRED_FIELDS = ['mobile_phone']
     volume = models.PositiveIntegerField(blank=True, null=True)
     volume_usage = models.PositiveIntegerField(blank=True, null=True)
+    start_premium = models.DateTimeField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"))
     number_of_days = models.PositiveIntegerField(blank=True, null=True, help_text=_("تعداد روز"))
 
     class Meta:
