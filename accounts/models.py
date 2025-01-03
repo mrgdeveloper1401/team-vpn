@@ -15,18 +15,19 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     REQUIRED_FIELDS = ['mobile_phone']
     volume = models.PositiveIntegerField(blank=True, null=True)
     volume_usage = models.PositiveIntegerField(blank=True, null=True)
+    number_of_days = models.PositiveIntegerField(blank=True, null=True, help_text=_("تعداد روز"))
 
     class Meta:
         db_table = 'auth_user'
 
 
 class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):
-    device_model = models.CharField(max_length=255, help_text=_("نام دستگاه"))
+    device_model = models.CharField(max_length=255, help_text=_("مدل دستگاه"))
     device_os = models.CharField(max_length=50, help_text=_("نسخه دستگاه"))
-    device_brand = models.CharField(max_length=50, help_text=_("برند گوشی"))
-    device_number = models.CharField(max_length=255)
+    # device_brand = models.CharField(max_length=50, help_text=_("برند گوشی"), blank=True, null=True)
+    device_number = models.CharField(max_length=255, help_text=_("سریال گوشی"))
     ip_address = models.GenericIPAddressField(help_text=_("ادرس ای پی"))
-    connected_at = models.DateTimeField(auto_now=True)
+    is_connected = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='user_device',
                              help_text=_("کاربر"))
     is_blocked = models.BooleanField(default=False, help_text=_("بلاک شدن"))
@@ -63,4 +64,4 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = 'private_notification'
-
+        ordering = ("-created_at",)

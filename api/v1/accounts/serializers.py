@@ -2,7 +2,7 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
-from accounts.models import User
+from accounts.models import User, ContentDevice, PrivateNotification
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -33,7 +33,7 @@ class ListUserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", 'username', "email", "mobile_phone", "first_name", "last_name", "birth_date", "account_type",
-                  "accounts_status", "is_active", "date_joined", "volume", "volume_usage"]
+                  "accounts_status", "is_active", "date_joined", "volume", "volume_usage", "number_of_days"]
 
 
 class UpdateUserProfileSerializer(serializers.ModelSerializer):
@@ -51,3 +51,18 @@ class AdminUserProfileSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(min_length=8, style={'input_type': 'password'})
+
+
+class ContentDeviceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContentDevice
+        exclude = ['is_deleted', "deleted_at", "created_at", "updated_at"]
+        extra_kwargs = {
+            "user": {'read_only': True}
+        }
+
+
+class PrivateNotificationsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PrivateNotification
+        exclude = ['is_deleted', "deleted_at"]

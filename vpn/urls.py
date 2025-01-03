@@ -27,6 +27,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 api_url = [
     path('auth/', include("api.v1.accounts.urls", namespace='accounts')),
     path('config/', include("api.v1.configs.urls", namespace='configs')),
+    path('main_settings/', include("api.v1.main_settings.urls", namespace='main_setting')),
 ]
 
 swagger_urls = [

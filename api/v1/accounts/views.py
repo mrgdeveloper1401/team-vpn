@@ -1,18 +1,17 @@
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework import mixins
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import views
-from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from accounts.models import User
-from vpn.utils.paginations import AdminUserProfilePagination
+from accounts.models import User, ContentDevice, PrivateNotification
+from vpn.utils.paginations import CommonPagination
 from vpn.utils.permissions import NotAuthenticated
 from . import serializers
+from .serializers import ContentDeviceSerializer, PrivateNotificationsSerializer
 
 
 class UserRegisterViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -70,3 +69,34 @@ class LoginApiView(views.APIView):
             )
             return response
         return Response({"detail": "invalid input"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ContentDeviceViewSet(viewsets.ModelViewSet):
+    serializer_class = ContentDeviceSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return ContentDevice.objects.filter(user=self.request.user)
+
+    def get_permissions(self):
+        if self.request.method not in permissions.SAFE_METHODS:
+            return [IsAdminUser()]
+        return super().get_permissions()
+
+
+class PrivateNotificationViewSet(viewsets.ModelViewSet):
+    serializer_class = PrivateNotificationsSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = CommonPagination
+
+    def get_queryset(self):
+        return PrivateNotification.objects.filter(user=self.request.user)
+
+    def get_permissions(self):
+        if self.request.method not in permissions.SAFE_METHODS:
+            return [IsAdminUser()]
+        return super().get_permissions()
+
+
+# def show_request(request):
+#     return request

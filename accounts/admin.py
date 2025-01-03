@@ -22,7 +22,7 @@ class UserConfigInline(admin.TabularInline):
 @admin.register(User)
 class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
     list_display = ("username", "email", "first_name", "last_name", "is_staff", "is_active", "is_superuser",
-                    "date_joined", "account_type", "accounts_status")
+                    "date_joined", "account_type", "accounts_status", "number_of_days")
     ordering = ('-date_joined',)
     add_fieldsets = (
         (
@@ -57,13 +57,14 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
 
 @admin.register(ContentDevice)
 class ContentDeviceAdmin(ImportExportModelAdmin):
-    list_display = ['user', "ip_address", "device_model", "connected_at", "is_blocked", "created_at"]
+    list_display = ["id", 'user', "ip_address", "device_model", "is_blocked", "is_connected", "created_at"]
     raw_id_fields = ['user']
     list_select_related = ['user']
     list_filter = ['is_blocked']
     list_editable = ['is_blocked']
     search_fields = ['user__username', "ip_address"]
     ordering = ("-created_at",)
+    list_display_links = ['id', "user"]
 
 
 @admin.register(PrivateNotification)

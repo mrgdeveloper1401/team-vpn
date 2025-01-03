@@ -13,3 +13,4 @@ djangorestframework
 django-axes
 django-ratelimit
 drf-spectacular
+drf-nested-routers
