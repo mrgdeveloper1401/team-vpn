@@ -74,7 +74,7 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
 
 @admin.register(ContentDevice)
 class ContentDeviceAdmin(ImportExportModelAdmin):
-    list_display = ["id", 'user', "ip_address", "device_model", "is_blocked", "is_connected", "created_at"]
+    list_display = ["id", 'user', "ip_address", "device_model", "is_blocked", "created_at"]
     raw_id_fields = ['user']
     list_select_related = ['user']
     list_filter = ['is_blocked']

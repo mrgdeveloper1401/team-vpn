@@ -4,9 +4,9 @@ from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import views
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.models import User, ContentDevice, PrivateNotification
+from vpn.utils.create_refresh_token import get_token_refresh_token
 from vpn.utils.paginations import CommonPagination
 from vpn.utils.permissions import NotAuthenticated
 from . import serializers
@@ -54,10 +54,11 @@ class LoginApiView(views.APIView):
 
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
+        device_number = request.data.get('device_number')
         user = authenticate(username=username, password=password, request=request)
 
         if user:
-            refresh = RefreshToken.for_user(user)
+            refresh = get_token_refresh_token(user, device_number)
             response = Response({"refresh": str(refresh), "access": str(refresh.access_token)},
                                 status=status.HTTP_200_OK)
             response.set_cookie(
@@ -76,10 +77,10 @@ class ContentDeviceViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return ContentDevice.objects.filter(user=self.request.user)
 
-    def get_permissions(self):
-        if self.request.method not in permissions.SAFE_METHODS:
-            return [IsAdminUser()]
-        return super().get_permissions()
+    # def get_permissions(self):
+    #     if self.request.method not in permissions.SAFE_METHODS:
+    #         return [IsAdminUser()]
+    #     return super().get_permissions()
 
 
 class PrivateNotificationViewSet(viewsets.ModelViewSet):
