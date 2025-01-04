@@ -66,3 +66,7 @@ class PrivateNotificationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PrivateNotification
         exclude = ['is_deleted', "deleted_at"]
+
+
+class LogoutSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField()

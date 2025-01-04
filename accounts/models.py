@@ -17,6 +17,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     volume_usage = models.PositiveIntegerField(blank=True, null=True)
     start_premium = models.DateTimeField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"))
     number_of_days = models.PositiveIntegerField(blank=True, null=True, help_text=_("تعداد روز"))
+    number_of_login = models.PositiveIntegerField(help_text=_("تعداد لاگین های کاربر"), editable=False, db_default=0)
 
     class Meta:
         db_table = 'auth_user'

@@ -57,9 +57,6 @@ class LoginApiView(views.APIView):
         password = serializer.validated_data['password']
         user = authenticate(username=username, password=password, request=request)
 
-        # if user and is_already_locked(request):
-            # raise PermissionDenied("your account blocked, please try agin after ten minute")
-
         if user:
             refresh = RefreshToken.for_user(user)
             response = Response({"refresh": str(refresh), "access": str(refresh.access_token)},
@@ -67,6 +64,8 @@ class LoginApiView(views.APIView):
             response.set_cookie(
                 key='token', value=str(refresh), httponly=True, secure=True, samesite='Lax'
             )
+            user.number_of_login += 1
+            user.save()
             return response
         return Response({"detail": "invalid input"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -97,6 +96,13 @@ class PrivateNotificationViewSet(viewsets.ModelViewSet):
             return [IsAdminUser()]
         return super().get_permissions()
 
+
+class LogoutApiView(views.APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.LogoutSerializer
+
+    def post(self, request, *args, **kwargs):
+        pass
 
 # def show_request(request):
 #     return request
