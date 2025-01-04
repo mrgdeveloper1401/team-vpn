@@ -2,18 +2,18 @@ FROM python:3.12-alpine
 
 WORKDIR /home/app
 
-COPY . .
+COPY ../../ /home/app
 
 RUN apk update && \
     apk upgrade && \
     apk add python3 && \
-    apk add postgresql && \
-    apk add py3-pip && \
-    apk add nginx
+    apk add py3-pip
 
-RUN pip install --upgrade pip && \
-    pip install -r ./requiremenets/development.txt
+RUN pip install -r /home/app/requirements/base.txt
 
-EXPOSE 8000
+ENV PYTHONDONOTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-ENTRYPOINT  ["./start.sh"]
+RUN chmod +x start.sh
+
+ENTRYPOINT ["./start.sh"]

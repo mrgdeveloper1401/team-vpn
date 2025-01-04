@@ -6,9 +6,9 @@ from .models import UtilsApps, PublicNotification
 
 @admin.register(UtilsApps)
 class UtilsAppsAdmin(admin.ModelAdmin):
-    list_display = ['version_number', "is_active", "created_at"]
-    list_editable = ['is_active']
-    list_filter = ['is_active']
+    list_display = ['version_number', "is_main_settings", "created_at", "updated_at"]
+    list_editable = ['is_main_settings']
+    list_filter = ['is_main_settings']
 
 
 @admin.register(PublicNotification)

@@ -1,0 +1,16 @@
+version: 3
+
+
+services:
+  backend:
+    container_name: django_backend
+    build:
+      context: .
+    command:
+      - python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8001:8000"
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=cwb#s(*ronaf7k(o6)5!ctw#d=kb4ses2de(rzyw8y06axu-z=
+      - ALLOWED_HOST=*

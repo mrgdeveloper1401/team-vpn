@@ -45,3 +45,5 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY

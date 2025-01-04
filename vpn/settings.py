@@ -10,9 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os.path
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
+
+from celery.schedules import crontab
 from decouple import config
+from vpn.celery import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,6 +39,13 @@ INSTALLED_APPS = [
 
     'import_export',
     # "jet_django",
+    "django_celery_beat",
+    "axes",
+    "drf_spectacular",
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+
     "accounts.apps.AccountsConfig",
     "configs.apps.ConfigsConfig",
     "cores.apps.CoresConfig",
@@ -53,6 +63,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # "accounts.middleware.LogMiddleware"
+    'axes.middleware.AxesMiddleware',
+
 ]
 
 ROOT_URLCONF = 'vpn.urls'
@@ -179,3 +191,41 @@ LOGGING = {
 
 # JET_PROJECT = 'vpn_4'
 # JET_TOKEN = config("JET_TOKEN")
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'vpn project',
+    'DESCRIPTION': 'vpn project',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AXES_FAILURE_LIMIT = 10
+AXES_LOCK_OUT_FAILURE = True
+AXES_LOCKOUT_TIME = timedelta(hours=1)
+AXES_COOLOFF_TIME = timedelta(minutes=10)
+AXES_CACHE = 'default'
+# AXES_LOCKOUT_CALLABLE = 'api.v1.accounts.views.show_block'
+AXES_LOCKOUT_TEMPLATE = None
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
