@@ -1,5 +1,4 @@
 from django.contrib.auth import authenticate
-from django.http import JsonResponse
 from rest_framework import viewsets, status, permissions
 from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -97,12 +96,9 @@ class PrivateNotificationViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
 
-class LogoutApiView(views.APIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = serializers.LogoutSerializer
-
-    def post(self, request, *args, **kwargs):
-        pass
+# class LogoutApiView(viewsets.GenericViewSet, mixins.CreateModelMixin):
+#     permission_classes = [IsAuthenticated]
+#     serializer_class = serializers.LogoutSerializer
 
 # def show_request(request):
 #     return request
