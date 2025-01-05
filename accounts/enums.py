@@ -10,5 +10,4 @@ class AccountStatus(models.TextChoices):
     ACTIVE = "active"
     LIMIT = "limit"
     EXPIRED = "expired"
-    BEN = "ben"
     NOTHING = "nothing"

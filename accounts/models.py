@@ -10,8 +10,10 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     mobile_phone = models.CharField(max_length=15, blank=True, null=True, unique=True,
                                     help_text=_("شماره موبایل کاربر"))
     birth_date = models.DateField(null=True, blank=True, help_text=_("تاریخ تولد"))
-    account_type = models.CharField(max_length=15, choices=AccountType.choices, default=AccountType.normal_user)
-    accounts_status = models.CharField(max_length=15, choices=AccountStatus.choices, default=AccountStatus.NOTHING)
+    account_type = models.CharField(max_length=15, choices=AccountType.choices, default=AccountType.normal_user,
+                                    help_text=_("نوع اکانت"))
+    accounts_status = models.CharField(max_length=15, choices=AccountStatus.choices, default=AccountStatus.NOTHING,
+                                       help_text=_(""))
     REQUIRED_FIELDS = ['mobile_phone']
     volume = models.PositiveIntegerField(blank=True, null=True)
     volume_usage = models.PositiveIntegerField(blank=True, null=True)

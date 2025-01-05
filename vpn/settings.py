@@ -65,6 +65,7 @@ MIDDLEWARE = [
     # "accounts.middleware.LogMiddleware"
     'axes.middleware.AxesMiddleware',
     "vpn.utils.middleware.CheckDeviceBlockMiddleware",
+    # "vpn.utils.middleware.CheckLoginMiddleware"
 
 ]
 
