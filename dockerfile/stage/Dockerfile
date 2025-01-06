@@ -12,5 +12,6 @@ RUN apk update && \
     apk add nginx
 
 RUN pip install --upgrade pip
+
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
