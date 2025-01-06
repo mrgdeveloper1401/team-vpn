@@ -1,12 +1,12 @@
 from django.dispatch import receiver
 from django.contrib.auth.signals import user_logged_in
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from axes.signals import user_locked_out
+from rest_framework import status
 
-from accounts.enums import AccountStatus
 from accounts.models import User
 
-from axes.signals import user_locked_out
-from rest_framework.exceptions import PermissionDenied
 
 
 @receiver(user_locked_out)
@@ -21,7 +21,8 @@ def increase_number_of_login(sender, request, user, **kwargs):
         user.save()
 
 
-@receiver(post_save, sender=User)
-def raise_permission_volume(sender, instance, **kwargs):
-    if instance.volume_usage > instance.volume:
-        raise PermissionDenied("volume usage not biggest volume")
+# @receiver(pre_save, sender=User)
+# def check_maximum_device(sender, instance, **kwargs):
+#     if instance.user_device.count() > instance.number_of_device:
+#         raise ValidationError({'detail': "your account max device connection has arrived"},
+#                               code=status.HTTP_403_FORBIDDEN)

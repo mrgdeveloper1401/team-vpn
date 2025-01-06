@@ -14,7 +14,7 @@ class AccountStatus(models.TextChoices):
 
 
 class VolumeChoices(models.TextChoices):
-    NOTHING = 'nothing'
+    # NOTHING = 'nothing'
     MG = 'mg'
     GB = "gb"
     TRA = 'tra'

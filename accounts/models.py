@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import ValidationError
+from django.core.exceptions import PermissionDenied
 
 from accounts.enums import AccountType, AccountStatus, VolumeChoices
 from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
@@ -17,15 +18,16 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                                        help_text=_("active --> حجم و تاریخ انتقضای کانفینگ کاربر فعال هسنن \n"
                                                    "limit --> لیمیت یعنی کاربر حجمش تموم شده هست \n"
                                                    "expire --> یعنی کاربر روز کانفینگ ان تموم شده هست"))
-    volume_choice = models.CharField(max_length=7, choices=VolumeChoices.choices, default=VolumeChoices.NOTHING)
+    volume_choice = models.CharField(max_length=7, choices=VolumeChoices.choices, default=VolumeChoices.GB)
     volume = models.PositiveIntegerField(blank=True, default=0)
-    volume_usage = models.PositiveIntegerField(blank=True, default=0)
+    volume_usage = models.FloatField(blank=True, default=0)
     start_premium = models.DateTimeField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"))
     number_of_days = models.PositiveIntegerField(blank=True, null=True, help_text=_("تعداد روز"))
     number_of_login = models.PositiveIntegerField(help_text=_("تعداد لاگین های کاربر"), editable=False, db_default=0)
     is_connected_user = models.BooleanField(default=False, help_text=_("این فیلد مشخص میکنه"
                                                                        " که کاربر ایا به کانفیگش متصل شده هست یا خیر"))
-    
+    number_of_device = models.PositiveIntegerField(default=1, help_text=_("هر اکانت چند تا یوزر میتواند به ان متصل شود"))
+
     REQUIRED_FIELDS = ['mobile_phone']
 
     def clean(self):
@@ -43,6 +45,14 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             self.account_type = AccountType.normal_user
             self.start_premium = None
             self.number_of_days = 0
+        if self.number_of_days == 0:
+            self.volume = 0
+            self.volume_usage = 0
+            self.account_type = AccountType.normal_user
+            self.start_premium = None
+            self.accounts_status = AccountStatus.EXPIRED
+        if self.pk is None:
+            self.accounts_status = AccountStatus.NOTHING
         return super().save(*args, **kwargs)
 
     class Meta:
@@ -63,6 +73,12 @@ class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     def __str__(self):
         return f'{self.device_model} {self.device_os} {self.ip_address}'
+
+    def save(self, *args, **kwargs):
+        if self.user.user_device.count() >= self.user.number_of_device:
+            if not self.pk:
+                raise PermissionDenied('your account max device connection has arrived')
+        return super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'content_device'

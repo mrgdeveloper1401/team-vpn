@@ -36,22 +36,24 @@ class UserConfigInline(admin.TabularInline):
 @admin.register(User)
 class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
     list_display = ("username", "email", "is_staff", "is_active", "is_superuser", "date_joined",
-                    "start_premium", "volume", "account_type", "accounts_status", "number_of_days")
+                    "start_premium", "volume", "volume_usage", "account_type", "accounts_status", "number_of_days",
+                    "number_of_device")
     ordering = ('-date_joined',)
     add_fieldsets = (
         (
             None,
             {
                 "classes": ("wide",),
-                "fields": ("username", "usable_password", "password1", "password2"),
+                "fields": ("username", "usable_password", "password1", "password2", "volume", "volume_choice",
+                           "number_of_days", "start_premium", "number_of_device", "account_type", "accounts_status"),
             },
         ),
     )
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "email", "mobile_phone", "account_type",
-                                         "accounts_status", "volume", "volume_usage", "number_of_days",
-                                         "number_of_login", "is_connected_user", "volume_choice")}),
+                                         "accounts_status", "volume", "volume_usage", "volume_choice",
+                                         "number_of_login", "is_connected_user", "number_of_days", "number_of_device")}),
         (
             _("Permissions"),
             {
@@ -64,12 +66,12 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
                 ),
             },
         ),
-        (_("Important dates"), {"fields": ("last_login", "date_joined", "start_premium")}),
+        (_("Important dates"), {"fields": ("last_login", "date_joined", "start_premium", "updated_at")}),
     )
     inlines = [ContentDeviceInline, UserConfigInline]
     list_filter = ['is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter]
-    list_editable = ['account_type', "accounts_status", "start_premium", 'volume']
-    readonly_fields = ['number_of_login']
+    # list_editable = ['account_type', "accounts_status", "start_premium", 'volume']
+    readonly_fields = ['number_of_login', "updated_at"]
 
 
 @admin.register(ContentDevice)
