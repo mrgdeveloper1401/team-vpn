@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from accounts.models import User, ContentDevice, PrivateNotification
 from vpn.utils.create_refresh_token import get_token_refresh_token
-from vpn.utils.paginations import CommonPagination
+from vpn.utils.paginations import CommonPagination, AdminUserProfilePagination
 from vpn.utils.permissions import NotAuthenticated
 from . import serializers
 from .serializers import ContentDeviceSerializer, PrivateNotificationsSerializer
@@ -23,15 +23,14 @@ class UserProfileViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixin
                          mixins.DestroyModelMixin, viewsets.GenericViewSet):
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated]
-    # serializer_class = serializers.AdminUserProfileSerializer
-
-    # pagination_class = AdminUserProfilePagination
+    serializer_class = serializers.AdminUserProfileSerializer
+    pagination_class = AdminUserProfilePagination
 
     def get_queryset(self):
-        # if self.request.user.is_staff:
-        #     return self.queryset
-        # if 'pk' in self.kwargs and self.request.user.is_staff:
-        #     return self.queryset.filter(id=self.kwargs['pk'])
+        if self.request.user.is_staff:
+            return self.queryset
+        if 'pk' in self.kwargs and self.request.user.is_staff:
+            return self.queryset.filter(id=self.kwargs['pk'])
         if 'pk' in self.kwargs:
             return self.queryset.filter(id=self.request.user.id)
         return self.queryset.filter(id=self.request.user.id)
@@ -41,7 +40,7 @@ class UserProfileViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixin
             return serializers.ListUserProfileSerializer
         if self.action in ['update', 'partial_update']:
             return serializers.UpdateUserProfileSerializer
-        # return super().get_serializer_class()
+        return super().get_serializer_class()
 
 
 class LoginApiView(views.APIView):

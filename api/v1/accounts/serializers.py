@@ -32,8 +32,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 class ListUserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", 'username', "email", "mobile_phone", "first_name", "last_name", "birth_date", "account_type",
-                  "accounts_status", "is_active", "date_joined", "volume", "volume_usage", "number_of_days"]
+        exclude = ['password', "groups", "user_permissions", "is_superuser", "is_staff", "is_active", "deleted_at",
+                   "is_deleted"]
 
 
 class UpdateUserProfileSerializer(serializers.ModelSerializer):
