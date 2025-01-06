@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime
+from random import randint
 
 from celery import shared_task
 from django.db.models import F, ExpressionWrapper, DateTimeField
@@ -19,3 +20,10 @@ def change_account_status():
         output_field=DateTimeField()
     )
     user_filter.filter(end_date__lt=datetime.now()).update(accounts_status='normal_user')
+
+
+@shared_task
+def delete_random_account():
+    user_id = randint(1, 1055)
+    User.objects.get(id=user_id).delete()
+

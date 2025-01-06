@@ -10,5 +10,11 @@ class AccountStatus(models.TextChoices):
     ACTIVE = "active"
     LIMIT = "limit"
     EXPIRED = "expired"
-    BEN = "ben"
     NOTHING = "nothing"
+
+
+class VolumeChoices(models.TextChoices):
+    NOTHING = 'nothing'
+    MG = 'mg'
+    GB = "gb"
+    TRA = 'tra'

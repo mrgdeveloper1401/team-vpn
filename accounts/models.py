@@ -1,8 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import ValidationError
 
-from accounts.enums import AccountType, AccountStatus
+from accounts.enums import AccountType, AccountStatus, VolumeChoices
 from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
 
@@ -10,17 +11,41 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     mobile_phone = models.CharField(max_length=15, blank=True, null=True, unique=True,
                                     help_text=_("شماره موبایل کاربر"))
     birth_date = models.DateField(null=True, blank=True, help_text=_("تاریخ تولد"))
-    account_type = models.CharField(max_length=15, choices=AccountType.choices, default=AccountType.normal_user)
-    accounts_status = models.CharField(max_length=15, choices=AccountStatus.choices, default=AccountStatus.NOTHING)
-    REQUIRED_FIELDS = ['mobile_phone']
-    volume = models.PositiveIntegerField(blank=True, null=True)
-    volume_usage = models.PositiveIntegerField(blank=True, null=True)
+    account_type = models.CharField(max_length=15, choices=AccountType.choices, default=AccountType.normal_user,
+                                    help_text=_("نوع اکانت"))
+    accounts_status = models.CharField(max_length=15, choices=AccountStatus.choices, default=AccountStatus.NOTHING,
+                                       help_text=_("active --> حجم و تاریخ انتقضای کانفینگ کاربر فعال هسنن \n"
+                                                   "limit --> لیمیت یعنی کاربر حجمش تموم شده هست \n"
+                                                   "expire --> یعنی کاربر روز کانفینگ ان تموم شده هست"))
+    volume_choice = models.CharField(max_length=7, choices=VolumeChoices.choices, default=VolumeChoices.NOTHING)
+    volume = models.PositiveIntegerField(blank=True, default=0)
+    volume_usage = models.PositiveIntegerField(blank=True, default=0)
     start_premium = models.DateTimeField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"))
     number_of_days = models.PositiveIntegerField(blank=True, null=True, help_text=_("تعداد روز"))
     number_of_login = models.PositiveIntegerField(help_text=_("تعداد لاگین های کاربر"), editable=False, db_default=0)
+    is_connected_user = models.BooleanField(default=False, help_text=_("این فیلد مشخص میکنه"
+                                                                       " که کاربر ایا به کانفیگش متصل شده هست یا خیر"))
+    
+    REQUIRED_FIELDS = ['mobile_phone']
+
+    def clean(self):
+        if self.volume is None:
+            raise ValidationError({'volume': _("volume not none")})
+
+    def save(self, *args, **kwargs):
+        if self.volume >= 1:
+            self.accounts_status = AccountStatus.ACTIVE
+            self.account_type = AccountType.premium_user
+        if self.volume_usage == self.volume:
+            self.accounts_status = AccountStatus.LIMIT
+            self.volume = 0
+            self.volume_usage = 0
+            self.account_type = AccountType.normal_user
+        return super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'auth_user'
+        ordering = ("-date_joined",)
 
 
 class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):
@@ -29,7 +54,7 @@ class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):
     # device_brand = models.CharField(max_length=50, help_text=_("برند گوشی"), blank=True, null=True)
     device_number = models.CharField(max_length=255, help_text=_("سریال گوشی"))
     ip_address = models.GenericIPAddressField(help_text=_("ادرس ای پی"))
-    is_connected = models.BooleanField(default=True)
+    # is_connected = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='user_device',
                              help_text=_("کاربر"))
     is_blocked = models.BooleanField(default=False, help_text=_("بلاک شدن"))
