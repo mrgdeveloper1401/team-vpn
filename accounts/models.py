@@ -41,6 +41,8 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             self.volume = 0
             self.volume_usage = 0
             self.account_type = AccountType.normal_user
+            self.start_premium = None
+            self.number_of_days = 0
         return super().save(*args, **kwargs)
 
     class Meta:
