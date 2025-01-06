@@ -258,4 +258,4 @@ staticfiles
 vpn.zip
 general_log_django
 **/__pycache__
-
+**/migrations/
