@@ -2,13 +2,15 @@ version: "3"
 
 
 services:
-  backend:
+  back76end:
     container_name: django_backend
     build:
-      context: .
+      context: ../../
+      dockerfile: dockerfile/dev/Dockerfile
     command:
       - python manage.py runserver 0.0.0.0:8000 && \
-      - celery -A vpn worker -l INFO
+      - celery -A vpn worker -l INFO && \
+      - celery -A vpn flower
     ports:
       - "8001:8000"
     environment:
