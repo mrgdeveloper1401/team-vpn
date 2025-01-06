@@ -2,7 +2,7 @@ FROM python:3.12-alpine
 
 WORKDIR /home/app
 
-COPY ../../ /home/app
+COPY . /home/app
 
 RUN apk update && \
     apk upgrade && \
