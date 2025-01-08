@@ -35,7 +35,7 @@ class ListUserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = ['password', "groups", "user_permissions", "is_superuser", "is_staff", "is_active", "deleted_at",
-                   "is_deleted"]
+                   "is_deleted", "last_login"]
 
 
 class UpdateUserProfileSerializer(serializers.ModelSerializer):
