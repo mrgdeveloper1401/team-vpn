@@ -26,7 +26,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     number_of_login = models.PositiveIntegerField(help_text=_("تعداد لاگین های کاربر"), editable=False, db_default=0)
     is_connected_user = models.BooleanField(default=False, help_text=_("این فیلد مشخص میکنه"
                                                                        " که کاربر ایا به کانفیگش متصل شده هست یا خیر"))
-    number_of_device = models.PositiveIntegerField(default=1, help_text=_("هر اکانت چند تا یوزر میتواند به ان متصل شود"))
+    number_of_max_device = models.PositiveIntegerField(default=1, help_text=_("هر اکانت چند تا یوزر میتواند به ان متصل شود"))
 
     REQUIRED_FIELDS = ['mobile_phone']
 
@@ -75,7 +75,7 @@ class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):
         return f'{self.device_model} {self.device_os} {self.ip_address}'
 
     def save(self, *args, **kwargs):
-        if self.user.user_device.count() >= self.user.number_of_device:
+        if self.user.user_device.count() >= self.user.number_of_max_device:
             if not self.pk:
                 raise PermissionDenied('your account max device connection has arrived')
         return super().save(*args, **kwargs)

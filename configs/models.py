@@ -46,6 +46,7 @@ class Config(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = "config"
+        ordering = ('-created_at',)
 
 
 # class Domain(CreateMixin, UpdateMixin, SoftDeleteMixin):

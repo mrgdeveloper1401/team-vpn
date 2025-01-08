@@ -37,7 +37,7 @@ class UserConfigInline(admin.TabularInline):
 class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
     list_display = ("username", "email", "is_staff", "is_active", "is_superuser", "date_joined",
                     "start_premium", "volume", "volume_usage", "account_type", "accounts_status", "number_of_days",
-                    "number_of_device")
+                    "number_of_max_device")
     ordering = ('-date_joined',)
     add_fieldsets = (
         (
@@ -45,7 +45,7 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
             {
                 "classes": ("wide",),
                 "fields": ("username", "usable_password", "password1", "password2", "volume", "volume_choice",
-                           "number_of_days", "start_premium", "number_of_device", "account_type", "accounts_status"),
+                           "number_of_days", "start_premium", "number_of_max_device", "account_type", "accounts_status"),
             },
         ),
     )
@@ -53,7 +53,8 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
         (None, {"fields": ("username", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "email", "mobile_phone", "account_type",
                                          "accounts_status", "volume", "volume_usage", "volume_choice",
-                                         "number_of_login", "is_connected_user", "number_of_days", "number_of_device")}),
+                                         "number_of_login", "is_connected_user", "number_of_days",
+                                         "number_of_max_device")}),
         (
             _("Permissions"),
             {
