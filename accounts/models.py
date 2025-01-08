@@ -61,8 +61,8 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
 
 
 class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):
-    device_model = models.CharField(max_length=255, help_text=_("مدل دستگاه"))
-    device_os = models.CharField(max_length=50, help_text=_("نسخه دستگاه"))
+    device_model = models.CharField(max_length=255, help_text=_("مدل دستگاه"), blank=True, null=True)
+    device_os = models.CharField(max_length=50, help_text=_("نسخه دستگاه"), blank=True, null=True)
     # device_brand = models.CharField(max_length=50, help_text=_("برند گوشی"), blank=True, null=True)
     device_number = models.CharField(max_length=255, help_text=_("سریال گوشی"))
     ip_address = models.GenericIPAddressField(help_text=_("ادرس ای پی"))

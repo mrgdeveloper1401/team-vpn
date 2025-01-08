@@ -259,3 +259,5 @@ vpn.zip
 general_log_django
 **/__pycache__
 **/migrations/
+vpn/utils/data_db
+vpn/utils/impoer_date_to_db.py

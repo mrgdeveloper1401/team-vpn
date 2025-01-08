@@ -1,8 +1,10 @@
 from django.contrib.auth.password_validation import validate_password
+from rest_framework.validators import ValidationError
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
 from accounts.models import User, ContentDevice, PrivateNotification
+from vpn.utils.status_code import ErrorResponse
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -17,7 +19,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if data['password'] != data['confirm_password']:
-            raise serializers.ValidationError({"password": _("invalid input")}, code=101)
+            raise serializers.ValidationError(ErrorResponse.INVALID_INPUT, code=101)
         try:
             validate_password(data['password'])
         except Exception as e:
@@ -51,6 +53,25 @@ class AdminUserProfileSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(min_length=8, style={'input_type': 'password'})
+
+    def validate(self, attrs):
+        pop_username = self.initial_data.pop("username")
+        pop_password = self.initial_data.pop('password')
+        try:
+            device_number = self.initial_data.get('device_number')
+            ip_address = self.initial_data.get('ip_address')
+            if not device_number:
+                raise ValidationError(ErrorResponse.INVALID_INPUT)
+            if not ip_address:
+                raise ValidationError(ErrorResponse.INVALID_INPUT)
+            device = ContentDevice.objects.get(user__username=attrs["username"], device_number=device_number)
+        except ContentDevice.DoesNotExist:
+            user = User.objects.get(username=pop_username)
+            ContentDevice.objects.create(**self.initial_data, user=user)
+        else:
+            if device.is_blocked:
+                raise ValidationError(ErrorResponse.LOGIN_BLOCKED)
+        return attrs
 
 
 class ContentDeviceSerializer(serializers.ModelSerializer):

@@ -254,3 +254,6 @@ cython_debug/
 #.idea/
 
 vpn.drawio.png
+vpn/utils/data_db
+vpn.zip
+vpn/utils/impoer_date_to_db.py
