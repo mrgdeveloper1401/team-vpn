@@ -25,6 +25,14 @@ DATABASES = {
         "PORT": "5432",
         "USER": "postgres",
         "NAME": "vpndb"
+    },
+    "second_db": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("PUB_POSTDB_NAME", cast=str),
+        "USER": config("PUB_POSTDB_USER", cast=str),
+        "PASSWORD": config("PUB_POSTDB_PASSWORD", cast=str),
+        "HOST": config("PUB_POSTDB_HOST", cast=str),
+        "PORT": config("PUB_POSTDB_PORT", cast=str),
     }
 }
 

@@ -10,11 +10,11 @@ from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 class Country(CreateMixin, UpdateMixin, SoftDeleteMixin):
     country_name = models.CharField(max_length=255, db_index=True,
                                     help_text=_("Names of countries in English"))
-    ir_country_name = models.CharField(max_length=255, db_index=True,
+    ir_country_name = models.CharField(max_length=255, blank=True, null=True,
                                        help_text=_("نام کشورها به صورت فارسی"))
     # country_image = models.ForeignKey("cores.Images", on_delete=models.DO_NOTHING, related_name="country_image",
     #                                   blank=True, null=True, help_text=_("عکس کشور"))
-    country_code = models.CharField(max_length=255)
+    country_code = models.CharField(max_length=255, help_text=_("کد کشور"))
     is_active = models.BooleanField(default=True, help_text=_("قابل نمایش"))
 
     def __str__(self):
@@ -35,6 +35,9 @@ class Config(CreateMixin, UpdateMixin, SoftDeleteMixin):
     price = models.FloatField(blank=True, null=True, help_text=_("قیمت کانفیگ"))
     # volume = models.PositiveIntegerField(help_text=_("حجم کانفینگ"))
 
+    def __str__(self):
+        return self.config
+
     def clean(self):
         if self.is_free and self.price:
             raise ValidationError({"price": _("is free and price both not choices")})
@@ -43,6 +46,7 @@ class Config(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     class Meta:
         db_table = "config"
+        ordering = ('-created_at',)
 
 
 # class Domain(CreateMixin, UpdateMixin, SoftDeleteMixin):

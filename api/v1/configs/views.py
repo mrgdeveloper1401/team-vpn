@@ -35,8 +35,9 @@ class ConfigViewSet(viewsets.ModelViewSet):
 
 
 class FreeConfigViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-    queryset = Config.objects.filter(is_free=True)
+    queryset = Config.objects.filter(is_free=True, is_active=True).select_related("country")
     serializer_class = ConfigSerializer
+    # permission_classes = [IsAuthenticated]
     # pagination_class = CommonPagination
 
 
@@ -45,4 +46,4 @@ class UserConfigViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewse
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return UserConfig.objects.filter(user=self.request.user).select_related("config")
+        return UserConfig.objects.filter(user=self.request.user).select_related("config__country")

@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.dispatch import receiver
 from django.contrib.auth.signals import user_logged_in
 from rest_framework.exceptions import PermissionDenied
@@ -15,4 +16,5 @@ def raise_permission_denied(*args, **kwargs):
 def increase_number_of_login(sender, request, user, **kwargs):
     if isinstance(user, User):
         user.number_of_login += 1
+        user.last_login = timezone.now()
         user.save()

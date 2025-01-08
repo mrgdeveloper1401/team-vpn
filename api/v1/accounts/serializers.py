@@ -1,8 +1,10 @@
 from django.contrib.auth.password_validation import validate_password
+from rest_framework.validators import ValidationError
 from rest_framework import serializers
-from django.utils.translation import gettext_lazy as _
+# from django.utils.translation import gettext_lazy as _
 
 from accounts.models import User, ContentDevice, PrivateNotification
+from vpn.utils.status_code import ErrorResponse
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -17,7 +19,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if data['password'] != data['confirm_password']:
-            raise serializers.ValidationError({"password": _("invalid input")}, code=101)
+            raise serializers.ValidationError(ErrorResponse.INVALID_INPUT, code=101)
         try:
             validate_password(data['password'])
         except Exception as e:
@@ -39,7 +41,7 @@ class ListUserProfileSerializer(serializers.ModelSerializer):
 class UpdateUserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', "email", "mobile_phone", "first_name", "last_name", "birth_date"]
+        fields = ["email", "mobile_phone", "first_name", "last_name", "birth_date"]
 
 
 class AdminUserProfileSerializer(serializers.ModelSerializer):
@@ -51,6 +53,27 @@ class AdminUserProfileSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(min_length=8, style={'input_type': 'password'})
+    device_number = serializers.CharField()
+    ip_address = serializers.IPAddressField()
+
+    def validate(self, attrs):
+        try:
+            device_number = attrs.get('device_number')
+            ip_address = attrs.get('ip_address')
+            if not device_number:
+                raise ValidationError(ErrorResponse.INVALID_INPUT)
+            if not ip_address:
+                raise ValidationError(ErrorResponse.INVALID_INPUT)
+            device = ContentDevice.objects.get(user__username=attrs["username"], device_number=device_number)
+        except ContentDevice.DoesNotExist:
+            user = User.objects.get(username=attrs['username'])
+            del self.initial_data['username']
+            del self.initial_data['password']
+            ContentDevice.objects.create(**self.initial_data, user=user)
+        else:
+            if device.is_blocked:
+                raise ValidationError(ErrorResponse.LOGIN_BLOCKED)
+        return attrs
 
 
 class ContentDeviceSerializer(serializers.ModelSerializer):

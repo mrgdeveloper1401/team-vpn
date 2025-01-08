@@ -34,6 +34,11 @@ class UserProfileViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixin
         if 'pk' in self.kwargs:
             return self.queryset.filter(id=self.request.user.id)
         return self.queryset.filter(id=self.request.user.id)
+    
+    def get_permissions(self):
+        if self.request.method == 'DELETE':
+            return [IsAdminUser()]
+        return super().get_permissions()
 
     def get_serializer_class(self):
         if self.action in ["list", 'retrieve']:
