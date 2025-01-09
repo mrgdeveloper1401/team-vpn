@@ -37,7 +37,7 @@ class UserConfigInline(admin.TabularInline):
 class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
     list_display = ("username", "email", "is_staff", "is_active", "is_superuser", "date_joined",
                     "start_premium", "volume", "volume_usage", "account_type", "accounts_status", "number_of_days",
-                    "number_of_max_device")
+                    "number_of_max_device", "end_date_subscription")
     ordering = ('-date_joined',)
     add_fieldsets = (
         (
