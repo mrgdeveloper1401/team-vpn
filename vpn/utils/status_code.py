@@ -8,3 +8,4 @@ class ErrorResponse:
     CODE_IS_EXPIRED_OR_INVALID = {'detail': 'CODE_IS_EXPIRED_OR_INVALID', 'error_code': 7}
     SOMETHING_WENT_WRONG = {'detail': "WE_ALSO_DON'T_KNOW_WHAT_HAPPENED!", 'error_code': 8}
     LOGIN_BLOCKED = {'detail': 'LOGIN_BLOCKED', 'error_code': 9}
+    USER_USAGE_LIMIT = {'detail': 'USER_USAGE_LIMIT', 'error_code': 10}

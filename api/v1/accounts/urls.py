@@ -21,6 +21,7 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/', views.LoginApiView.as_view(), name='login'),
     path('token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),
+    path('volume_usage/', views.VolumeUsageApiView.as_view(), name='volume_usage'),
 
     # path('show_request/', views.show_request, name='show_request'),
 ]

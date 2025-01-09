@@ -20,7 +20,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                                                    "expire --> یعنی کاربر روز کانفینگ ان تموم شده هست"))
     volume_choice = models.CharField(max_length=7, choices=VolumeChoices.choices, default=VolumeChoices.GB)
     volume = models.PositiveIntegerField(blank=True, default=0)
-    volume_usage = models.FloatField(blank=True, default=0)
+    volume_usage = models.FloatField(blank=True, default=0, help_text=_("حجم مصرفی میباشد که بر اساس مگابایت هست"))
     start_premium = models.DateTimeField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"))
     number_of_days = models.PositiveIntegerField(blank=True, null=True, help_text=_("تعداد روز"))
     number_of_login = models.PositiveIntegerField(help_text=_("تعداد لاگین های کاربر"), editable=False, db_default=0)
@@ -35,24 +35,13 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             raise ValidationError({'volume': _("volume not none")})
 
     def save(self, *args, **kwargs):
-        if self.volume >= 1:
-            self.accounts_status = AccountStatus.ACTIVE
-            self.account_type = AccountType.premium_user
-        if self.volume_usage == self.volume:
-            self.accounts_status = AccountStatus.LIMIT
-            self.volume = 0
-            self.volume_usage = 0
-            self.account_type = AccountType.normal_user
-            self.start_premium = None
-            self.number_of_days = 0
-        if self.number_of_days == 0:
-            self.volume = 0
-            self.volume_usage = 0
-            self.account_type = AccountType.normal_user
-            self.start_premium = None
-            self.accounts_status = AccountStatus.EXPIRED
-        if self.pk is None:
-            self.accounts_status = AccountStatus.NOTHING
+        if self.volume_choice == VolumeChoices.GB:
+            if (self.volume_usage / 1000) == self.volume or (self.volume_usage / 1000) > self.volume:
+                self.accounts_status = AccountStatus.LIMIT
+                self.account_type = AccountType.normal_user
+            elif self.volume > self.volume_usage / 1000:
+                self.accounts_status = AccountStatus.ACTIVE
+                self.account_type = AccountType.premium_user
         return super().save(*args, **kwargs)
 
     class Meta:
