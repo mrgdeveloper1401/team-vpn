@@ -53,7 +53,7 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
         (None, {"fields": ("username", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "email", "mobile_phone", "account_type",
                                          "accounts_status", "volume", "volume_usage", "volume_choice",
-                                         "number_of_login", "is_connected_user", "number_of_days",
+                                         "number_of_login", "number_of_days",
                                          "number_of_max_device")}),
         (
             _("Permissions"),
@@ -62,6 +62,7 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
                     "is_active",
                     "is_staff",
                     "is_superuser",
+                    "is_connected_user",
                     "groups",
                     "user_permissions",
                 ),

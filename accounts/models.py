@@ -23,8 +23,8 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     volume_choice = models.CharField(max_length=7, choices=VolumeChoices.choices, default=VolumeChoices.GB)
     volume = models.PositiveIntegerField(blank=True, default=0)
     volume_usage = models.FloatField(blank=True, default=0, help_text=_("حجم مصرفی میباشد که بر اساس مگابایت هست"))
-    start_premium = models.DateTimeField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"))
-    number_of_days = models.PositiveIntegerField(blank=True, null=True, help_text=_("تعداد روز"))
+    start_premium = models.DateTimeField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"), default=timezone.now)
+    number_of_days = models.PositiveIntegerField(blank=True, null=True, help_text=_("تعداد روز"), default=0)
     number_of_login = models.PositiveIntegerField(help_text=_("تعداد لاگین های کاربر"), editable=False, db_default=0)
     is_connected_user = models.BooleanField(default=False, help_text=_("این فیلد مشخص میکنه"
                                                                        " که کاربر ایا به کانفیگش متصل شده هست یا خیر"))
@@ -44,6 +44,8 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             raise ValidationError({'volume': _("volume not none")})
 
     def save(self, *args, **kwargs):
+        # if self.pk is None:
+        #     self.start_premium = timezone.now()
         #   if admin volume_choice == GIG
         if self.volume_choice == VolumeChoices.GB:
             if (self.volume_usage / 1_000) == self.volume or (self.volume_usage / 1_000) > self.volume:
@@ -52,7 +54,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             if self.volume > self.volume_usage / 1_000:
                 self.accounts_status = AccountStatus.ACTIVE
                 self.account_type = AccountType.premium_user
-            if self.end_date_subscription < timezone.now():
+            if self.end_date_subscription and self.end_date_subscription < timezone.now():
                 self.accounts_status = AccountStatus.EXPIRED
                 self.account_type = AccountType.normal_user
         # if volume_choice == MEG
@@ -63,7 +65,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             if self.volume > self.volume_usage:
                 self.accounts_status = AccountStatus.ACTIVE
                 self.account_type = AccountType.premium_user
-            if self.end_date_subscription < timezone.now():
+            if self.end_date_subscription and self.end_date_subscription < timezone.now():
                 self.accounts_status = AccountStatus.EXPIRED
                 self.account_type = AccountType.normal_user
         # if volume_choice = TERA
@@ -74,9 +76,11 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             if self.volume > self.volume_usage / 1_000_000:
                 self.accounts_status = AccountStatus.ACTIVE
                 self.account_type = AccountType.premium_user
-            if self.end_date_subscription < timezone.now():
+            if self.end_date_subscription and self.end_date_subscription < timezone.now():
                 self.accounts_status = AccountStatus.EXPIRED
                 self.account_type = AccountType.normal_user
+        if self.pk is None:
+            self.accounts_status = AccountStatus.NOTHING
         return super().save(*args, **kwargs)
 
     class Meta:

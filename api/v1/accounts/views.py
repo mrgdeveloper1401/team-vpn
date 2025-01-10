@@ -14,6 +14,7 @@ from . import serializers
 from .serializers import ContentDeviceSerializer, PrivateNotificationsSerializer, VolumeUsageSerializer
 from vpn.utils.status_code import ErrorResponse
 
+
 class UserRegisterViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.UserRegisterSerializer
@@ -21,10 +22,10 @@ class UserRegisterViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 
 class UserProfileViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
-                         mixins.DestroyModelMixin, viewsets.GenericViewSet):
+                         viewsets.GenericViewSet):
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated]
-    serializer_class = serializers.AdminUserProfileSerializer
+    # serializer_class = serializers.AdminUserProfileSerializer
     pagination_class = AdminUserProfilePagination
 
     def get_queryset(self):
@@ -36,10 +37,10 @@ class UserProfileViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixin
             return self.queryset.filter(id=self.request.user.id)
         return self.queryset.filter(id=self.request.user.id)
     
-    def get_permissions(self):
-        if self.request.method == 'DELETE':
-            return [IsAdminUser()]
-        return super().get_permissions()
+    # def get_permissions(self):
+    #     if self.request.method == 'DELETE':
+    #         return [IsAdminUser()]
+    #     return super().get_permissions()
 
     def get_serializer_class(self):
         if self.action in ["list", 'retrieve']:
@@ -123,3 +124,25 @@ class VolumeUsageApiView(views.APIView):
             request.user.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(ErrorResponse.USER_USAGE_LIMIT, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateConnectionApiView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        if user.accounts_status == AccountStatus.ACTIVE:
+            user.is_connected_user = True
+            user.save()
+            return Response(status=status.HTTP_200_OK)
+        return Response(ErrorResponse.USER_USAGE_LIMIT, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeactivateUserConnectionApiView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        user.is_connected_user = False
+        user.save()
+        return Response(status=status.HTTP_200_OK)
