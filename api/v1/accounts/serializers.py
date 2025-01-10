@@ -1,7 +1,7 @@
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.validators import ValidationError
 from rest_framework import serializers
-# from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from accounts.models import User, ContentDevice, PrivateNotification
 from vpn.utils.status_code import ErrorResponse
@@ -35,7 +35,7 @@ class ListUserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = ['password', "groups", "user_permissions", "is_superuser", "is_staff", "is_active", "deleted_at",
-                   "is_deleted"]
+                   "is_deleted", "last_login"]
 
 
 class UpdateUserProfileSerializer(serializers.ModelSerializer):
@@ -96,3 +96,9 @@ class PrivateNotificationsSerializer(serializers.ModelSerializer):
 #
 #     def save(self, **kwargs):
 #         pass
+
+
+class VolumeUsageSerializer(serializers.Serializer):
+    volume_usage = serializers.FloatField(
+        help_text=_("حجم مصرفی به صورت مگابایت ارسال شود")
+    )

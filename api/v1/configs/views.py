@@ -8,7 +8,7 @@ from .serializers import CountrySerializer, ConfigSerializer, UserConfigurationS
 
 
 class CountryViewSet(viewsets.ModelViewSet):
-    queryset = Country.objects.filter(is_active=True)
+    queryset = Country.objects.all()
     serializer_class = CountrySerializer
     permission_classes = [IsAuthenticated]
 
@@ -35,7 +35,7 @@ class ConfigViewSet(viewsets.ModelViewSet):
 
 
 class FreeConfigViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-    queryset = Config.objects.filter(is_free=True, is_active=True).select_related("country")
+    queryset = Config.objects.select_related("country")
     serializer_class = ConfigSerializer
     # permission_classes = [IsAuthenticated]
     # pagination_class = CommonPagination

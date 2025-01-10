@@ -16,21 +16,21 @@ from . import models
 
 @admin.register(models.Country)
 class CountryAdmin(ImportExportModelAdmin):
-    list_display = ['country_name', "ir_country_name", "is_active"]
+    list_display = ['en_country_name', "fa_country_name"]
     # raw_id_fields = ['country_image']
     # list_select_related = ['country_image']
-    list_editable = ['is_active']
-    list_filter = ['is_active']
-    search_fields = ['country_name', "ir_country_name"]
+    # list_editable = ['is_active']
+    # list_filter = ['is_active']
+    search_fields = ['en_country_name', "fa_country_name"]
 
 
 @admin.register(models.Config)
 class ConfigAdmin(ImportExportModelAdmin):
-    list_display = ["country", "is_free", "is_active", "created_at", "price"]
+    list_display = ["country", "created_at"]
     raw_id_fields = ["country"]
     list_select_related = ["country"]
-    list_editable = ['is_free', "is_active", "price"]
-    list_filter = ['is_free', "is_active"]
+    # list_editable = ["is_active"]
+    # list_filter = ["is_active"]
     search_fields = ['country__country_name']
 
 

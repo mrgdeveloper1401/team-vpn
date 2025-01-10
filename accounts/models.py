@@ -1,3 +1,5 @@
+from datetime import timedelta
+from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -20,37 +22,63 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                                                    "expire --> یعنی کاربر روز کانفینگ ان تموم شده هست"))
     volume_choice = models.CharField(max_length=7, choices=VolumeChoices.choices, default=VolumeChoices.GB)
     volume = models.PositiveIntegerField(blank=True, default=0)
-    volume_usage = models.FloatField(blank=True, default=0)
-    start_premium = models.DateTimeField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"))
-    number_of_days = models.PositiveIntegerField(blank=True, null=True, help_text=_("تعداد روز"))
+    volume_usage = models.FloatField(blank=True, default=0, help_text=_("حجم مصرفی میباشد که بر اساس مگابایت هست"))
+    start_premium = models.DateTimeField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"), default=timezone.now)
+    number_of_days = models.PositiveIntegerField(blank=True, null=True, help_text=_("تعداد روز"), default=0)
     number_of_login = models.PositiveIntegerField(help_text=_("تعداد لاگین های کاربر"), editable=False, db_default=0)
     is_connected_user = models.BooleanField(default=False, help_text=_("این فیلد مشخص میکنه"
                                                                        " که کاربر ایا به کانفیگش متصل شده هست یا خیر"))
-    number_of_max_device = models.PositiveIntegerField(default=1, help_text=_("هر اکانت چند تا یوزر میتواند به ان متصل شود"))
+    number_of_max_device = models.PositiveIntegerField(default=1,
+                                                       help_text=_("هر اکانت چند تا یوزر میتواند به ان متصل شود"))
 
     REQUIRED_FIELDS = ['mobile_phone']
+
+    @property
+    def end_date_subscription(self):
+        if self.start_premium is not None and self.number_of_days is not None:
+            return self.start_premium + timedelta(days=self.number_of_days)
+        return None
 
     def clean(self):
         if self.volume is None:
             raise ValidationError({'volume': _("volume not none")})
 
     def save(self, *args, **kwargs):
-        if self.volume >= 1:
-            self.accounts_status = AccountStatus.ACTIVE
-            self.account_type = AccountType.premium_user
-        if self.volume_usage == self.volume:
-            self.accounts_status = AccountStatus.LIMIT
-            self.volume = 0
-            self.volume_usage = 0
-            self.account_type = AccountType.normal_user
-            self.start_premium = None
-            self.number_of_days = 0
-        if self.number_of_days == 0:
-            self.volume = 0
-            self.volume_usage = 0
-            self.account_type = AccountType.normal_user
-            self.start_premium = None
-            self.accounts_status = AccountStatus.EXPIRED
+        # if self.pk is None:
+        #     self.start_premium = timezone.now()
+        #   if admin volume_choice == GIG
+        if self.volume_choice == VolumeChoices.GB:
+            if (self.volume_usage / 1_000) == self.volume or (self.volume_usage / 1_000) > self.volume:
+                self.accounts_status = AccountStatus.LIMIT
+                self.account_type = AccountType.normal_user
+            if self.volume > self.volume_usage / 1_000:
+                self.accounts_status = AccountStatus.ACTIVE
+                self.account_type = AccountType.premium_user
+            if self.end_date_subscription and self.end_date_subscription < timezone.now():
+                self.accounts_status = AccountStatus.EXPIRED
+                self.account_type = AccountType.normal_user
+        # if volume_choice == MEG
+        elif self.volume_choice == VolumeChoices.MG:
+            if self.volume_usage == self.volume or self.volume_usage > self.volume:
+                self.accounts_status = AccountStatus.LIMIT
+                self.account_type = AccountType.normal_user
+            if self.volume > self.volume_usage:
+                self.accounts_status = AccountStatus.ACTIVE
+                self.account_type = AccountType.premium_user
+            if self.end_date_subscription and self.end_date_subscription < timezone.now():
+                self.accounts_status = AccountStatus.EXPIRED
+                self.account_type = AccountType.normal_user
+        # if volume_choice = TERA
+        else:
+            if (self.volume_usage / 1_000_000) == self.volume or (self.volume_usage / 1_000_000) > self.volume:
+                self.accounts_status = AccountStatus.LIMIT
+                self.account_type = AccountType.normal_user
+            if self.volume > self.volume_usage / 1_000_000:
+                self.accounts_status = AccountStatus.ACTIVE
+                self.account_type = AccountType.premium_user
+            if self.end_date_subscription and self.end_date_subscription < timezone.now():
+                self.accounts_status = AccountStatus.EXPIRED
+                self.account_type = AccountType.normal_user
         if self.pk is None:
             self.accounts_status = AccountStatus.NOTHING
         return super().save(*args, **kwargs)
