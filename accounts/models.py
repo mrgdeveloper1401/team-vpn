@@ -7,6 +7,7 @@ from django.core.validators import ValidationError
 from django.core.exceptions import PermissionDenied
 
 from accounts.enums import AccountType, AccountStatus, VolumeChoices
+from accounts.managers import DeleteQuerySet
 from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
 
@@ -16,7 +17,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     birth_date = models.DateField(null=True, blank=True, help_text=_("تاریخ تولد"))
     account_type = models.CharField(max_length=15, choices=AccountType.choices, default=AccountType.normal_user,
                                     help_text=_("نوع اکانت"))
-    accounts_status = models.CharField(max_length=15, choices=AccountStatus.choices, default=AccountStatus.NOTHING,
+    accounts_status = models.CharField(max_length=15, choices=AccountStatus.choices, default=AccountStatus.EXPIRED,
                                        help_text=_("active --> حجم و تاریخ انتقضای کانفینگ کاربر فعال هسنن \n"
                                                    "limit --> لیمیت یعنی کاربر حجمش تموم شده هست \n"
                                                    "expire --> یعنی کاربر روز کانفینگ ان تموم شده هست"))
@@ -38,6 +39,16 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
         if self.start_premium is not None and self.number_of_days is not None:
             return self.start_premium + timedelta(days=self.number_of_days)
         return None
+
+    @property
+    def remaining_volume_amount(self):
+        if self.volume_choice == VolumeChoices.GB:
+            remaining = self.volume - (self.volume_usage / 1000)
+        elif self.volume_choice == VolumeChoices.MG:
+            remaining = self.volume - self.volume_usage
+        else:
+            remaining = self.volume - (self.volume_usage / 1_000_000)
+        return f'{remaining}, {self.volume_choice}'
 
     def clean(self):
         if self.volume is None:
@@ -79,13 +90,20 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             if self.end_date_subscription and self.end_date_subscription < timezone.now():
                 self.accounts_status = AccountStatus.EXPIRED
                 self.account_type = AccountType.normal_user
-        if self.pk is None:
-            self.accounts_status = AccountStatus.NOTHING
+        # if self.pk is None:
+        #     self.accounts_status = AccountStatus.NOTHING
         return super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'auth_user'
         ordering = ("-date_joined",)
+
+
+class RecycleUser(User):
+    objects = DeleteQuerySet()
+
+    class Meta:
+        proxy = True
 
 
 class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):

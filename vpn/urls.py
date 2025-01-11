@@ -30,6 +30,10 @@ api_url = [
     path('main_settings/', include("api.v1.main_settings.urls", namespace='main_setting')),
 ]
 
+admin_api = [
+    path('admin_auth/', include("api.v1_admin.accounts.urls", namespace='admin_auth')),
+    path('admin_config/', include("api.v1_admin.configs.urls", namespace='admin_config')),
+]
 swagger_urls = [
     # YOUR PATTERNS
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -42,7 +46,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # path('jet_api/', include('jet_django.urls')),
 
-] + api_url + swagger_urls
+] + api_url + swagger_urls + admin_api
 
 
 if DEBUG:

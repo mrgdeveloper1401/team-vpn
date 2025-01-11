@@ -1,7 +1,8 @@
 from django.contrib import admin
+from django.contrib.auth.forms import UserChangeForm, AdminUserCreationForm
 from django.utils.translation import gettext_lazy as _
 
-from .models import User, ContentDevice, PrivateNotification
+from .models import User, ContentDevice, PrivateNotification, RecycleUser
 from subscriptions.models import UserConfig
 from import_export.admin import ImportExportModelAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -35,9 +36,9 @@ class UserConfigInline(admin.TabularInline):
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
-    list_display = ("username", "email", "is_staff", "is_active", "is_superuser", "date_joined",
+    list_display = ("username", "email", "is_staff", "is_active", "is_connected_user", "is_superuser", "date_joined",
                     "start_premium", "volume", "volume_usage", "account_type", "accounts_status", "number_of_days",
-                    "number_of_max_device", "end_date_subscription")
+                    "number_of_max_device", "end_date_subscription", "remaining_volume_amount")
     ordering = ('-date_joined',)
     add_fieldsets = (
         (
@@ -97,3 +98,14 @@ class PrivateNotificationAdmin(ImportExportModelAdmin):
     search_fields = ['title', "user__username"]
     list_editable = ['is_active']
     ordering = ("-created_at",)
+
+
+@admin.register(RecycleUser)
+class RecycleUserAdmin(admin.ModelAdmin):
+    form = UserChangeForm
+    add_form = AdminUserCreationForm
+    actions = ['recovery_user']
+
+    @admin.action(description='Recover user')
+    def recovery_user(self, request, queryset):
+        queryset.update(is_deleted=False, deleted_at=None)

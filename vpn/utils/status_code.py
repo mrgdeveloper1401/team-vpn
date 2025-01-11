@@ -9,3 +9,6 @@ class ErrorResponse:
     SOMETHING_WENT_WRONG = {'detail': "WE_ALSO_DON'T_KNOW_WHAT_HAPPENED!", 'error_code': 8}
     LOGIN_BLOCKED = {'detail': 'LOGIN_BLOCKED', 'error_code': 9}
     USER_USAGE_LIMIT = {'detail': 'USER_USAGE_LIMIT', 'error_code': 10}
+    FIELD_NOT_ACTIVE = {'detail': 'FIELD_NOT_ACTIVE', 'error_code': 11}
+    FIELD_IS_ACTIVE = {"detail": "FIELD_IS_ACTIVE", 'error_code': 12}
+    INVALID_PASSWORD = {"detail": "INVALID_PASSWORD", 'error_code': 13}

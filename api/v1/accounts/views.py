@@ -25,22 +25,11 @@ class UserProfileViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixin
                          viewsets.GenericViewSet):
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated]
-    # serializer_class = serializers.AdminUserProfileSerializer
     pagination_class = AdminUserProfilePagination
 
     def get_queryset(self):
-        if self.request.user.is_staff:
-            return self.queryset
-        if 'pk' in self.kwargs and self.request.user.is_staff:
-            return self.queryset.filter(id=self.kwargs['pk'])
-        if 'pk' in self.kwargs:
-            return self.queryset.filter(id=self.request.user.id)
         return self.queryset.filter(id=self.request.user.id)
-    
-    # def get_permissions(self):
-    #     if self.request.method == 'DELETE':
-    #         return [IsAdminUser()]
-    #     return super().get_permissions()
+
 
     def get_serializer_class(self):
         if self.action in ["list", 'retrieve']:
@@ -83,11 +72,6 @@ class ContentDeviceViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return ContentDevice.objects.filter(user=self.request.user)
 
-    # def get_permissions(self):
-    #     if self.request.method not in permissions.SAFE_METHODS:
-    #         return [IsAdminUser()]
-    #     return super().get_permissions()
-
 
 class PrivateNotificationViewSet(viewsets.ModelViewSet):
     serializer_class = PrivateNotificationsSerializer
@@ -127,11 +111,17 @@ class VolumeUsageApiView(views.APIView):
 
 
 class UpdateConnectionApiView(views.APIView):
+    """
+    this api update field is_connected_user
+    you have error 400, when two something was happened
+    if a user account is not active
+    if field is_connected_user is active
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        if user.accounts_status == AccountStatus.ACTIVE:
+        if user.accounts_status == AccountStatus.ACTIVE and not user.is_connected_user:
             user.is_connected_user = True
             user.save()
             return Response(status=status.HTTP_200_OK)
@@ -139,10 +129,15 @@ class UpdateConnectionApiView(views.APIView):
 
 
 class DeactivateUserConnectionApiView(views.APIView):
+    """
+    this api deactivate field is_connected_user
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        user.is_connected_user = False
-        user.save()
-        return Response(status=status.HTTP_200_OK)
+        if user.is_connected_user:
+            user.is_connected_user = False
+            user.save()
+            return Response(status=status.HTTP_200_OK)
+        return Response(ErrorResponse.FIELD_NOT_ACTIVE)

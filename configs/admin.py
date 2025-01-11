@@ -16,12 +16,13 @@ from . import models
 
 @admin.register(models.Country)
 class CountryAdmin(ImportExportModelAdmin):
-    list_display = ['en_country_name', "fa_country_name"]
+    list_display = ["id", 'en_country_name', "fa_country_name"]
     # raw_id_fields = ['country_image']
     # list_select_related = ['country_image']
     # list_editable = ['is_active']
     # list_filter = ['is_active']
     search_fields = ['en_country_name', "fa_country_name"]
+    list_display_links = ['id', "en_country_name"]
 
 
 @admin.register(models.Config)
