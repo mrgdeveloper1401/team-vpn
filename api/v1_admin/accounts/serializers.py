@@ -3,7 +3,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
-from accounts.models import User, ContentDevice
+from accounts.models import User, ContentDevice, OneDayLeftUser
 from vpn.utils.status_code import ErrorResponse
 
 
@@ -66,3 +66,9 @@ class AdminUserContentDeviceSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_id = self.context['user_pk']
         return ContentDevice.objects.create(user_id=user_id, **validated_data)
+
+
+class OneDayLeftUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OneDayLeftUser
+        fields = ['username', "start_premium", "number_of_days", "end_date_subscription"]
