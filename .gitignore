@@ -261,3 +261,11 @@ general_log_django
 **/migrations/
 vpn/utils/data_db
 vpn/utils/impoer_date_to_db.py
+#templates
+static
+node_modules
+frontend
+vpn/firebase_conf
+node_modules
+package-lock.json
+package.json

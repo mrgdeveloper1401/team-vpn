@@ -7,7 +7,10 @@ from django.core.validators import ValidationError
 from django.core.exceptions import PermissionDenied
 
 from accounts.enums import AccountType, AccountStatus, VolumeChoices
+from accounts.managers import DeleteQuerySet
 from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
+# from .tasks import send_notification_task
+from vpn.utils.status_code import ErrorResponse
 
 
 class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
@@ -16,7 +19,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     birth_date = models.DateField(null=True, blank=True, help_text=_("تاریخ تولد"))
     account_type = models.CharField(max_length=15, choices=AccountType.choices, default=AccountType.normal_user,
                                     help_text=_("نوع اکانت"))
-    accounts_status = models.CharField(max_length=15, choices=AccountStatus.choices, default=AccountStatus.NOTHING,
+    accounts_status = models.CharField(max_length=15, choices=AccountStatus.choices, default=AccountStatus.EXPIRED,
                                        help_text=_("active --> حجم و تاریخ انتقضای کانفینگ کاربر فعال هسنن \n"
                                                    "limit --> لیمیت یعنی کاربر حجمش تموم شده هست \n"
                                                    "expire --> یعنی کاربر روز کانفینگ ان تموم شده هست"))
@@ -30,7 +33,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                                                                        " که کاربر ایا به کانفیگش متصل شده هست یا خیر"))
     number_of_max_device = models.PositiveIntegerField(default=1,
                                                        help_text=_("هر اکانت چند تا یوزر میتواند به ان متصل شود"))
-
+    fcm_token = models.CharField(max_length=255, blank=True, null=True, help_text=_("fcm token"))
     REQUIRED_FIELDS = ['mobile_phone']
 
     @property
@@ -38,6 +41,16 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
         if self.start_premium is not None and self.number_of_days is not None:
             return self.start_premium + timedelta(days=self.number_of_days)
         return None
+
+    @property
+    def remaining_volume_amount(self):
+        if self.volume_choice == VolumeChoices.GB:
+            remaining = self.volume - (self.volume_usage / 1000)
+        elif self.volume_choice == VolumeChoices.MG:
+            remaining = self.volume - self.volume_usage
+        else:
+            remaining = self.volume - (self.volume_usage / 1_000_000)
+        return f'{remaining}, {self.volume_choice}'
 
     def clean(self):
         if self.volume is None:
@@ -79,13 +92,20 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             if self.end_date_subscription and self.end_date_subscription < timezone.now():
                 self.accounts_status = AccountStatus.EXPIRED
                 self.account_type = AccountType.normal_user
-        if self.pk is None:
-            self.accounts_status = AccountStatus.NOTHING
+        # if self.pk is None:
+        #     self.accounts_status = AccountStatus.NOTHING
         return super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'auth_user'
         ordering = ("-date_joined",)
+
+
+class RecycleUser(User):
+    objects = DeleteQuerySet()
+
+    class Meta:
+        proxy = True
 
 
 class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):
@@ -134,6 +154,18 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     def __str__(self):
         return self.title
+
+    def send_to_user(self):
+        # try:
+        #     if self.user.fcm_token:
+        #         send_notification_task.delay(self.user.fcm_token, self.title, self.body)
+        # except Exception:
+        #     raise ErrorResponse.SOMETHING_WENT_WRONG
+        try:
+            if self.user.fcm_token:
+                pass
+        except Exception:
+            raise ErrorResponse.SOMETHING_WENT_WRONG
 
     class Meta:
         db_table = 'private_notification'

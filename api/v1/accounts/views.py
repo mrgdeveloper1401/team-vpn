@@ -25,22 +25,10 @@ class UserProfileViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixin
                          viewsets.GenericViewSet):
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated]
-    # serializer_class = serializers.AdminUserProfileSerializer
     pagination_class = AdminUserProfilePagination
 
     def get_queryset(self):
-        if self.request.user.is_staff:
-            return self.queryset
-        if 'pk' in self.kwargs and self.request.user.is_staff:
-            return self.queryset.filter(id=self.kwargs['pk'])
-        if 'pk' in self.kwargs:
-            return self.queryset.filter(id=self.request.user.id)
         return self.queryset.filter(id=self.request.user.id)
-    
-    # def get_permissions(self):
-    #     if self.request.method == 'DELETE':
-    #         return [IsAdminUser()]
-    #     return super().get_permissions()
 
     def get_serializer_class(self):
         if self.action in ["list", 'retrieve']:
@@ -71,6 +59,7 @@ class LoginApiView(views.APIView):
                 key='token', value=str(refresh), httponly=True, secure=True, samesite='Lax'
             )
             user.number_of_login += 1
+            user.fcm_token = serializer.validated_data['fcm_token']
             user.save()
             return response
         return Response({"detail": "invalid input"}, status=status.HTTP_400_BAD_REQUEST)
@@ -83,24 +72,14 @@ class ContentDeviceViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return ContentDevice.objects.filter(user=self.request.user)
 
-    # def get_permissions(self):
-    #     if self.request.method not in permissions.SAFE_METHODS:
-    #         return [IsAdminUser()]
-    #     return super().get_permissions()
 
-
-class PrivateNotificationViewSet(viewsets.ModelViewSet):
+class PrivateNotificationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = PrivateNotificationsSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = CommonPagination
 
     def get_queryset(self):
         return PrivateNotification.objects.filter(user=self.request.user)
-
-    def get_permissions(self):
-        if self.request.method not in permissions.SAFE_METHODS:
-            return [IsAdminUser()]
-        return super().get_permissions()
 
 
 # class LogoutApiView(viewsets.GenericViewSet, mixins.CreateModelMixin):
@@ -127,11 +106,17 @@ class VolumeUsageApiView(views.APIView):
 
 
 class UpdateConnectionApiView(views.APIView):
+    """
+    this api update field is_connected_user
+    you have error 400, when two something was happened
+    if a user account is not active
+    if field is_connected_user is active
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        if user.accounts_status == AccountStatus.ACTIVE:
+        if user.accounts_status == AccountStatus.ACTIVE and not user.is_connected_user:
             user.is_connected_user = True
             user.save()
             return Response(status=status.HTTP_200_OK)
@@ -139,10 +124,15 @@ class UpdateConnectionApiView(views.APIView):
 
 
 class DeactivateUserConnectionApiView(views.APIView):
+    """
+    this api deactivate field is_connected_user
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        user.is_connected_user = False
-        user.save()
-        return Response(status=status.HTTP_200_OK)
+        if user.is_connected_user:
+            user.is_connected_user = False
+            user.save()
+            return Response(status=status.HTTP_200_OK)
+        return Response(ErrorResponse.FIELD_NOT_ACTIVE)

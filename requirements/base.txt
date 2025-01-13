@@ -17,3 +17,5 @@ drf-nested-routers
 celery[redis]
 django-celery-beat
 flower
+firebase-admin
+pyfcm

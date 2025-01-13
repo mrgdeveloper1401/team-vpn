@@ -7,3 +7,7 @@ class AdminUserProfilePagination(PageNumberPagination):
 
 class CommonPagination(PageNumberPagination):
     page_size = 20
+
+
+class AdminPagePagination(PageNumberPagination):
+    page_size = 30

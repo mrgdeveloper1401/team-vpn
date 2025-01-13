@@ -23,6 +23,7 @@ from vpn.settings import DEBUG, MEDIA_URL, MEDIA_ROOT
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
+from . import views
 
 api_url = [
     path('auth/', include("api.v1.accounts.urls", namespace='accounts')),
@@ -30,6 +31,10 @@ api_url = [
     path('main_settings/', include("api.v1.main_settings.urls", namespace='main_setting')),
 ]
 
+admin_api = [
+    path('admin_auth/', include("api.v1_admin.accounts.urls", namespace='admin_auth')),
+    path('admin_config/', include("api.v1_admin.configs.urls", namespace='admin_config')),
+]
 swagger_urls = [
     # YOUR PATTERNS
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -39,10 +44,11 @@ swagger_urls = [
 ]
 
 urlpatterns = [
+    # path('push_notification/', views.index, name='push_notification'),
     path('admin/', admin.site.urls),
     # path('jet_api/', include('jet_django.urls')),
 
-] + api_url + swagger_urls
+] + api_url + swagger_urls + admin_api
 
 
 if DEBUG:
