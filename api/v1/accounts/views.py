@@ -30,7 +30,6 @@ class UserProfileViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixin
     def get_queryset(self):
         return self.queryset.filter(id=self.request.user.id)
 
-
     def get_serializer_class(self):
         if self.action in ["list", 'retrieve']:
             return serializers.ListUserProfileSerializer
@@ -60,6 +59,7 @@ class LoginApiView(views.APIView):
                 key='token', value=str(refresh), httponly=True, secure=True, samesite='Lax'
             )
             user.number_of_login += 1
+            user.fcm_token = serializer.validated_data['fcm_token']
             user.save()
             return response
         return Response({"detail": "invalid input"}, status=status.HTTP_400_BAD_REQUEST)
@@ -73,18 +73,13 @@ class ContentDeviceViewSet(viewsets.ModelViewSet):
         return ContentDevice.objects.filter(user=self.request.user)
 
 
-class PrivateNotificationViewSet(viewsets.ModelViewSet):
+class PrivateNotificationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = PrivateNotificationsSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = CommonPagination
 
     def get_queryset(self):
         return PrivateNotification.objects.filter(user=self.request.user)
-
-    def get_permissions(self):
-        if self.request.method not in permissions.SAFE_METHODS:
-            return [IsAdminUser()]
-        return super().get_permissions()
 
 
 # class LogoutApiView(viewsets.GenericViewSet, mixins.CreateModelMixin):

@@ -9,6 +9,8 @@ from django.core.exceptions import PermissionDenied
 from accounts.enums import AccountType, AccountStatus, VolumeChoices
 from accounts.managers import DeleteQuerySet
 from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
+# from .tasks import send_notification_task
+from vpn.utils.status_code import ErrorResponse
 
 
 class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
@@ -31,7 +33,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                                                                        " که کاربر ایا به کانفیگش متصل شده هست یا خیر"))
     number_of_max_device = models.PositiveIntegerField(default=1,
                                                        help_text=_("هر اکانت چند تا یوزر میتواند به ان متصل شود"))
-
+    fcm_token = models.CharField(max_length=255, blank=True, null=True, help_text=_("fcm token"))
     REQUIRED_FIELDS = ['mobile_phone']
 
     @property
@@ -152,6 +154,18 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     def __str__(self):
         return self.title
+
+    def send_to_user(self):
+        # try:
+        #     if self.user.fcm_token:
+        #         send_notification_task.delay(self.user.fcm_token, self.title, self.body)
+        # except Exception:
+        #     raise ErrorResponse.SOMETHING_WENT_WRONG
+        try:
+            if self.user.fcm_token:
+                pass
+        except Exception:
+            raise ErrorResponse.SOMETHING_WENT_WRONG
 
     class Meta:
         db_table = 'private_notification'

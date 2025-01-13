@@ -23,6 +23,7 @@ from vpn.settings import DEBUG, MEDIA_URL, MEDIA_ROOT
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
+from . import views
 
 api_url = [
     path('auth/', include("api.v1.accounts.urls", namespace='accounts')),
@@ -43,6 +44,7 @@ swagger_urls = [
 ]
 
 urlpatterns = [
+    # path('push_notification/', views.index, name='push_notification'),
     path('admin/', admin.site.urls),
     # path('jet_api/', include('jet_django.urls')),
 

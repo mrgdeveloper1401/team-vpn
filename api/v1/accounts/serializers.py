@@ -55,24 +55,27 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(min_length=8, style={'input_type': 'password'})
     device_number = serializers.CharField()
     ip_address = serializers.IPAddressField()
+    device_model = serializers.CharField()
+    device_os = serializers.CharField()
+    fcm_token = serializers.CharField()
 
     def validate(self, attrs):
         try:
             device_number = attrs.get('device_number')
-            ip_address = attrs.get('ip_address')
-            if not device_number:
-                raise ValidationError(ErrorResponse.INVALID_INPUT)
-            if not ip_address:
-                raise ValidationError(ErrorResponse.INVALID_INPUT)
             device = ContentDevice.objects.get(user__username=attrs["username"], device_number=device_number)
         except ContentDevice.DoesNotExist:
             user = User.objects.get(username=attrs['username'])
             del self.initial_data['username']
             del self.initial_data['password']
+            del self.initial_data['fcm_token']
             ContentDevice.objects.create(**self.initial_data, user=user)
         else:
             if device.is_blocked:
                 raise ValidationError(ErrorResponse.LOGIN_BLOCKED)
+            for key, value in self.initial_data.items():
+                if hasattr(device, key):
+                    setattr(device, key, value)
+            device.save()
         return attrs
 
 
@@ -89,6 +92,11 @@ class PrivateNotificationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PrivateNotification
         exclude = ['is_deleted', "deleted_at"]
+
+    def create(self, validated_data):
+        notification = PrivateNotification.objects.create(**validated_data)
+        notification.send_to_user()
+        return notification
 
 
 # class LogoutSerializer(serializers.Serializer):
