@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.forms import UserChangeForm, AdminUserCreationForm
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
-from .models import User, ContentDevice, PrivateNotification, RecycleUser
+from .models import User, ContentDevice, PrivateNotification, RecycleUser, OneDayLeftUser
 from subscriptions.models import UserConfig
 from import_export.admin import ImportExportModelAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -109,3 +110,25 @@ class RecycleUserAdmin(admin.ModelAdmin):
     @admin.action(description='Recover user')
     def recovery_user(self, request, queryset):
         queryset.update(is_deleted=False, deleted_at=None)
+
+
+@admin.register(OneDayLeftUser)
+class OneDayLeftUserAdmin(admin.ModelAdmin):
+    list_display = ("username", "number_of_days", "end_date_subscription")
+    fieldsets = [
+        (None, {
+            'fields': [
+                'username', "number_of_days", "start_premium"
+            ],
+        }),
+    ]
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+    list_per_page = 20
