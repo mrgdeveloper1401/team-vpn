@@ -3,15 +3,13 @@ from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import ValidationError
+from django.core.validators import ValidationError, MinValueValidator
 from django.core.exceptions import PermissionDenied
 
 from accounts.enums import AccountType, AccountStatus, VolumeChoices
 from accounts.managers import DeleteQuerySet, OneDayLeftQuerySet
 from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
-# from .tasks import send_notification_task
 from vpn.firebase_conf.firebase import send_notification
-from vpn.utils.status_code import ErrorResponse
 
 
 class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
@@ -26,7 +24,8 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                                                    "expire --> یعنی کاربر روز کانفینگ ان تموم شده هست"))
     volume_choice = models.CharField(max_length=7, choices=VolumeChoices.choices, default=VolumeChoices.GB)
     volume = models.PositiveIntegerField(blank=True, default=0)
-    volume_usage = models.FloatField(blank=True, default=0, help_text=_("حجم مصرفی میباشد که بر اساس مگابایت هست"))
+    volume_usage = models.FloatField(blank=True, default=0, help_text=_("حجم مصرفی میباشد که بر اساس مگابایت هست"),
+                                     validators=[MinValueValidator(0)])
     start_premium = models.DateField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"),
                                      default=timezone.localdate)
     number_of_days = models.PositiveIntegerField(blank=True, null=True, help_text=_("تعداد روز"), default=0)
