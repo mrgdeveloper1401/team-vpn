@@ -1,6 +1,20 @@
-from django.db.models import Manager, QuerySet
+from django.db.models import Manager, F, ExpressionWrapper, DateField
+from django.utils import timezone
+
+from accounts.enums import AccountType
 
 
 class DeleteQuerySet(Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_deleted=True)
+
+
+class OneDayLeftQuerySet(Manager):
+    def get_queryset(self):
+        return (super().get_queryset().annotate(
+            end_date=ExpressionWrapper(
+                F('start_premium') + F('number_of_days'),
+                output_field=DateField()
+            )
+        ).filter(account_type=AccountType.premium_user).
+                filter(end_date=timezone.localdate() + timezone.timedelta(days=1)))

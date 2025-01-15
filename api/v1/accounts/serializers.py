@@ -91,12 +91,7 @@ class ContentDeviceSerializer(serializers.ModelSerializer):
 class PrivateNotificationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PrivateNotification
-        exclude = ['is_deleted', "deleted_at"]
-
-    def create(self, validated_data):
-        notification = PrivateNotification.objects.create(**validated_data)
-        notification.send_to_user()
-        return notification
+        exclude = ['is_deleted', "deleted_at", "user"]
 
 
 # class LogoutSerializer(serializers.Serializer):

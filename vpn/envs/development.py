@@ -40,6 +40,7 @@ DATABASES = {
 
 INSTALLED_APPS += [
     "debug_toolbar",
+    "django_extensions",
 ]
 
 MIDDLEWARE += [
@@ -55,3 +56,5 @@ INTERNAL_IPS = [
 ]
 
 SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
+
+CACHES['default']['LOCATION'] = "redis://localhost:6380/2"

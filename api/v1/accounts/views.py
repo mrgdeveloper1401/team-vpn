@@ -21,7 +21,7 @@ class UserRegisterViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     permission_classes = [NotAuthenticated]
 
 
-class UserProfileViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
+class UserProfileViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin,
                          viewsets.GenericViewSet):
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated]
@@ -73,7 +73,7 @@ class ContentDeviceViewSet(viewsets.ModelViewSet):
         return ContentDevice.objects.filter(user=self.request.user)
 
 
-class PrivateNotificationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+class PrivateNotificationViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     serializer_class = PrivateNotificationsSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = CommonPagination

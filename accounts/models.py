@@ -3,14 +3,13 @@ from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import ValidationError
+from django.core.validators import ValidationError, MinValueValidator
 from django.core.exceptions import PermissionDenied
 
 from accounts.enums import AccountType, AccountStatus, VolumeChoices
-from accounts.managers import DeleteQuerySet
+from accounts.managers import DeleteQuerySet, OneDayLeftQuerySet
 from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
-# from .tasks import send_notification_task
-from vpn.utils.status_code import ErrorResponse
+from vpn.firebase_conf.firebase import send_notification
 
 
 class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
@@ -25,8 +24,10 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                                                    "expire --> یعنی کاربر روز کانفینگ ان تموم شده هست"))
     volume_choice = models.CharField(max_length=7, choices=VolumeChoices.choices, default=VolumeChoices.GB)
     volume = models.PositiveIntegerField(blank=True, default=0)
-    volume_usage = models.FloatField(blank=True, default=0, help_text=_("حجم مصرفی میباشد که بر اساس مگابایت هست"))
-    start_premium = models.DateTimeField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"), default=timezone.now)
+    volume_usage = models.FloatField(blank=True, default=0, help_text=_("حجم مصرفی میباشد که بر اساس مگابایت هست"),
+                                     validators=[MinValueValidator(0)])
+    start_premium = models.DateField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"),
+                                     default=timezone.localdate)
     number_of_days = models.PositiveIntegerField(blank=True, null=True, help_text=_("تعداد روز"), default=0)
     number_of_login = models.PositiveIntegerField(help_text=_("تعداد لاگین های کاربر"), editable=False, db_default=0)
     is_connected_user = models.BooleanField(default=False, help_text=_("این فیلد مشخص میکنه"
@@ -67,7 +68,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             if self.volume > self.volume_usage / 1_000:
                 self.accounts_status = AccountStatus.ACTIVE
                 self.account_type = AccountType.premium_user
-            if self.end_date_subscription and self.end_date_subscription < timezone.now():
+            if self.end_date_subscription and self.end_date_subscription < timezone.localdate():
                 self.accounts_status = AccountStatus.EXPIRED
                 self.account_type = AccountType.normal_user
         # if volume_choice == MEG
@@ -78,7 +79,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             if self.volume > self.volume_usage:
                 self.accounts_status = AccountStatus.ACTIVE
                 self.account_type = AccountType.premium_user
-            if self.end_date_subscription and self.end_date_subscription < timezone.now():
+            if self.end_date_subscription and self.end_date_subscription < timezone.localdate():
                 self.accounts_status = AccountStatus.EXPIRED
                 self.account_type = AccountType.normal_user
         # if volume_choice = TERA
@@ -89,7 +90,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             if self.volume > self.volume_usage / 1_000_000:
                 self.accounts_status = AccountStatus.ACTIVE
                 self.account_type = AccountType.premium_user
-            if self.end_date_subscription and self.end_date_subscription < timezone.now():
+            if self.end_date_subscription and self.end_date_subscription < timezone.localdate():
                 self.accounts_status = AccountStatus.EXPIRED
                 self.account_type = AccountType.normal_user
         # if self.pk is None:
@@ -103,6 +104,13 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
 
 class RecycleUser(User):
     objects = DeleteQuerySet()
+
+    class Meta:
+        proxy = True
+
+
+class OneDayLeftUser(User):
+    objects = OneDayLeftQuerySet()
 
     class Meta:
         proxy = True
@@ -156,16 +164,14 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
         return self.title
 
     def send_to_user(self):
-        # try:
-        #     if self.user.fcm_token:
-        #         send_notification_task.delay(self.user.fcm_token, self.title, self.body)
-        # except Exception:
-        #     raise ErrorResponse.SOMETHING_WENT_WRONG
         try:
-            if self.user.fcm_token:
-                pass
-        except Exception:
-            raise ErrorResponse.SOMETHING_WENT_WRONG
+            send_notification(self.user.fcm_token, self.title, self.body)
+        except Exception as e:
+            raise e
+
+    def save(self, *args, **kwargs):
+        self.send_to_user()
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'private_notification'
