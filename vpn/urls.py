@@ -34,6 +34,7 @@ api_url = [
 admin_api = [
     path('admin_auth/', include("api.v1_admin.accounts.urls", namespace='admin_auth')),
     path('admin_config/', include("api.v1_admin.configs.urls", namespace='admin_config')),
+    path('admin_settings/', include('api.v1_admin.main_settings.urls', namespace='admin_main_settings')),
 ]
 swagger_urls = [
     # YOUR PATTERNS

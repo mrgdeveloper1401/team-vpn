@@ -13,9 +13,7 @@ import os.path
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from celery.schedules import crontab
 from decouple import config
-from vpn.celery import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +38,7 @@ INSTALLED_APPS = [
     'import_export',
     # "jet_django",
     "django_celery_beat",
+    "django_celery_results",
     "axes",
     "drf_spectacular",
     "rest_framework",
@@ -235,6 +234,9 @@ AXES_LOCKOUT_TEMPLATE = None
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
+DJANGO_CELERY_RESULTS_TASK_ID_MAX_LENGTH = 191
+
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -243,3 +245,7 @@ CACHES = {
         },
     }
 }
+
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
