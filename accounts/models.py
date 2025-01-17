@@ -8,6 +8,7 @@ from django.core.exceptions import PermissionDenied
 
 from accounts.enums import AccountType, AccountStatus, VolumeChoices
 from accounts.managers import DeleteQuerySet, OneDayLeftQuerySet
+from accounts.validator import integer_device_number
 from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 from vpn.firebase_conf.firebase import send_notification
 
@@ -120,7 +121,7 @@ class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):
     device_model = models.CharField(max_length=255, help_text=_("مدل دستگاه"), blank=True, null=True)
     device_os = models.CharField(max_length=50, help_text=_("نسخه دستگاه"), blank=True, null=True)
     # device_brand = models.CharField(max_length=50, help_text=_("برند گوشی"), blank=True, null=True)
-    device_number = models.CharField(max_length=255, help_text=_("سریال گوشی"))
+    device_number = models.CharField(max_length=255, help_text=_("سریال گوشی"), validators=[integer_device_number])
     ip_address = models.GenericIPAddressField(help_text=_("ادرس ای پی"))
     # is_connected = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='user_device',
