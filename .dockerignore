@@ -266,3 +266,5 @@ package-lock.json
 .pytest_cache
 general_log_django
 tests
+.gitignore
+README.md
