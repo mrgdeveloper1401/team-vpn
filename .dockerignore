@@ -214,7 +214,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+#.env
 .venv
 env/
 venv/
@@ -257,3 +257,14 @@ vpn.drawio.png
 vpn/utils/data_db
 vpn.zip
 vpn/utils/impoer_date_to_db.py
+frontend
+node_modules
+package.json
+package-lock.json
+.github
+.idea
+.pytest_cache
+general_log_django
+tests
+.coverage
+celerybeat-schedule

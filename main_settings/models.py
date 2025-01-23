@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
+from accounts.models import User
+from accounts.tasks import send_public_notification
 from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 from django.utils.translation import gettext_lazy as _
 
@@ -13,6 +15,13 @@ class PublicNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        qs = super().save(*args, **kwargs)
+        all_user = User.objects.filter(is_active=True)
+        for user in all_user:
+            if user.fcm_token:
+                send_public_notification(user.fcm_token, qs.title, qs.body)
 
     class Meta:
         db_table = 'public_notifications'

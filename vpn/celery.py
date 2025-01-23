@@ -1,23 +1,31 @@
 import os
+
 from celery import Celery
 from decouple import config
-from vpn import settings
 
 DEBUG = config("DEBUG", cast=bool)
 
-if DEBUG:
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'vpn.envs.development')
-else:
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'vpn.envs.production')
-
-app = Celery('vpn')
-
-app.config_from_object('django.conf:settings', namespace='CELERY')
-app.conf.broker_url = settings.CELERY_BROKER_URL
-app.conf.result_backend = settings.CELERY_RESULT_BACKEND
-app.autodiscover_tasks()
+settings_module = os.environ.setdefault("DJANGO_SETTINGS_MODULE", "vpn.envs.development" if DEBUG else "vpn.envs.production")
 
 
-@app.task(bind=True)
+celery_app = Celery("vpn")
+
+celery_app.config_from_object(settings_module)
+
+celery_app.conf.update(
+    timezone="Asia/Tehran",
+    task_serializer="json",
+    result_serializer="json",
+    accept_content=["application/json"],
+    worker_prefetch_multiplier=1,
+    result_expires=120,
+    task_always_eager=False,
+    broker_connection_retry_on_startup=True,
+)
+
+celery_app.autodiscover_tasks()
+
+
+@celery_app.task(bind=True)
 def debug_task(self):
     print(f"Request: {self.request!r}")

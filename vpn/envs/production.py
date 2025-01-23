@@ -23,16 +23,28 @@ STORAGES = {
     },
 }
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "HOST": config("POSTDB_HOST", cast=str),
+#         "PASSWORD": config("POSTDB_PASSWORD", cast=str),
+#         "PORT": config("POSTDB_PORT", cast=str),
+#         "USER": config("POSTDB_USER", cast=str),
+#         "NAME": config("POSTDB_NAME", cast=str)
+#     }
+# }
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "HOST": config("POSTDB_HOST", cast=str),
-        "PASSWORD": config("POSTDB_PASSWORD", cast=str),
-        "PORT": config("POSTDB_PORT", cast=str),
-        "USER": config("POSTDB_USER", cast=str),
-        "NAME": config("POSTDB_NAME", cast=str)
+        "HOST": "vpn_postgres",
+        "PASSWORD": "vpn.2025",
+        "PORT": 5432,
+        "USER": "vpn",
+        "NAME": "vpndb"
     }
 }
+
 
 # DATABASES = {
 #     "default": {
@@ -73,3 +85,8 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # AWS_S3_ENDPOINT_URL = config("AWS_S3_DOMAIN", cast=str)
 
 SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
+
+broker_url = config("BROCKER_URL", cast=str)
+result_backend = config("RESULT_BACKEND", cast=str)
+
+

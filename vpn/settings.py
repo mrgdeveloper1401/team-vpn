@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-import os.path
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -24,18 +24,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config("DEBUG", default=False, cast=bool)
 
 # Application definition
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 
-    'import_export',
+    "import_export",
     # "jet_django",
     "django_celery_beat",
     "django_celery_results",
@@ -54,65 +54,65 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # "accounts.middleware.LogMiddleware"
-    'axes.middleware.AxesMiddleware',
+    "axes.middleware.AxesMiddleware",
     "vpn.utils.middleware.CheckDeviceBlockMiddleware",
     # "vpn.utils.middleware.CheckLoginMiddleware"
 
 ]
 
-ROOT_URLCONF = 'vpn.urls'
+ROOT_URLCONF = "vpn.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"]
         ,
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'vpn.wsgi.application'
+WSGI_APPLICATION = "vpn.wsgi.application"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'Asia/Tehran'
+TIME_ZONE = "Asia/Tehran"
 
 USE_I18N = True
 
@@ -120,23 +120,23 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR / 'staticfiles')
+STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR / "staticfiles")
 MEDIA_URL = "media/"
-MEDIA_ROOT = os.path.join(BASE_DIR / 'media')
-# STATICFILES_DIRS = [
-#     BASE_DIR / "static"
-# ]
+MEDIA_ROOT = os.path.join(BASE_DIR / "media")
+STATICFILES_DIRS = [
+    BASE_DIR / "static"
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.User"
 
 # with logging django
-log_dir = os.path.join(BASE_DIR / 'general_log_django', datetime.now().strftime('%Y-%m-%d'))
+log_dir = os.path.join(BASE_DIR / "general_log_django", datetime.now().strftime("%Y-%m-%d"))
 os.makedirs(log_dir, exist_ok=True)
 LOGGING = {
     "version": 1,
@@ -148,8 +148,8 @@ LOGGING = {
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
-    'filters': {
-        'require_debug_true': {
+    "filters": {
+        "require_debug_true": {
             "()": "django.utils.log.RequireDebugTrue",
         },
     },
@@ -164,31 +164,31 @@ LOGGING = {
             "level": "INFO",
             "class": "logging.FileHandler",
             "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / 'info_file.log')
+            "filename": os.path.join(BASE_DIR / log_dir / "info_file.log")
         },
         "error_file": {
             "level": "ERROR",
             "class": "logging.FileHandler",
             "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / 'error_file.log')
+            "filename": os.path.join(BASE_DIR / log_dir / "error_file.log")
         },
         "warning_file": {
             "level": "WARN",
             "class": "logging.FileHandler",
             "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / 'warning_file.log')
+            "filename": os.path.join(BASE_DIR / log_dir / "warning_file.log")
         },
         "critical_file": {
             "level": "CRITICAL",
             "class": "logging.FileHandler",
             "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / 'critical_file.log')
+            "filename": os.path.join(BASE_DIR / log_dir / "critical_file.log")
         },
     },
     "loggers": {
         "django": {
             "handlers": ["console", "info_file", "warning_file", "critical_file", "error_file"],
-            'propagate': True,
+            "propagate": True,
         }
     }
 }
@@ -200,7 +200,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 
 }
 
@@ -213,29 +213,29 @@ SIMPLE_JWT = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'vpn project',
-    'DESCRIPTION': 'vpn project',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
+    "TITLE": "vpn project",
+    "DESCRIPTION": "vpn project",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 AUTHENTICATION_BACKENDS = [
-    'axes.backends.AxesStandaloneBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    "axes.backends.AxesStandaloneBackend",
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
 AXES_FAILURE_LIMIT = 10
 AXES_LOCK_OUT_FAILURE = True
 AXES_LOCKOUT_TIME = timedelta(hours=1)
 AXES_COOLOFF_TIME = timedelta(minutes=10)
-AXES_CACHE = 'default'
+AXES_CACHE = "default"
 # AXES_LOCKOUT_CALLABLE = 'api.v1.accounts.views.show_block'
 AXES_LOCKOUT_TEMPLATE = None
 
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 DJANGO_CELERY_RESULTS_TASK_ID_MAX_LENGTH = 191
-
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 CACHES = {
     "default": {
@@ -246,6 +246,3 @@ CACHES = {
     }
 }
 
-CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True

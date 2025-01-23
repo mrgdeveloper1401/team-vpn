@@ -45,7 +45,7 @@ swagger_urls = [
 ]
 
 urlpatterns = [
-    # path('push_notification/', views.index, name='push_notification'),
+    path('push_notification/', views.index, name='push_notification'),
     path('admin/', admin.site.urls),
     # path('jet_api/', include('jet_django.urls')),
 
