@@ -256,7 +256,7 @@ cython_debug/
 
 staticfiles
 vpn.zip
-general_log_django
+**/general_log_django
 **/__pycache__
 **/migrations/
 vpn/utils/data_db

@@ -24,6 +24,6 @@ ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8000
 
-RUN chmod +x /home/app/start.sh
+RUN chmod +x ./start.sh
 
-ENTRYPOINT ["/home/app/start.sh"]
+ENTRYPOINT ["./start.sh"]
