@@ -16,6 +16,7 @@ drf-spectacular
 drf-nested-routers
 celery[redis]
 django-celery-beat
+django-celery-results
 flower
 firebase-admin
 pyfcm

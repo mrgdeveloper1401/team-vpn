@@ -1,9 +1,0 @@
-timezone = 'Asia/Tehran'
-broker_connection_retry_on_startup = True
-task_serializer = 'json'
-result_serializer = 'json'
-accept_content = ['json']
-worker_prefetch_multiplier = 1
-result_expires = 120
-task_always_eager = False
-enable_utc = True

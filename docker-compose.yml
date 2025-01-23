@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  django:
+    container_name: django_vpn
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - ./dj_vpn:/home/app
+    env_file: ".env"
+
+  db:
+    container_name: vpn_postgres
+    image: postgres:16.4-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    environment:
+      POSTGRES_USER: ${DOCKER_POSTGRES_USER}
+      POSTGRES_DB: ${DOCKER_POSTGRES_DB}
+      POSTGRES_PASSWORD: ${DOCKER_POSTGRES_PASSWORD}
+
+  redis:
+    container_name: redis
+    image: redis:7.4-alpine
+    restart: always
+    entrypoint: ['/home/app/redis_entrypoint.sh', "redis-server"]
+
+  celery:
+    container_name: celery
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    command: celery -A vpn worker -l INFO
+    volumes:
+      - ./dj_vpn:/home/app
+    ports:
+      - "8002:8000"
+    environment:
+        - DEBUG=${DEBUG}
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:
