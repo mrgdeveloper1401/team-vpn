@@ -26,7 +26,7 @@ services:
     container_name: redis
     image: redis:7.4-alpine
     restart: always
-    entrypoint: ['redis_entrypoint.sh', "redis-server"]
+    entrypoint: ['/home/app/redis_entrypoint.sh', "redis-server"]
 
   celery:
     container_name: celery
