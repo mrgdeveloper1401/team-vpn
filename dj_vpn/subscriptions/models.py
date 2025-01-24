@@ -4,12 +4,14 @@ from django.db import models
 # from django.utils.translation import gettext_lazy as _
 
 
-from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
+from dj_vpn.cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
+from dj_vpn.accounts.models import User
+from dj_vpn.configs.models import Config
 
 
 class UserConfig(CreateMixin, UpdateMixin, SoftDeleteMixin):
-    user = models.ForeignKey("accounts.User", on_delete=models.DO_NOTHING, related_name="user_subscription")
-    config = models.ForeignKey('configs.Config', on_delete=models.DO_NOTHING, related_name="config_subscription")
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="user_subscription")
+    config = models.ForeignKey(Config, on_delete=models.DO_NOTHING, related_name="config_subscription")
     # volume_usage = models.PositiveIntegerField(default=0)
     # is_active = models.BooleanField(default=True)
     # volume = models.PositiveIntegerField()

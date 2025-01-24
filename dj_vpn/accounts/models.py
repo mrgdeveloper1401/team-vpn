@@ -6,11 +6,11 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import ValidationError, MinValueValidator
 from django.core.exceptions import PermissionDenied
 
-from accounts.enums import AccountType, AccountStatus, VolumeChoices
-from accounts.managers import DeleteQuerySet, OneDayLeftQuerySet
-from accounts.validator import integer_device_number
-from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
-from vpn.firebase_conf.firebase import send_notification
+from dj_vpn.accounts.enums import AccountType, AccountStatus, VolumeChoices
+from dj_vpn.accounts.managers import DeleteQuerySet, OneDayLeftQuerySet
+from dj_vpn.accounts.validator import integer_device_number
+from dj_vpn.cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
+from dj_vpn.vpn.firebase_conf.firebase import send_notification
 
 
 class User(AbstractUser, UpdateMixin, SoftDeleteMixin):

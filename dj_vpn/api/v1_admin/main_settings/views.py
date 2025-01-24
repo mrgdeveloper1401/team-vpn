@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework import permissions
 
 from . import serializers
-from main_settings.models import UtilsApps
+from dj_vpn.main_settings.models import UtilsApps
 
 
 class UtilsAppsViewSet(viewsets.ModelViewSet):

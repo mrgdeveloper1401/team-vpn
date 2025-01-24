@@ -2,9 +2,9 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework import viewsets
 from rest_framework import mixins
 
-from vpn.utils.paginations import AdminPagePagination
+from dj_vpn.vpn.utils.paginations import AdminPagePagination
 from . import serializers
-from accounts.models import User, ContentDevice, OneDayLeftUser
+from dj_vpn.accounts.models import User, ContentDevice, OneDayLeftUser
 
 
 class AdminAddUserViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):

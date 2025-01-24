@@ -1,7 +1,7 @@
 from django.db.models import Manager, F, ExpressionWrapper, DateField
 from django.utils import timezone
 
-from accounts.enums import AccountType
+from dj_vpn.accounts.enums import AccountType
 
 
 class DeleteQuerySet(Manager):

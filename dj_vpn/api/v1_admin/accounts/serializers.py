@@ -3,8 +3,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
-from accounts.models import User, ContentDevice, OneDayLeftUser
-from vpn.utils.status_code import ErrorResponse
+from dj_vpn.accounts.models import User, ContentDevice, OneDayLeftUser
+from dj_vpn.vpn.utils.status_code import ErrorResponse
 
 
 class AdminUserAddSerializer(serializers.ModelSerializer):

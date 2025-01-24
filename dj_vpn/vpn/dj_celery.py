@@ -5,7 +5,8 @@ from decouple import config
 
 DEBUG = config("DEBUG", cast=bool)
 
-settings_module = os.environ.setdefault("DJANGO_SETTINGS_MODULE", "vpn.envs.development" if DEBUG else "vpn.envs.production")
+settings_module = os.environ.setdefault("DJANGO_SETTINGS_MODULE",
+                                        "dj_vpn.vpn.envs.development" if DEBUG else "dj_vpn.vpn.envs.production")
 
 
 celery_app = Celery("vpn")

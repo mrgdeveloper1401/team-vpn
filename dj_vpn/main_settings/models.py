@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from accounts.models import User
-from accounts.tasks import send_public_notification
-from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
+from dj_vpn.accounts.models import User
+from dj_vpn.accounts.tasks import send_public_notification
+from dj_vpn.cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 from django.utils.translation import gettext_lazy as _
 
 

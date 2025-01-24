@@ -1,10 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.forms import UserChangeForm, AdminUserCreationForm
 from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
 
 from .models import User, ContentDevice, PrivateNotification, RecycleUser, OneDayLeftUser
-from subscriptions.models import UserConfig
+from dj_vpn.subscriptions.models import UserConfig
 from import_export.admin import ImportExportModelAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 # Register your models here.
@@ -47,7 +46,7 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
             {
                 "classes": ("wide",),
                 "fields": ("username", "usable_password", "password1", "password2", "volume", "volume_choice",
-                           "number_of_days", "start_premium", "number_of_max_device", "account_type", "accounts_status"),
+                           "number_of_days", "start_premium", "number_of_max_device", "account_type", "accounts_status")
             },
         ),
     )

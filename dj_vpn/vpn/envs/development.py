@@ -1,7 +1,6 @@
-from vpn.settings import *
+from dj_vpn.vpn.settings import *
 
 SECRET_KEY = config("DEV_SECRET_KEY", cast=str)
-
 
 ALLOWED_HOSTS = []
 

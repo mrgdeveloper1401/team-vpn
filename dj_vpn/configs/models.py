@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 # from configs.enums import ProtocolChoices
-from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
+from dj_vpn.cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
 
 class Country(CreateMixin, UpdateMixin, SoftDeleteMixin):

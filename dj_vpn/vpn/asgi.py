@@ -15,8 +15,8 @@ from decouple import config
 debug_mode = config('DEBUG', cast=bool, default=False)
 
 if debug_mode:
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'vpn.envs.development')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dj_vpn.vpn.envs.development')
 else:
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'vpn.envs.production')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dj_vpn.vpn.envs.production')
 
 application = get_asgi_application()

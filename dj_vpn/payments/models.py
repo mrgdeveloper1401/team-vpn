@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from django.db import models
 
-from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
+from dj_vpn.cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
 
 # class Order(CreateMixin, UpdateMixin, SoftDeleteMixin):

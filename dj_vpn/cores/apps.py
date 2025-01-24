@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class CoresConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "cores"
+    name = "dj_vpn.cores"

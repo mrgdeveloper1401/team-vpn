@@ -1,4 +1,4 @@
-from vpn.settings import *
+from dj_vpn.vpn.settings import *
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=str).split(" ")
 

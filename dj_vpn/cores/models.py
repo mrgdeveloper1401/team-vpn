@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django.db import models
 
-from cores.managers import SoftManager
+from dj_vpn.cores.managers import SoftManager
 
 
 # Create your models here.

@@ -1,9 +1,8 @@
 from django.http import JsonResponse
 from rest_framework import status
-from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from accounts.models import ContentDevice
+from dj_vpn.accounts.models import ContentDevice
 
 
 class CheckDeviceBlockMiddleware:

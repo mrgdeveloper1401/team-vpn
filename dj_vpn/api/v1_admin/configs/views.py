@@ -1,9 +1,9 @@
 from rest_framework.permissions import IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
-from configs.models import Country, Config
-from subscriptions.models import UserConfig
-from vpn.utils.paginations import AdminPagePagination
+from dj_vpn.configs.models import Country, Config
+from dj_vpn.subscriptions.models import UserConfig
+from dj_vpn.vpn.utils.paginations import AdminPagePagination
 from . import serializers
 
 

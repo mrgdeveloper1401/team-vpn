@@ -3,8 +3,8 @@ from rest_framework.validators import ValidationError
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
-from accounts.models import User, ContentDevice, PrivateNotification
-from vpn.utils.status_code import ErrorResponse
+from dj_vpn.accounts.models import User, ContentDevice, PrivateNotification
+from dj_vpn.vpn.utils.status_code import ErrorResponse
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):

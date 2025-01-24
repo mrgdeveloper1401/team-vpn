@@ -5,14 +5,14 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import views
 from rest_framework.response import Response
 
-from accounts.enums import AccountStatus
-from accounts.models import User, ContentDevice, PrivateNotification
-from vpn.utils.create_refresh_token import get_token_refresh_token
-from vpn.utils.paginations import CommonPagination, AdminUserProfilePagination
-from vpn.utils.permissions import NotAuthenticated
+from dj_vpn.accounts.enums import AccountStatus
+from dj_vpn.accounts.models import User, ContentDevice, PrivateNotification
+from dj_vpn.vpn.utils.create_refresh_token import get_token_refresh_token
+from dj_vpn.vpn.utils.paginations import CommonPagination, AdminUserProfilePagination
+from dj_vpn.vpn.utils.permissions import NotAuthenticated
 from . import serializers
 from .serializers import ContentDeviceSerializer, PrivateNotificationsSerializer, VolumeUsageSerializer
-from vpn.utils.status_code import ErrorResponse
+from dj_vpn.vpn.utils.status_code import ErrorResponse
 
 
 class UserRegisterViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):

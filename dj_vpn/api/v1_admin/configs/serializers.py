@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from configs.models import Config, Country
-from subscriptions.models import UserConfig
+from dj_vpn.configs.models import Config, Country
+from dj_vpn.subscriptions.models import UserConfig
 
 
 class AdminCountrySerializer(serializers.ModelSerializer):

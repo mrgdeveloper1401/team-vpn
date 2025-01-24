@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils import timezone
 
-from accounts.models import User
+from dj_vpn.accounts.models import User
 
 
 class PointTest(TestCase):

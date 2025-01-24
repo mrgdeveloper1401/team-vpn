@@ -1,7 +1,7 @@
 from celery import shared_task
 
-from accounts.models import OneDayLeftUser, User
-from vpn.firebase_conf.firebase import send_notification
+from dj_vpn.accounts.models import OneDayLeftUser, User
+from dj_vpn.vpn.firebase_conf.firebase import send_notification
 
 
 @shared_task
