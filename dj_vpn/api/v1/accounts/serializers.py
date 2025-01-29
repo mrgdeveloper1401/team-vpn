@@ -31,7 +31,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data)
 
 
-class ListUserProfileSerializer(serializers.ModelSerializer):
+class GetUserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = ['password', "groups", "user_permissions", "is_superuser", "is_staff", "is_active", "deleted_at",

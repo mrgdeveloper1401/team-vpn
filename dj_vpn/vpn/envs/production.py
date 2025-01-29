@@ -37,11 +37,11 @@ STORAGES = {
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "HOST": "vpn_postgres",
-        "PASSWORD": "vpn.2025",
+        "HOST": config("DOCKER_POSTGRES_HOST", cast=str),
+        "PASSWORD": config("DOCKER_POSTGRES_PASSWORD", cast=str),
         "PORT": 5432,
-        "USER": "vpn",
-        "NAME": "vpndb"
+        "USER": config("DOCKER_POSTGRES_USER", cast=str),
+        "NAME": config("DOCKER_POSTGRES_DB", cast=str),
     }
 }
 

@@ -6,14 +6,14 @@ services:
       dockerfile: Dockerfile
     restart: always
     volumes:
-      - ./dj_vpn:/home/app
+      - ./:/home/app
     env_file: ".env"
-    ports:
-      - "8000:8000"
 
   db:
     container_name: vpn_postgres
     image: postgres:16.4-alpine
+    expose:
+      - 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
@@ -28,20 +28,20 @@ services:
     restart: always
     entrypoint: ['/home/app/redis_entrypoint.sh', "redis-server"]
 
-#  celery:
-#    container_name: celery
-#    build:
-#      context: .
-#    restart: always
-#    command: celery -A vpn worker -l INFO
-#    volumes:
-#      - ./dj_vpn:/home/app
-#    ports:
-#      - "8002:8000"
-#    environment:
-#      - DEBUG=${DEBUG}
-#    depends_on:
-#      - redis
+  celery:
+    container_name: celery
+    build:
+      context: .
+    restart: always
+    command: celery -A dj_vpn.vpn worker -l INFO
+    volumes:
+      - ./:/home/app
+    ports:
+      - "8002:8000"
+    environment:
+      - DEBUG=${DEBUG}
+    depends_on:
+      - redis
 
 volumes:
   postgres_data:

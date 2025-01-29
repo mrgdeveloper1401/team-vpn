@@ -21,21 +21,30 @@ class UserRegisterViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     permission_classes = [NotAuthenticated]
 
 
-class UserProfileViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin,
+class UserProfileViewSet(mixins.UpdateModelMixin, mixins.RetrieveModelMixin,
                          viewsets.GenericViewSet):
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated]
-    pagination_class = AdminUserProfilePagination
 
     def get_queryset(self):
         return self.queryset.filter(id=self.request.user.id)
 
     def get_serializer_class(self):
         if self.action in ["list", 'retrieve']:
-            return serializers.ListUserProfileSerializer
+            return serializers.GetUserProfileSerializer
         if self.action in ['update', 'partial_update']:
             return serializers.UpdateUserProfileSerializer
         return super().get_serializer_class()
+
+
+class UserProfileApiView(views.APIView):
+    serializer_class = serializers.GetUserProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        query = User.objects.get(username=request.user.username)
+        serializer = self.serializer_class(query)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class LoginApiView(views.APIView):
@@ -93,7 +102,7 @@ class PrivateNotificationViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixi
 class VolumeUsageApiView(views.APIView):
     serializer_class = VolumeUsageSerializer
     permission_classes = [IsAuthenticated]
-    
+
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)

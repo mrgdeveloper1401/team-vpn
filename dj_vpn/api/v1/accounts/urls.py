@@ -18,6 +18,7 @@ router.register('private_notification', views.PrivateNotificationViewSet, basena
 
 urlpatterns = [
     # path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('user_profile/', views.UserProfileApiView.as_view(), name='user_profile_api_view'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/', views.LoginApiView.as_view(), name='login'),
     path('token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),
