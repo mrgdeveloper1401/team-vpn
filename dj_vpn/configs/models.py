@@ -9,12 +9,13 @@ from dj_vpn.cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
 class Country(CreateMixin, UpdateMixin, SoftDeleteMixin):
     en_country_name = models.CharField(max_length=255, db_index=True,
-                                    help_text=_("Names of countries in English"))
+                                       help_text=_("Names of countries in English"))
     fa_country_name = models.CharField(max_length=255, blank=True, null=True,
                                        help_text=_("نام کشورها به صورت فارسی"))
     # country_image = models.ForeignKey("cores.Images", on_delete=models.DO_NOTHING, related_name="country_image",
     #                                   blank=True, null=True, help_text=_("عکس کشور"))
     country_code = models.CharField(max_length=255, help_text=_("کد کشور"))
+
     # is_active = models.BooleanField(default=True, help_text=_("قابل نمایش"))
 
     def __str__(self):
@@ -28,6 +29,7 @@ class Config(CreateMixin, UpdateMixin, SoftDeleteMixin):
     country = models.ForeignKey(Country, on_delete=models.DO_NOTHING, related_name="country_configs",
                                 help_text=_("کشور مورد نظر"))
     config = models.TextField(help_text=_("کانفینگ"))
+
     # protocol = models.CharField(choices=ProtocolChoices.choices,
     #                             help_text=_("پروتوکول های فیلترشکن"))
     # is_free = models.BooleanField(default=False, help_text=_("رایگان"))
@@ -39,15 +41,14 @@ class Config(CreateMixin, UpdateMixin, SoftDeleteMixin):
         return self.config
 
     # def clean(self):
-        # if self.is_free and self.price:
-        #     raise ValidationError({"price": _("is free and price both not choices")})
-        # if not self.is_free and not self.price:
-        #     raise ValidationError({"price": _("You have to choose between free and price")})
+    # if self.is_free and self.price:
+    #     raise ValidationError({"price": _("is free and price both not choices")})
+    # if not self.is_free and not self.price:
+    #     raise ValidationError({"price": _("You have to choose between free and price")})
 
     class Meta:
         db_table = "config"
         ordering = ('-created_at',)
-
 
 # class Domain(CreateMixin, UpdateMixin, SoftDeleteMixin):
 #     domain = models.CharField(max_length=255, db_index=True, help_text=_("نام دامنه"))

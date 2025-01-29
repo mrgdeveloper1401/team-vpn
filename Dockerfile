@@ -4,7 +4,7 @@ WORKDIR /home/app
 
 COPY . /home/app
 
-RUN adduser --disabled-password --gecos "" mg && \
+RUN adduser -D -H mg && \
     chown -R mg:mg /home/app && \
     chmod -R 755 /home/app && \
     pip install colorlog django-axes
