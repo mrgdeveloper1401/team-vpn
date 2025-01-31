@@ -28,10 +28,10 @@ class ContentDeviceInline(admin.TabularInline):
     extra = 1
 
 
-class UserConfigInline(admin.TabularInline):
-    model = UserConfig
-    extra = 1
-    raw_id_fields = ('config',)
+# class UserConfigInline(admin.TabularInline):
+#     model = UserConfig
+#     extra = 1
+#     raw_id_fields = ('config',)
 
 
 @admin.register(User)
@@ -63,18 +63,17 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
                     "is_active",
                     "is_staff",
                     "is_superuser",
-                    "is_connected_user",
-                    "groups",
-                    "user_permissions",
+                    "is_connected_user"
                 ),
             },
         ),
         (_("Important dates"), {"fields": ("last_login", "date_joined", "start_premium", "updated_at")}),
     )
-    inlines = [ContentDeviceInline, UserConfigInline]
+    inlines = [ContentDeviceInline]
     list_filter = ['is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter]
     # list_editable = ['account_type', "accounts_status", "start_premium", 'volume']
-    readonly_fields = ['number_of_login', "updated_at"]
+    readonly_fields = ['number_of_login', "updated_at", "start_premium", "date_joined", "last_login",
+                       "account_type", "accounts_status"]
 
 
 @admin.register(ContentDevice)

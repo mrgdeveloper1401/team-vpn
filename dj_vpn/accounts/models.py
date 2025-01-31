@@ -8,7 +8,6 @@ from django.core.exceptions import PermissionDenied
 
 from dj_vpn.accounts.enums import AccountType, AccountStatus, VolumeChoices
 from dj_vpn.accounts.managers import DeleteQuerySet, OneDayLeftQuerySet
-from dj_vpn.accounts.validator import integer_device_number
 from dj_vpn.cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 from dj_vpn.vpn.firebase_conf.firebase import send_notification
 
@@ -24,13 +23,13 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                                                    "limit --> لیمیت یعنی کاربر حجمش تموم شده هست \n"
                                                    "expire --> یعنی کاربر روز کانفینگ ان تموم شده هست"))
     volume_choice = models.CharField(max_length=7, choices=VolumeChoices.choices, default=VolumeChoices.GB)
-    volume = models.PositiveIntegerField(blank=True, default=0)
+    volume = models.PositiveIntegerField()
     volume_usage = models.FloatField(blank=True, default=0, help_text=_("حجم مصرفی میباشد که بر اساس مگابایت هست"),
                                      validators=[MinValueValidator(0)])
-    start_premium = models.DateField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"),
-                                     default=timezone.localdate)
-    number_of_days = models.PositiveIntegerField(blank=True, null=True, help_text=_("تعداد روز"), default=0)
-    number_of_login = models.PositiveIntegerField(help_text=_("تعداد لاگین های کاربر"), editable=False, db_default=0)
+    start_premium = models.DateField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"))
+    number_of_days = models.PositiveIntegerField(help_text=_("تعداد روز"))
+    number_of_login = models.PositiveIntegerField(help_text=_("تعداد لاگین های کاربر"), editable=False, db_default=0,
+                                                  default=0)
     is_connected_user = models.BooleanField(default=False, help_text=_("این فیلد مشخص میکنه"
                                                                        " که کاربر ایا به کانفیگش متصل شده هست یا خیر"))
     number_of_max_device = models.PositiveIntegerField(default=1,
@@ -54,49 +53,50 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             remaining = self.volume - (self.volume_usage / 1_000_000)
         return f'{remaining}, {self.volume_choice}'
 
-    def clean(self):
-        if self.volume is None:
-            raise ValidationError({'volume': _("volume not none")})
-
     def save(self, *args, **kwargs):
-        # if self.pk is None:
-        #     self.start_premium = timezone.now()
-        #   if admin volume_choice == GIG
-        if self.volume_choice == VolumeChoices.GB:
-            if (self.volume_usage / 1_000) == self.volume or (self.volume_usage / 1_000) > self.volume:
-                self.accounts_status = AccountStatus.LIMIT
-                self.account_type = AccountType.normal_user
-            if self.volume > self.volume_usage / 1_000:
-                self.accounts_status = AccountStatus.ACTIVE
-                self.account_type = AccountType.premium_user
-            if self.end_date_subscription and self.end_date_subscription < timezone.localdate():
-                self.accounts_status = AccountStatus.EXPIRED
-                self.account_type = AccountType.normal_user
-        # if volume_choice == MEG
-        elif self.volume_choice == VolumeChoices.MG:
-            if self.volume_usage == self.volume or self.volume_usage > self.volume:
-                self.accounts_status = AccountStatus.LIMIT
-                self.account_type = AccountType.normal_user
-            if self.volume > self.volume_usage:
-                self.accounts_status = AccountStatus.ACTIVE
-                self.account_type = AccountType.premium_user
-            if self.end_date_subscription and self.end_date_subscription < timezone.localdate():
-                self.accounts_status = AccountStatus.EXPIRED
-                self.account_type = AccountType.normal_user
-        # if volume_choice = TERA
+
+        if self.number_of_login == 1 and not self.start_premium:
+            self.start_premium = timezone.now().date()
+
+        if self.start_premium:
+            if self.volume_choice == VolumeChoices.GB:
+                if self.volume_usage / 1_000 == self.volume:
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.LIMIT
+                if self.volume_usage / 1_000 < self.volume and self.number_of_login > 0:
+                    self.account_type = AccountType.premium_user
+                    self.accounts_status = AccountStatus.ACTIVE
+                if self.start_premium + timedelta(days=self.number_of_days) < timezone.now().date():
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.EXPIRED
+
+            if self.volume_choice == VolumeChoices.MG:
+                if self.volume_usage == self.volume:
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.LIMIT
+                if self.volume_usage < self.volume and self.number_of_login > 0:
+                    self.account_type = AccountType.premium_user
+                    self.accounts_status = AccountStatus.ACTIVE
+                if self.start_premium + timedelta(days=self.number_of_days) < timezone.now().date():
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.EXPIRED
+
+            if self.volume_choice == VolumeChoices.TRA:
+                if self.volume_usage / 1_000_000 == self.volume:
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.LIMIT
+                if self.volume_usage / 1_000_000 < self.volume and self.number_of_login > 0:
+                    self.account_type = AccountType.premium_user
+                    self.accounts_status = AccountStatus.ACTIVE
+                if self.start_premium + timedelta(days=self.number_of_days) < timezone.now().date():
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.EXPIRED
+
         else:
-            if (self.volume_usage / 1_000_000) == self.volume or (self.volume_usage / 1_000_000) > self.volume:
-                self.accounts_status = AccountStatus.LIMIT
-                self.account_type = AccountType.normal_user
-            if self.volume > self.volume_usage / 1_000_000:
-                self.accounts_status = AccountStatus.ACTIVE
-                self.account_type = AccountType.premium_user
-            if self.end_date_subscription and self.end_date_subscription < timezone.localdate():
-                self.accounts_status = AccountStatus.EXPIRED
-                self.account_type = AccountType.normal_user
-        # if self.pk is None:
-        #     self.accounts_status = AccountStatus.NOTHING
-        return super().save(*args, **kwargs)
+            self.account_type = AccountType.normal_user
+            self.accounts_status = AccountStatus.NOTHING
+
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'auth_user'

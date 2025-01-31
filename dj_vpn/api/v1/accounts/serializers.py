@@ -64,11 +64,14 @@ class LoginSerializer(serializers.Serializer):
             device_number = attrs.get('device_number')
             device = ContentDevice.objects.get(user__username=attrs["username"], device_number=device_number)
         except ContentDevice.DoesNotExist:
-            user = User.objects.get(username=attrs['username'])
-            del self.initial_data['username']
-            del self.initial_data['password']
-            del self.initial_data['fcm_token']
-            ContentDevice.objects.create(**self.initial_data, user=user)
+            user = User.objects.filter(username=attrs['username']).first()
+            if user:
+                del self.initial_data['username']
+                del self.initial_data['password']
+                del self.initial_data['fcm_token']
+                ContentDevice.objects.create(**self.initial_data, user=user)
+            else:
+                raise ValidationError(ErrorResponse.OBJECT_NOT_FOUND)
         else:
             if device.is_blocked:
                 raise ValidationError(ErrorResponse.LOGIN_BLOCKED)

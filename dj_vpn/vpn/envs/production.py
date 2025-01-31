@@ -14,13 +14,9 @@ MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware", )
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware", )
 
 STORAGES = {
-    # ...
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-    "default": {
-        "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
-    },
+    }
 }
 
 DATABASES = {

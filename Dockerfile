@@ -16,4 +16,4 @@ ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8000
 
-ENTRYPOINT ["gunicorn", "dj_vpn.vpn.wsgi", "-b", "0.0.0.0:8000"]
+ENTRYPOINT ["sh", "-c", "/home/app/start.sh"]
