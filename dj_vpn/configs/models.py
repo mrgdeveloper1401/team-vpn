@@ -33,7 +33,7 @@ class Config(CreateMixin, UpdateMixin, SoftDeleteMixin):
     # protocol = models.CharField(choices=ProtocolChoices.choices,
     #                             help_text=_("پروتوکول های فیلترشکن"))
     # is_free = models.BooleanField(default=False, help_text=_("رایگان"))
-    # is_active = models.BooleanField(default=True, help_text=_("قابل نمایش"))
+    is_active = models.BooleanField(default=True, help_text=_("قابل نمایش"))
     # price = models.FloatField(blank=True, null=True, help_text=_("قیمت کانفیگ"))
     # volume = models.PositiveIntegerField(help_text=_("حجم کانفینگ"))
 

@@ -3,8 +3,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 from dj_vpn.configs.models import Country, Config
 from dj_vpn.subscriptions.models import UserConfig
-from dj_vpn.vpn.utils.permissions import IsOwner
-from .serializers import CountrySerializer, ConfigSerializer, UserConfigurationSerializer
+from .serializers import CountrySerializer, ConfigSerializer, ConfigurationSerializer
 
 
 class CountryViewSet(viewsets.ModelViewSet):
@@ -41,9 +40,7 @@ class FreeConfigViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewse
     # pagination_class = CommonPagination
 
 
-class UserConfigViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-    serializer_class = UserConfigurationSerializer
+class ConfigListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    serializer_class = ConfigurationSerializer
     permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return UserConfig.objects.filter(user=self.request.user).select_related("config__country")
+    queryset = Config.objects.filter(is_active=True).select_related("country")
