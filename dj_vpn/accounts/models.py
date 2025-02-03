@@ -56,7 +56,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     def day_left(self):
         if self.account_type == AccountType.premium_user:
             reminder_day = (self.end_date_subscription - date.today()).days
-            return reminder_day
+            return max(reminder_day, 0)
         return None
 
     def save(self, *args, **kwargs):
