@@ -1,6 +1,8 @@
 import os
+from datetime import timedelta
 
 from celery import Celery
+from celery.schedules import crontab
 from decouple import config
 
 DEBUG = config("DEBUG", cast=bool)
@@ -17,11 +19,12 @@ celery_app.conf.update(
     timezone="Asia/Tehran",
     task_serializer="json",
     result_serializer="json",
-    accept_content=["application/json"],
+    accept_content=["json"],
     worker_prefetch_multiplier=1,
     result_expires=120,
     task_always_eager=False,
     broker_connection_retry_on_startup=True,
+    task_acks_late=True,
 )
 
 celery_app.autodiscover_tasks()

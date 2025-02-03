@@ -1,4 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
+from django.db.models import Count
 from rest_framework.validators import ValidationError
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
@@ -32,6 +33,15 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class GetUserProfileSerializer(serializers.ModelSerializer):
+    day_left = serializers.SerializerMethodField()
+    end_date_subscription = serializers.SerializerMethodField()
+
+    def get_day_left(self, obj):
+        return obj.day_left
+
+    def get_end_date_subscription(self, obj):
+        return obj.end_date_subscription
+
     class Meta:
         model = User
         exclude = ['password', "groups", "user_permissions", "is_superuser", "is_staff", "is_active", "deleted_at",
@@ -62,14 +72,19 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, attrs):
         try:
             device_number = attrs.get('device_number')
-            device = ContentDevice.objects.get(user__username=attrs["username"], device_number=device_number)
+            username = attrs.get("username")
+            device = ContentDevice.objects.get(user__username=username, device_number=device_number)
         except ContentDevice.DoesNotExist:
-            user = User.objects.filter(username=attrs['username']).first()
+            user = User.objects.filter(username=username).first()
             if user:
-                del self.initial_data['username']
-                del self.initial_data['password']
-                del self.initial_data['fcm_token']
-                ContentDevice.objects.create(**self.initial_data, user=user)
+                data = attrs.copy()
+                del data['username']
+                del data['password']
+                del data['fcm_token']
+                if user.number_of_max_device > user.user_device.count():
+                    ContentDevice.objects.create(**data, user=user)
+                else:
+                    raise ValidationError(ErrorResponse.MAXIMUM_REACH)
             else:
                 raise ValidationError(ErrorResponse.OBJECT_NOT_FOUND)
         else:

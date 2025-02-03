@@ -38,7 +38,7 @@ class ContentDeviceInline(admin.TabularInline):
 class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
     list_display = ("username", "email", "is_staff", "is_active", "is_connected_user", "is_superuser", "date_joined",
                     "start_premium", "volume", "volume_usage", "account_type", "accounts_status", "number_of_days",
-                    "number_of_max_device", "end_date_subscription", "remaining_volume_amount")
+                    "day_left", "number_of_max_device", "end_date_subscription", "remaining_volume_amount")
     ordering = ('-date_joined',)
     add_fieldsets = (
         (

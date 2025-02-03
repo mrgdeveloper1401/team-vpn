@@ -19,7 +19,7 @@ def send_public_notification(fcm_token, title, body):
 
 
 @shared_task
-def automatic_add_volume():
+def automatic_add_volume_usage():
     all_user = User.objects.all()
     for user in all_user:
         user.volume_usage += 10

@@ -188,7 +188,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=365),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "AUTH_HEADER_TYPES": ("Bearer",),
     "ROTATE_REFRESH_TOKENS": True,
@@ -202,10 +202,6 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
-AUTHENTICATION_BACKENDS = [
-    "axes.backends.AxesStandaloneBackend",
-    "django.contrib.auth.backends.ModelBackend",
-]
 
 AXES_FAILURE_LIMIT = 10
 AXES_LOCK_OUT_FAILURE = True
@@ -218,7 +214,6 @@ AXES_LOCKOUT_TEMPLATE = None
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 DJANGO_CELERY_RESULTS_TASK_ID_MAX_LENGTH = 191
-CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 CACHES = {
     "default": {
@@ -228,3 +223,8 @@ CACHES = {
         },
     }
 }
+
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]

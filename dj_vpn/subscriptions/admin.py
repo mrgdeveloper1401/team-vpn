@@ -13,13 +13,13 @@ from .models import UserConfig
 #     raw_id_fields = ['config']
 
 
-@admin.register(UserConfig)
-class UserConfigAdmin(admin.ModelAdmin):
-    list_display = ['user', "config"]
-    # list_filter = ['is_active']
-    # list_editable = ['is_active']
-    raw_id_fields = ['user', "config"]
-    list_select_related = ["user", "config"]
+# @admin.register(UserConfig)
+# class UserConfigAdmin(admin.ModelAdmin):
+#     list_display = ['user', "config"]
+#     # list_filter = ['is_active']
+#     # list_editable = ['is_active']
+#     raw_id_fields = ['user', "config"]
+#     list_select_related = ["user", "config"]
 
 
 # @admin.register(Coupon)

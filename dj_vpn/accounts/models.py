@@ -1,9 +1,8 @@
-from datetime import timedelta
-from django.utils import timezone
+from datetime import timedelta, date
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import ValidationError, MinValueValidator
+from django.core.validators import MinValueValidator
 from django.core.exceptions import PermissionDenied
 
 from dj_vpn.accounts.enums import AccountType, AccountStatus, VolumeChoices
@@ -53,10 +52,17 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             remaining = self.volume - (self.volume_usage / 1_000_000)
         return f'{remaining}, {self.volume_choice}'
 
+    @property
+    def day_left(self):
+        if self.account_type == AccountType.premium_user:
+            reminder_day = (self.end_date_subscription - date.today()).days
+            return reminder_day
+        return None
+
     def save(self, *args, **kwargs):
 
         if self.number_of_login == 1 and not self.start_premium:
-            self.start_premium = timezone.now().date()
+            self.start_premium = date.today()
 
         if self.start_premium:
             if self.volume_choice == VolumeChoices.GB:
@@ -66,7 +72,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                 if self.volume_usage / 1_000 < self.volume and self.number_of_login > 0:
                     self.account_type = AccountType.premium_user
                     self.accounts_status = AccountStatus.ACTIVE
-                if self.start_premium + timedelta(days=self.number_of_days) < timezone.now().date():
+                if self.start_premium + timedelta(days=self.number_of_days) < date.today():
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.EXPIRED
 
@@ -77,7 +83,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                 if self.volume_usage < self.volume and self.number_of_login > 0:
                     self.account_type = AccountType.premium_user
                     self.accounts_status = AccountStatus.ACTIVE
-                if self.start_premium + timedelta(days=self.number_of_days) < timezone.now().date():
+                if self.start_premium + timedelta(days=self.number_of_days) < date.today():
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.EXPIRED
 
@@ -88,7 +94,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                 if self.volume_usage / 1_000_000 < self.volume and self.number_of_login > 0:
                     self.account_type = AccountType.premium_user
                     self.accounts_status = AccountStatus.ACTIVE
-                if self.start_premium + timedelta(days=self.number_of_days) < timezone.now().date():
+                if self.start_premium + timedelta(days=self.number_of_days) < date.today():
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.EXPIRED
 
