@@ -48,15 +48,15 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
                 "classes": ("wide",),
                 "fields": ("username", "usable_password", "password1", "password2", "volume", "volume_choice",
                            "number_of_days", "start_premium", "number_of_max_device", "account_type", "accounts_status",
-                           "user_type")
+                           "user_type", "is_inf_volume")
             },
         ),
     )
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "email", "mobile_phone", "account_type",
-                                         "accounts_status", "volume", "volume_usage", "volume_choice",
-                                         "number_of_login", "number_of_days",
+                                         "accounts_status", "volume", "volume_usage", "all_volume_usage",
+                                         "number_of_login", "number_of_days", "volume_choice", "is_inf_volume",
                                          "number_of_max_device", "fcm_token", "user_type")}),
         (
             _("Permissions"),
@@ -76,7 +76,7 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
     inlines = [ContentDeviceInline]
     list_filter = ['is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter]
     # list_editable = ['account_type', "accounts_status", "start_premium", 'volume']
-    readonly_fields = ['number_of_login', "updated_at", "date_joined", "last_login",
+    readonly_fields = ['number_of_login', "updated_at", "date_joined", "last_login", "all_volume_usage",
                        "account_type", "accounts_status"]
 
     def save_model(self, request, obj, form, change):

@@ -1,9 +1,10 @@
 from datetime import timedelta, date
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 
 from dj_vpn.accounts.enums import AccountType, AccountStatus, VolumeChoices
 from dj_vpn.accounts.managers import DeleteQuerySet, OneDayLeftQuerySet
@@ -22,9 +23,13 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                                                    "limit --> لیمیت یعنی کاربر حجمش تموم شده هست \n"
                                                    "expire --> یعنی کاربر روز کانفینگ ان تموم شده هست"))
     volume_choice = models.CharField(max_length=7, choices=VolumeChoices.choices, default=VolumeChoices.GB)
-    volume = models.PositiveIntegerField()
+    volume = models.PositiveIntegerField(validators=[MinValueValidator(0)], help_text=_("کاربر چقدر حجم داشته باشد"),
+                                         default=0)
     volume_usage = models.FloatField(blank=True, default=0, help_text=_("حجم مصرفی میباشد که بر اساس مگابایت هست"),
                                      validators=[MinValueValidator(0)])
+    is_inf_volume = models.BooleanField(default=False, help_text=_("ایا حجم کاربر نامحدود باشد!"))
+    all_volume_usage = models.FloatField(default=0, validators=[MinValueValidator(0)], editable=False,
+                                         help_text=_("کاربر تا الان چقدر حجم مصرف کرده!"))
     start_premium = models.DateField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"))
     number_of_days = models.PositiveIntegerField(help_text=_("تعداد روز"))
     number_of_login = models.PositiveIntegerField(help_text=_("تعداد لاگین های کاربر"), editable=False, db_default=0,
@@ -60,6 +65,10 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             reminder_day = (self.end_date_subscription - date.today()).days
             return max(reminder_day, 0)
         return None
+
+    def clean(self):
+        if self.volume > 0 and self.is_inf_volume:
+            raise ValidationError({"volume": _("volume and is_inf volume they can't be together")})
 
     def save(self, *args, **kwargs):
 
@@ -99,6 +108,9 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                 if self.start_premium + timedelta(days=self.number_of_days) < date.today():
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.EXPIRED
+            if self.is_inf_volume:
+                self.accounts_status = AccountStatus.ACTIVE
+                self.account_type = AccountType.premium_user
 
         else:
             self.account_type = AccountType.normal_user

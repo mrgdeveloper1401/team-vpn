@@ -115,6 +115,7 @@ class VolumeUsageApiView(views.APIView):
 
         if request.user.accounts_status == AccountStatus.ACTIVE:
             request.user.volume_usage += serializer.validated_data['volume_usage']
+            request.user.all_volume_usage += serializer.validated_data['volume_usage']
             request.user.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(ErrorResponse.USER_USAGE_LIMIT, status=status.HTTP_400_BAD_REQUEST)
