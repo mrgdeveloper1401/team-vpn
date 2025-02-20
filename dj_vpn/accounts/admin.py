@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.forms import UserChangeForm, AdminUserCreationForm
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import PermissionDenied
 
 from .models import User, ContentDevice, PrivateNotification, RecycleUser, OneDayLeftUser
 from dj_vpn.subscriptions.models import UserConfig
@@ -46,7 +47,8 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
             {
                 "classes": ("wide",),
                 "fields": ("username", "usable_password", "password1", "password2", "volume", "volume_choice",
-                           "number_of_days", "start_premium", "number_of_max_device", "account_type", "accounts_status")
+                           "number_of_days", "start_premium", "number_of_max_device", "account_type", "accounts_status",
+                           "user_type")
             },
         ),
     )
@@ -55,7 +57,7 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
         (_("Personal info"), {"fields": ("first_name", "last_name", "email", "mobile_phone", "account_type",
                                          "accounts_status", "volume", "volume_usage", "volume_choice",
                                          "number_of_login", "number_of_days",
-                                         "number_of_max_device", "fcm_token")}),
+                                         "number_of_max_device", "fcm_token", "user_type")}),
         (
             _("Permissions"),
             {
@@ -63,7 +65,9 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
                     "is_active",
                     "is_staff",
                     "is_superuser",
-                    "is_connected_user"
+                    "is_connected_user",
+                    "groups",
+                    "user_permissions",
                 ),
             },
         ),
@@ -72,8 +76,19 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
     inlines = [ContentDeviceInline]
     list_filter = ['is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter]
     # list_editable = ['account_type', "accounts_status", "start_premium", 'volume']
-    readonly_fields = ['number_of_login', "updated_at", "start_premium", "date_joined", "last_login",
+    readonly_fields = ['number_of_login', "updated_at", "date_joined", "last_login",
                        "account_type", "accounts_status"]
+
+    def save_model(self, request, obj, form, change):
+        if change:
+            request_user_type = request.user.user_type
+            get_user_type = form.cleaned_data.get("user_type")
+            if get_user_type != request_user_type:
+                if not obj.is_superuser:
+                    raise PermissionDenied("you not permission this field user_type")
+        if obj.id is None:
+            obj.user_type = request.user.user_type
+        return super().save_model(request, obj, form, change)
 
 
 @admin.register(ContentDevice)

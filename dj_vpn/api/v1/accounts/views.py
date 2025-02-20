@@ -44,7 +44,13 @@ class UserProfileApiView(views.APIView):
     def get(self, request, *args, **kwargs):
         query = User.objects.get(username=request.user.username)
         serializer = self.serializer_class(query)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if query.accounts_status == AccountStatus.LIMIT:
+            response = Response(data={"message": "limit for today reached"}, status=status.HTTP_403_FORBIDDEN)
+        elif query.accounts_status == AccountStatus.EXPIRED:
+            response = Response(data={"message": "usage limit reached"}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            response = Response(serializer.data, status=status.HTTP_200_OK)
+        return response
 
 
 class LoginApiView(views.APIView):

@@ -37,4 +37,4 @@ class ConfigurationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Config
-        fields = ['id', "en_country_name", "fa_country_name", "country_code", "config"]
+        fields = ['id', "en_country_name", "fa_country_name", "country_code", "config", "config_type"]

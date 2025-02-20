@@ -13,3 +13,5 @@ class ErrorResponse:
     FIELD_IS_ACTIVE = {"detail": "FIELD_IS_ACTIVE", 'error_code': 12}
     INVALID_PASSWORD = {"detail": "INVALID_PASSWORD", 'error_code': 13}
     MAXIMUM_REACH = {"detail": "MAXIMUM_REACH", 'error_code': 14}
+    EXPIRED = {"detail": "EXPIRED", 'error_code': 215}
+    LIMIT_REACH = {"detail": "LIMIT", 'error_code': 216}

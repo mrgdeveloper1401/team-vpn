@@ -34,6 +34,8 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     number_of_max_device = models.PositiveIntegerField(default=1,
                                                        help_text=_("هر اکانت چند تا یوزر میتواند به ان متصل شود"))
     fcm_token = models.CharField(max_length=255, blank=True, null=True, help_text=_("fcm token"))
+    user_type = models.CharField(choices=[("a_user", _("a user")), ("b_user", _("b user"))], null=True, blank=True)
+
     REQUIRED_FIELDS = ['mobile_phone']
 
     @property
@@ -101,7 +103,6 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
         else:
             self.account_type = AccountType.normal_user
             self.accounts_status = AccountStatus.NOTHING
-
         super().save(*args, **kwargs)
 
     class Meta:

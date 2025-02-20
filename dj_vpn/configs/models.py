@@ -29,7 +29,8 @@ class Config(CreateMixin, UpdateMixin, SoftDeleteMixin):
     country = models.ForeignKey(Country, on_delete=models.DO_NOTHING, related_name="country_configs",
                                 help_text=_("کشور مورد نظر"))
     config = models.TextField(help_text=_("کانفینگ"))
-
+    config_type = models.CharField(choices=[("tunnel_server", _("سرور تانل")), ("direct_server", _("سرور مستقیم"))],
+                                   max_length=14, blank=True, null=True)
     # protocol = models.CharField(choices=ProtocolChoices.choices,
     #                             help_text=_("پروتوکول های فیلترشکن"))
     # is_free = models.BooleanField(default=False, help_text=_("رایگان"))

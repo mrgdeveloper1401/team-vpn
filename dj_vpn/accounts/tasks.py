@@ -16,11 +16,3 @@ def send_notif_one_day_left_user(fcm_token, title, body):
 @shared_task
 def send_public_notification(fcm_token, title, body):
     send_notification(fcm_token, title, body)
-
-
-@shared_task
-def automatic_add_volume_usage():
-    all_user = User.objects.all()
-    for user in all_user:
-        user.volume_usage += 10
-    User.objects.bulk_update(all_user, ['volume_usage'])

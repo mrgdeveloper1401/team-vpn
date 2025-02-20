@@ -19,16 +19,16 @@ STORAGES = {
     }
 }
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "HOST": config("POSTDB_HOST", cast=str),
-        "PASSWORD": config("POSTDB_PASSWORD", cast=str),
-        "PORT": config("POSTDB_PORT", cast=str),
-        "USER": config("POSTDB_USER", cast=str),
-        "NAME": config("POSTDB_NAME", cast=str)
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "HOST": config("POSTDB_HOST", cast=str),
+#         "PASSWORD": config("POSTDB_PASSWORD", cast=str),
+#         "PORT": config("POSTDB_PORT", cast=str),
+#         "USER": config("POSTDB_USER", cast=str),
+#         "NAME": config("POSTDB_NAME", cast=str)
+#     }
+# }
 
 # DATABASES = {
 #     "default": {
@@ -42,16 +42,16 @@ DATABASES = {
 # }
 
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "HOST": config("PUB_POSTDB_HOST", cast=str),
-#         "PASSWORD": config("PUB_POSTDB_PASSWORD", cast=str),
-#         "PORT": config("PUB_POSTDB_PORT", cast=str),
-#         "USER": config("PUB_POSTDB_USER", cast=str),
-#         "NAME": config("PUB_POSTDB_NAME", cast=str)
-#     }
-# }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": config("PUB_POSTDB_HOST", cast=str),
+        "PASSWORD": config("PUB_POSTDB_PASSWORD", cast=str),
+        "PORT": config("PUB_POSTDB_PORT", cast=str),
+        "USER": config("PUB_POSTDB_USER", cast=str),
+        "NAME": config("PUB_POSTDB_NAME", cast=str)
+    }
+}
 
 # django cors header settings
 CORS_ALLOW_ALL_ORIGINS = True
@@ -84,5 +84,3 @@ SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
 
 broker_url = config("BROCKER_URL", cast=str)
 result_backend = config("RESULT_BACKEND", cast=str)
-
-

@@ -43,4 +43,10 @@ class FreeConfigViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewse
 class ConfigListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     serializer_class = ConfigurationSerializer
     permission_classes = [IsAuthenticated]
-    queryset = Config.objects.filter(is_active=True).select_related("country")
+
+    def get_queryset(self):
+        request_user_type = self.request.user.user_type
+        if request_user_type == "a_user":
+            return Config.objects.filter(is_active=True, config_type="tunnel_server").select_related("country")
+        else:
+            return Config.objects.filter(is_active=True, config_type="direct_server").select_related("country")

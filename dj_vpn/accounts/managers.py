@@ -1,5 +1,5 @@
 from django.db.models import Manager, F, ExpressionWrapper, DateField
-from django.utils import timezone
+from datetime import date, timedelta
 
 from dj_vpn.accounts.enums import AccountType
 
@@ -17,4 +17,4 @@ class OneDayLeftQuerySet(Manager):
                 output_field=DateField()
             )
         ).filter(account_type=AccountType.premium_user).
-                filter(end_date=timezone.localdate() + timezone.timedelta(days=1)))
+                filter(end_date=date.today() + timedelta(days=1)))

@@ -1,8 +1,18 @@
-FROM mrgdocker2023/dj_5_base:1.0.0
+FROM python:3.12-alpine
 
 WORKDIR /home/app
 
 COPY . /home/app
+
+RUN apk add --update --upgrade --no-cache --virtual .tmp python3  \
+    py3-pip  \
+    redis  \
+    celery  \
+    postgresql  \
+    nginx
+
+RUN pip install --upgrade pip && \
+    pip install -r ./requirements/production.txt
 
 RUN adduser -D -H mg && \
     chown -R mg:mg /home/app && \
