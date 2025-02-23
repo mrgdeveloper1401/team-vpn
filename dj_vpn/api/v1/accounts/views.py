@@ -81,7 +81,7 @@ class LoginApiView(views.APIView):
         return Response({"detail": "invalid input"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ContentDeviceViewSet(viewsets.ModelViewSet):
+class ContentDeviceViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = ContentDeviceSerializer
     permission_classes = [IsAuthenticated]
 

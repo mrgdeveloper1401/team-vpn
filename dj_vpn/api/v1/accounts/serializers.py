@@ -35,12 +35,16 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 class GetUserProfileSerializer(serializers.ModelSerializer):
     day_left = serializers.SerializerMethodField()
     end_date_subscription = serializers.SerializerMethodField()
+    remaining_volume_amount = serializers.SerializerMethodField()
 
     def get_day_left(self, obj):
         return obj.day_left
 
     def get_end_date_subscription(self, obj):
         return obj.end_date_subscription
+
+    def get_remaining_volume_amount(self, obj):
+        return obj.remaining_volume_amount
 
     class Meta:
         model = User
@@ -52,12 +56,6 @@ class UpdateUserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["email", "mobile_phone", "first_name", "last_name", "birth_date"]
-
-
-class AdminUserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        exclude = ['groups', "user_permissions"]
 
 
 class LoginSerializer(serializers.Serializer):
@@ -110,13 +108,6 @@ class PrivateNotificationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PrivateNotification
         exclude = ['is_deleted', "deleted_at", "user"]
-
-
-# class LogoutSerializer(serializers.Serializer):
-#     refresh_token = serializers.CharField()
-#
-#     def save(self, **kwargs):
-#         pass
 
 
 class VolumeUsageSerializer(serializers.Serializer):

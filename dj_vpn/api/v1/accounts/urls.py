@@ -13,7 +13,7 @@ app_name = 'accounts'
 router = routers.DefaultRouter()
 # router.register(r'create_user', views.UserRegisterViewSet, basename="create_user")
 router.register("user_profile", views.UserProfileViewSet, basename="user_profile")
-# router.register('content_device', views.ContentDeviceViewSet, basename="content_device")
+router.register('content_device', views.ContentDeviceViewSet, basename="content_device")
 router.register('private_notification', views.PrivateNotificationViewSet, basename="private_notification")
 
 urlpatterns = [
