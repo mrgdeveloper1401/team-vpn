@@ -22,7 +22,9 @@ class Config(CreateMixin, UpdateMixin, SoftDeleteMixin):
     country = models.ForeignKey(Country, on_delete=models.DO_NOTHING, related_name="country_configs",
                                 help_text=_("کشور مورد نظر"))
     config = models.TextField(help_text=_("کانفینگ"))
-    config_type = models.CharField(choices=[("tunnel_server", _("سرور تانل")), ("direct_server", _("سرور مستقیم"))],
+    config_type = models.CharField(
+        choices=[("tunnel", _("سرور تانل")), ("direct", _("سرور مستقیم")),
+                 ("tunnel_direct", _("سرور تانل و دایرکت"))],
                                    max_length=14, blank=True, null=True)
     is_active = models.BooleanField(default=True, help_text=_("قابل نمایش"))
 

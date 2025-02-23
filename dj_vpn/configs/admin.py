@@ -27,7 +27,7 @@ class CountryAdmin(ImportExportModelAdmin):
 
 @admin.register(models.Config)
 class ConfigAdmin(ImportExportModelAdmin):
-    list_display = ["country", "created_at", "config_type"]
+    list_display = ["country", "created_at", "config_type", "is_active"]
     raw_id_fields = ["country"]
     list_select_related = ["country"]
     # list_editable = ["is_active"]
