@@ -257,8 +257,7 @@ cython_debug/
 staticfiles
 vpn.zip
 **/general_log_django
-**/__pycache__
-**/migrations/
+**/__pycache__/**
 vpn/utils/data_db
 vpn/utils/impoer_date_to_db.py
 #templates
@@ -266,7 +265,6 @@ static
 node_modules
 frontend
 vpn/firebase_conf
-node_modules
 package-lock.json
 package.json
 .coverage

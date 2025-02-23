@@ -24,12 +24,3 @@ class CheckDeviceBlockMiddleware:
                     return JsonResponse({'detail': "your device is blocked"}, status=status.HTTP_403_FORBIDDEN)
         response = self.get_response(request)
         return response
-
-
-class CheckLoginMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        response = self.get_response(request)
-        return response

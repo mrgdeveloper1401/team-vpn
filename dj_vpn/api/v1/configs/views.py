@@ -2,7 +2,6 @@ from rest_framework import viewsets, permissions, mixins
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 from dj_vpn.configs.models import Country, Config
-from dj_vpn.subscriptions.models import UserConfig
 from .serializers import CountrySerializer, ConfigSerializer, ConfigurationSerializer
 
 

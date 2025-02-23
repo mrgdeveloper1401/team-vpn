@@ -10,7 +10,6 @@ from django.utils.translation import gettext_lazy as _
 class PublicNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
     title = models.CharField(max_length=255)
     body = models.TextField(null=True, blank=True)
-    # file = models.FileField(upload_to="notifications/", null=True, blank=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

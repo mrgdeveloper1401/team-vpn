@@ -20,7 +20,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     "import_export",
-    # "jet_django",
     "django_celery_beat",
     "django_celery_results",
     "axes",
@@ -32,9 +31,7 @@ INSTALLED_APPS = [
     "dj_vpn.accounts.apps.AccountsConfig",
     "dj_vpn.configs.apps.ConfigsConfig",
     "dj_vpn.cores.apps.CoresConfig",
-    "dj_vpn.main_settings.apps.MainSettingsConfig",
-    "dj_vpn.payments.apps.PaymentsConfig",
-    "dj_vpn.subscriptions.apps.SubscriptionsConfig",
+    "dj_vpn.main_settings.apps.MainSettingsConfig"
 ]
 
 MIDDLEWARE = [
@@ -57,7 +54,7 @@ ROOT_URLCONF = "dj_vpn.vpn.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+        "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -103,13 +100,13 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-STATIC_URL = "static/"
+STATIC_URL = "static/static/"
 STATIC_ROOT = os.path.join(BASE_DIR / "staticfiles")
-MEDIA_URL = "media/"
+MEDIA_URL = "static/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR / "media")
-STATICFILES_DIRS = [
-    BASE_DIR / "static"
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static"
+# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

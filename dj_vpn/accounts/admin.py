@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import PermissionDenied
 
 from .models import User, ContentDevice, PrivateNotification, RecycleUser, OneDayLeftUser
-from dj_vpn.subscriptions.models import UserConfig
 from import_export.admin import ImportExportModelAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 # Register your models here.
@@ -78,13 +77,14 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
     # list_editable = ['account_type', "accounts_status", "start_premium", 'volume']
     readonly_fields = ['number_of_login', "updated_at", "date_joined", "last_login", "all_volume_usage",
                        "account_type", "accounts_status"]
+    list_per_page = 20
 
     def save_model(self, request, obj, form, change):
         if change:
             request_user_type = request.user.user_type
             get_user_type = form.cleaned_data.get("user_type")
             if get_user_type != request_user_type:
-                if not obj.is_superuser:
+                if not request.user.is_superuser:
                     raise PermissionDenied("you not permission this field user_type")
         if obj.id is None:
             obj.user_type = request.user.user_type

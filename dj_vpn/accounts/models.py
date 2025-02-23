@@ -30,8 +30,9 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     is_inf_volume = models.BooleanField(default=False, help_text=_("ایا حجم کاربر نامحدود باشد!"))
     all_volume_usage = models.FloatField(default=0, validators=[MinValueValidator(0)], editable=False,
                                          help_text=_("کاربر تا الان چقدر حجم مصرف کرده!"))
-    start_premium = models.DateField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"))
-    number_of_days = models.PositiveIntegerField(help_text=_("تعداد روز"))
+    start_premium = models.DateField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک اگر کاربر لاگین کند"
+                                                                        " اشتراک کاربر از همان روز شروع خواهد شد"))
+    number_of_days = models.PositiveIntegerField(help_text=_("تعداد روز"), null=True, default=0)
     number_of_login = models.PositiveIntegerField(help_text=_("تعداد لاگین های کاربر"), editable=False, db_default=0,
                                                   default=0)
     is_connected_user = models.BooleanField(default=False, help_text=_("این فیلد مشخص میکنه"
@@ -39,7 +40,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     number_of_max_device = models.PositiveIntegerField(default=1,
                                                        help_text=_("هر اکانت چند تا یوزر میتواند به ان متصل شود"))
     fcm_token = models.CharField(max_length=255, blank=True, null=True, help_text=_("fcm token"))
-    user_type = models.CharField(choices=[("a_user", _("a user")), ("b_user", _("b user"))], null=True, blank=True)
+    user_type = models.CharField(choices=[("direct", _("مستقیم")), ("tunnel", _("تانل"))], null=True, blank=True)
 
     REQUIRED_FIELDS = ['mobile_phone']
 
@@ -57,6 +58,8 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             remaining = self.volume - self.volume_usage
         else:
             remaining = self.volume - (self.volume_usage / 1_000_000)
+        if self.is_inf_volume:
+            return "inf"
         return f'{remaining}, {self.volume_choice}'
 
     @property
@@ -71,7 +74,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             raise ValidationError({"volume": _("volume and is_inf volume they can't be together")})
 
     def save(self, *args, **kwargs):
-
+        # اگر کاربر لاگین کند برای بار اول تاریخ شروع اکانت مشخص خواهد شد
         if self.number_of_login == 1 and not self.start_premium:
             self.start_premium = date.today()
 
@@ -122,6 +125,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
         ordering = ("-date_joined",)
 
 
+# deleted user show it
 class RecycleUser(User):
     objects = DeleteQuerySet()
 
@@ -129,6 +133,7 @@ class RecycleUser(User):
         proxy = True
 
 
+# one day left user show it
 class OneDayLeftUser(User):
     objects = OneDayLeftQuerySet()
 
@@ -139,10 +144,8 @@ class OneDayLeftUser(User):
 class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):
     device_model = models.CharField(max_length=255, help_text=_("مدل دستگاه"), blank=True, null=True)
     device_os = models.CharField(max_length=50, help_text=_("نسخه دستگاه"), blank=True, null=True)
-    # device_brand = models.CharField(max_length=50, help_text=_("برند گوشی"), blank=True, null=True)
     device_number = models.CharField(max_length=255, help_text=_("سریال گوشی"))
     ip_address = models.GenericIPAddressField(help_text=_("ادرس ای پی"))
-    # is_connected = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='user_device',
                              help_text=_("کاربر"))
     is_blocked = models.BooleanField(default=False, help_text=_("بلاک شدن"))
@@ -160,23 +163,9 @@ class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):
         db_table = 'content_device'
 
 
-# class RequestLog(CreateMixin, UpdateMixin, SoftDeleteMixin):
-#     user = models.CharField(editable=False, max_length=255)
-#     path = models.CharField(max_length=255, editable=False)
-#     method = models.CharField(max_length=10, editable=False)
-#     status_code = models.BooleanField(editable=False)
-#     template_name = models.CharField(editable=False)
-#     logs = models.JSONField(editable=False)
-#
-#     class Meta:
-#         db_table = 'request_log'
-
-
 class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
     title = models.CharField(max_length=255, help_text=_("عنوان اعلانات"))
     body = models.TextField(help_text=_("متن اعلانات"))
-    # file = models.FileField(upload_to="notifications/%Y/%m/%d", null=True, blank=True,
-    #                         help_text=_("فایل برای اعلانات"))
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, help_text=_("گاربر"))
     is_active = models.BooleanField(default=True, help_text=_("قابل نمایش"))
 

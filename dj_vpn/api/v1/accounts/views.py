@@ -1,14 +1,15 @@
 from django.contrib.auth import authenticate
-from rest_framework import viewsets, status, permissions
+from rest_framework import viewsets, status
 from rest_framework import mixins
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import views
 from rest_framework.response import Response
+from django.db.models import F
 
 from dj_vpn.accounts.enums import AccountStatus
 from dj_vpn.accounts.models import User, ContentDevice, PrivateNotification
 from dj_vpn.vpn.utils.create_refresh_token import get_token_refresh_token
-from dj_vpn.vpn.utils.paginations import CommonPagination, AdminUserProfilePagination
+from dj_vpn.vpn.utils.paginations import CommonPagination
 from dj_vpn.vpn.utils.permissions import NotAuthenticated
 from . import serializers
 from .serializers import ContentDeviceSerializer, PrivateNotificationsSerializer, VolumeUsageSerializer
@@ -114,9 +115,10 @@ class VolumeUsageApiView(views.APIView):
         serializer.is_valid(raise_exception=True)
 
         if request.user.accounts_status == AccountStatus.ACTIVE:
-            request.user.volume_usage += serializer.validated_data['volume_usage']
-            request.user.all_volume_usage += serializer.validated_data['volume_usage']
-            request.user.save()
+            User.objects.filter(id=request.user.id).update(
+                volume_usage=F('volume_usage') + serializer.validated_data['volume_usage'],
+                all_volume_usage=F("all_volume_usage") + serializer.validated_data['volume_usage'],
+            )
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(ErrorResponse.USER_USAGE_LIMIT, status=status.HTTP_400_BAD_REQUEST)
 
