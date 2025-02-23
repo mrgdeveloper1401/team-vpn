@@ -45,7 +45,7 @@ class ConfigListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewse
 
     def get_queryset(self):
         request_user_type = self.request.user.user_type
-        if request_user_type == "a_user":
+        if request_user_type == "tunnel":
             return Config.objects.filter(is_active=True, config_type="tunnel_server").select_related("country")
         else:
             return Config.objects.filter(is_active=True, config_type="direct_server").select_related("country")
