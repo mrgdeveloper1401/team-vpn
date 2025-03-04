@@ -32,6 +32,7 @@ class ContentDeviceInline(admin.TabularInline):
 @admin.register(User)
 class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
     add_form = forms.UserAccountCreationForm
+    change_password_form = forms.UserAdminPasswordChangeForm
     list_display = ("username", "email", "is_staff", "is_active", "is_connected_user", "is_superuser", "date_joined",
                     "start_premium", "volume", "volume_usage", "account_type", "accounts_status", "number_of_days",
                     "day_left", "number_of_max_device", "end_date_subscription", "remaining_volume_amount")
