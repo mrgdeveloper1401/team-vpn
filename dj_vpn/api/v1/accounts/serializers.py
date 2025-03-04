@@ -60,7 +60,7 @@ class UpdateUserProfileSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
-    password = serializers.CharField(min_length=8, style={'input_type': 'password'})
+    password = serializers.CharField(style={'input_type': 'password'})
     device_number = serializers.CharField()
     ip_address = serializers.IPAddressField()
     device_model = serializers.CharField()

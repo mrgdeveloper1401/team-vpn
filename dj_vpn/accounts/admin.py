@@ -6,6 +6,7 @@ from django.core.exceptions import PermissionDenied
 from .models import User, ContentDevice, PrivateNotification, RecycleUser, OneDayLeftUser
 from import_export.admin import ImportExportModelAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from . import forms
 # Register your models here.
 
 
@@ -28,14 +29,9 @@ class ContentDeviceInline(admin.TabularInline):
     extra = 1
 
 
-# class UserConfigInline(admin.TabularInline):
-#     model = UserConfig
-#     extra = 1
-#     raw_id_fields = ('config',)
-
-
 @admin.register(User)
-class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
+class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
+    add_form = forms.UserAccountCreationForm
     list_display = ("username", "email", "is_staff", "is_active", "is_connected_user", "is_superuser", "date_joined",
                     "start_premium", "volume", "volume_usage", "account_type", "accounts_status", "number_of_days",
                     "day_left", "number_of_max_device", "end_date_subscription", "remaining_volume_amount")
