@@ -33,10 +33,9 @@ class ContentDeviceInline(admin.TabularInline):
 class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
     add_form = forms.UserAccountCreationForm
     change_password_form = forms.UserAdminPasswordChangeForm
-    list_display = ("username", "email", "is_staff", "is_active", "is_connected_user", "is_superuser", "date_joined",
-                    "start_premium", "volume", "volume_usage", "account_type", "accounts_status", "number_of_days",
+    list_display = ("username", "is_staff", "is_active", "is_connected_user", "start_premium", "volume",
+                    "volume_usage", "account_type", "accounts_status", "number_of_days",
                     "day_left", "number_of_max_device", "end_date_subscription", "remaining_volume_amount")
-    ordering = ('-date_joined',)
     add_fieldsets = (
         (
             None,
@@ -44,7 +43,7 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
                 "classes": ("wide",),
                 "fields": ("username", "usable_password", "password1", "password2", "volume", "volume_choice",
                            "number_of_days", "start_premium", "number_of_max_device", "account_type", "accounts_status",
-                           "user_type", "is_inf_volume")
+                           "user_type", "is_inf_volume", "is_staff", "groups", "user_permissions")
             },
         ),
     )
@@ -67,25 +66,41 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
                 ),
             },
         ),
-        (_("Important dates"), {"fields": ("last_login", "date_joined", "start_premium", "updated_at")}),
+        (_("Important dates"), {"fields": ("last_login", "date_joined", "start_premium", "updated_at", "birth_date")}),
     )
     inlines = [ContentDeviceInline]
     list_filter = ['is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter]
-    # list_editable = ['account_type', "accounts_status", "start_premium", 'volume']
     readonly_fields = ['number_of_login', "updated_at", "date_joined", "last_login", "all_volume_usage",
                        "account_type", "accounts_status"]
     list_per_page = 20
+    search_fields = ['username']
+    ordering = ['-date_joined']
+
+    def get_readonly_fields(self, request, obj=None):
+        read_only_fields = super().get_readonly_fields(request, obj)
+        if not request.user.is_superuser:
+            read_only_fields += ["is_superuser", "is_staff", "is_connected_user", "groups", "user_permissions",
+                                 "user_type", "is_inf_volume", "start_premium", "fcm_token"]
+        return read_only_fields
 
     def save_model(self, request, obj, form, change):
         if change:
-            request_user_type = request.user.user_type
-            get_user_type = form.cleaned_data.get("user_type")
-            if get_user_type != request_user_type:
-                if not request.user.is_superuser:
-                    raise PermissionDenied("you not permission this field user_type")
+            if not request.user.is_superuser:
+                request_user_type = request.user.user_type
+                get_user_type = form.cleaned_data.get("user_type")
+                if get_user_type != request_user_type:
+                    if not request.user.is_superuser:
+                        raise PermissionDenied("you not permission this field user_type")
         if obj.id is None:
-            obj.user_type = request.user.user_type
+            if not request.user.is_superuser:
+                obj.user_type = request.user.user_type
         return super().save_model(request, obj, form, change)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if not request.user.is_superuser:
+            qs = qs.filter(user_type=request.user.user_type)
+        return qs
 
 
 @admin.register(ContentDevice)

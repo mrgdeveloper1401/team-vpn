@@ -180,7 +180,13 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
         except Exception as e:
             raise e
 
+    def clean(self):
+        if not self.user.fcm_token:
+            raise ValidationError({"user": _("User does not have an FCM token.")})
+        super().clean()
+
     def save(self, *args, **kwargs):
+        self.clean()
         self.send_to_user()
         super().save(*args, **kwargs)
 
