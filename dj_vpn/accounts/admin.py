@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.forms import UserChangeForm, AdminUserCreationForm
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import PermissionDenied
+# from guardian.admin import GuardedModelAdmin
+# from guardian.shortcuts import get_objects_for_user
 
 from .models import User, ContentDevice, PrivateNotification, RecycleUser, OneDayLeftUser
 from import_export.admin import ImportExportModelAdmin
@@ -70,18 +72,11 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
     )
     inlines = [ContentDeviceInline]
     list_filter = ['is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter]
-    readonly_fields = ['number_of_login', "updated_at", "date_joined", "last_login", "all_volume_usage",
-                       "account_type", "accounts_status"]
+    readonly_fields = ["updated_at", "date_joined", "last_login", "account_type", "accounts_status",
+                       "all_volume_usage", 'number_of_login']
     list_per_page = 20
     search_fields = ['username']
     ordering = ['-date_joined']
-
-    def get_readonly_fields(self, request, obj=None):
-        read_only_fields = super().get_readonly_fields(request, obj)
-        if not request.user.is_superuser:
-            read_only_fields += ["is_superuser", "is_staff", "is_connected_user", "groups", "user_permissions",
-                                 "user_type", "is_inf_volume", "start_premium", "fcm_token"]
-        return read_only_fields
 
     def save_model(self, request, obj, form, change):
         if change:
@@ -101,6 +96,54 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
         if not request.user.is_superuser:
             qs = qs.filter(user_type=request.user.user_type)
         return qs
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        is_superuser = request.user.is_superuser
+
+        if not is_superuser:
+            if request.user.has_perm("accounts.change_user"):
+                form.base_fields['is_superuser'].disabled = True
+                form.base_fields['is_staff'].disabled = True
+                form.base_fields['is_connected_user'].disabled = True
+                form.base_fields['start_premium'].disabled = True
+                form.base_fields['is_inf_volume'].disabled = True
+                form.base_fields['fcm_token'].disabled = True
+                form.base_fields['user_type'].disabled = True
+                form.base_fields['groups'].disabled = True
+                form.base_fields['user_permissions'].disabled = True
+        return form
+
+    # def has_module_permission(self, request):
+    #     is_superuser = request.user.is_superuser
+    #     if is_superuser:
+    #         return True
+    #     return self.get_model_objects(request).exists()
+
+    # def get_model_objects(self, request, action=None, klass=None):
+    #     opts = self.opts
+    #     actions = [action] if action else ['view', "edit", "delete"]
+    #     klass = klass if klass else opts.model
+    #     model_name = klass._meta.model_name
+    #     return get_objects_for_user(user=request.user, perms=[f"{perm}_{model_name}" for perm in actions], klass=klass,
+    #                                 any_perm=True)
+
+    # def has_permissions(self, request, obj, action):
+    #     opts = self.opts
+    #     code_name = f'{action}_{opts.model_name}'
+    #     if obj:
+    #         return request.user.has_perm(f'{opts.app_label}.{code_name}', obj)
+    #     else:
+    #         return self.get_model_objects(request).exists()
+
+    # def has_view_permission(self, request, obj=None):
+    #     return self.has_permissions(request, obj, "view")
+
+    # def has_change_permission(self, request, obj=None):
+    #     return self.has_permissions(request, obj, "change")
+
+    # def has_delete_permission(self, request, obj=None):
+    #     return self.has_permissions(request, obj, "delete")
 
 
 @admin.register(ContentDevice)

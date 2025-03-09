@@ -42,9 +42,9 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     fcm_token = models.CharField(max_length=255, blank=True, null=True, help_text=_("fcm token"))
     user_type = models.CharField(
         choices=[("direct", _("مستقیم")), ("tunnel", _("تانل")), ("tunnel_direct", _("تانل و دایرکت"))],
-        null=True, blank=True)
+        null=True, blank=True, max_length=14, help_text=_("you can choice --> tunnel - direct - tunnel_direct"))
 
-    REQUIRED_FIELDS = ['mobile_phone']
+    REQUIRED_FIELDS = ['mobile_phone', "user_type"]
 
     @property
     def end_date_subscription(self):

@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
+    # "guardian",
 
     "dj_vpn.accounts.apps.AccountsConfig",
     "dj_vpn.configs.apps.ConfigsConfig",
@@ -222,6 +223,7 @@ CACHES = {
 }
 
 AUTHENTICATION_BACKENDS = [
-    "axes.backends.AxesStandaloneBackend",
-    "django.contrib.auth.backends.ModelBackend",
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+    # 'guardian.backends.ObjectPermissionBackend',
 ]

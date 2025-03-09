@@ -4,7 +4,6 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=str).split(" ")
 
 SECRET_KEY = config("PROD_SECRET_KEY", cast=str)
 
-
 INSTALLED_APPS += [
     "corsheaders",
     "storages",
@@ -19,16 +18,16 @@ STORAGES = {
     }
 }
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "HOST": config("POSTDB_HOST", cast=str),
-#         "PASSWORD": config("POSTDB_PASSWORD", cast=str),
-#         "PORT": config("POSTDB_PORT", cast=str),
-#         "USER": config("POSTDB_USER", cast=str),
-#         "NAME": config("POSTDB_NAME", cast=str)
-#     }
-# }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": config("POSTDB_HOST", cast=str),
+        "PASSWORD": config("POSTDB_PASSWORD", cast=str),
+        "PORT": config("POSTDB_PORT", cast=str),
+        "USER": config("POSTDB_USER", cast=str),
+        "NAME": config("POSTDB_NAME", cast=str)
+    }
+}
 
 # DATABASES = {
 #     "default": {
@@ -42,16 +41,28 @@ STORAGES = {
 # }
 
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "HOST": config("PUB_POSTDB_HOST", cast=str),
-        "PASSWORD": config("PUB_POSTDB_PASSWORD", cast=str),
-        "PORT": config("PUB_POSTDB_PORT", cast=str),
-        "USER": config("PUB_POSTDB_USER", cast=str),
-        "NAME": config("PUB_POSTDB_NAME", cast=str)
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "HOST": config("PUB_POSTDB_HOST", cast=str),
+#         "PASSWORD": config("PUB_POSTDB_PASSWORD", cast=str),
+#         "PORT": config("PUB_POSTDB_PORT", cast=str),
+#         "USER": config("PUB_POSTDB_USER", cast=str),
+#         "NAME": config("PUB_POSTDB_NAME", cast=str)
+#     }
+# }
+
+# when test production model we can use these databases
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "postgres",
+#         "USER": "postgres",
+#         "PASSWORD": "postgres",
+#         "HOST": "localhost",
+#         "PORT": "5433",
+#     }
+# }
 
 # django cors header settings
 CORS_ALLOW_ALL_ORIGINS = True
@@ -69,7 +80,6 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 SECURE_REFERRER_POLICY = "strict-origin"
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-
 
 # aws config
 # AWS_ACCESS_KEY_ID = config("ARVAN_ACCESS_KEY", cast=str)
