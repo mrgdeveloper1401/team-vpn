@@ -9,6 +9,11 @@ class DeleteQuerySet(Manager):
         return super().get_queryset().filter(is_deleted=True)
 
 
+class AllUserManager(Manager):
+    def get_queryset(self):
+        return super().get_queryset()
+
+
 class OneDayLeftQuerySet(Manager):
     def get_queryset(self):
         return (super().get_queryset().annotate(

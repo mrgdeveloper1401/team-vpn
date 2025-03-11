@@ -121,6 +121,13 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
                         form.base_fields[field_name].disabled = True
         return form
 
+    def has_delete_permission(self, request, obj=None):
+        if not request.user.is_superuser:
+            if obj:
+                if obj.is_staff and request.user.is_staff:
+                    return False
+        return super().has_delete_permission(request, obj)
+
 
 @admin.register(ContentDevice)
 class ContentDeviceAdmin(ImportExportModelAdmin):

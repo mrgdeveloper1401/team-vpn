@@ -10,3 +10,8 @@ class SoftQuerySet(QuerySet):
 class SoftManager(Manager):
     def get_queryset(self):
         return SoftQuerySet(self.model, using=self._db).filter(Q(is_deleted=False) | Q(is_deleted=None))
+
+
+class UserSoftManager(Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(Q(is_deleted=False) | Q(is_deleted=None))
