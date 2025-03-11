@@ -72,7 +72,8 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
         (_("Important dates"), {"fields": ("last_login", "date_joined", "start_premium", "updated_at", "birth_date")}),
     )
     inlines = [ContentDeviceInline]
-    list_filter = ['is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter]
+    list_filter = ('is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter,
+                   "user_type")
     readonly_fields = ["updated_at", "date_joined", "last_login", "account_type", "accounts_status",
                        "all_volume_usage", 'number_of_login']
     list_per_page = 20
