@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.forms import UserChangeForm, AdminUserCreationForm
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 # from guardian.admin import GuardedModelAdmin
 # from guardian.shortcuts import get_objects_for_user
 
@@ -103,47 +104,22 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
 
         if not is_superuser:
             if request.user.has_perm("accounts.change_user"):
-                form.base_fields['is_superuser'].disabled = True
-                form.base_fields['is_staff'].disabled = True
-                form.base_fields['is_connected_user'].disabled = True
-                form.base_fields['start_premium'].disabled = True
-                form.base_fields['is_inf_volume'].disabled = True
-                form.base_fields['fcm_token'].disabled = True
-                form.base_fields['user_type'].disabled = True
-                form.base_fields['groups'].disabled = True
-                form.base_fields['user_permissions'].disabled = True
+                fields_to_disable = [
+                    'is_superuser',
+                    'is_staff',
+                    'is_connected_user',
+                    'start_premium',
+                    'is_inf_volume',
+                    'fcm_token',
+                    'user_type',
+                    'groups',
+                    'user_permissions',
+                ]
+
+                for field_name in fields_to_disable:
+                    if field_name in form.base_fields:
+                        form.base_fields[field_name].disabled = True
         return form
-
-    # def has_module_permission(self, request):
-    #     is_superuser = request.user.is_superuser
-    #     if is_superuser:
-    #         return True
-    #     return self.get_model_objects(request).exists()
-
-    # def get_model_objects(self, request, action=None, klass=None):
-    #     opts = self.opts
-    #     actions = [action] if action else ['view', "edit", "delete"]
-    #     klass = klass if klass else opts.model
-    #     model_name = klass._meta.model_name
-    #     return get_objects_for_user(user=request.user, perms=[f"{perm}_{model_name}" for perm in actions], klass=klass,
-    #                                 any_perm=True)
-
-    # def has_permissions(self, request, obj, action):
-    #     opts = self.opts
-    #     code_name = f'{action}_{opts.model_name}'
-    #     if obj:
-    #         return request.user.has_perm(f'{opts.app_label}.{code_name}', obj)
-    #     else:
-    #         return self.get_model_objects(request).exists()
-
-    # def has_view_permission(self, request, obj=None):
-    #     return self.has_permissions(request, obj, "view")
-
-    # def has_change_permission(self, request, obj=None):
-    #     return self.has_permissions(request, obj, "change")
-
-    # def has_delete_permission(self, request, obj=None):
-    #     return self.has_permissions(request, obj, "delete")
 
 
 @admin.register(ContentDevice)

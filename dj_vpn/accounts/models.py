@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.core.exceptions import PermissionDenied, ValidationError
 
+from cores.managers import SoftManager
 from dj_vpn.accounts.enums import AccountType, AccountStatus, VolumeChoices
 from dj_vpn.accounts.managers import DeleteQuerySet, OneDayLeftQuerySet
 from dj_vpn.cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
@@ -45,6 +46,8 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
         null=True, blank=True, max_length=14, help_text=_("you can choice --> tunnel - direct - tunnel_direct"))
 
     REQUIRED_FIELDS = ['mobile_phone', "user_type"]
+
+    objects = SoftManager()
 
     @property
     def end_date_subscription(self):

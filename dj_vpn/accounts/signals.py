@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from django.contrib.auth.signals import user_logged_in
 from rest_framework.exceptions import PermissionDenied
 from axes.signals import user_locked_out
+from django.db.models.signals import pre_delete
 
 from dj_vpn.accounts.models import User
 
@@ -18,3 +19,7 @@ def increase_number_of_login(sender, request, user, **kwargs):
         user.number_of_login += 1
         user.last_login = timezone.now()
         user.save()
+
+@receiver(pre_delete, sender=User)
+def check_delete(sender, instance, **kwargs):
+    print(sender)

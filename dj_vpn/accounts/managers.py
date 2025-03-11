@@ -1,4 +1,4 @@
-from django.db.models import Manager, F, ExpressionWrapper, DateField
+from django.db.models import Manager, F, ExpressionWrapper, DateField, Q
 from datetime import date, timedelta
 
 from dj_vpn.accounts.enums import AccountType
