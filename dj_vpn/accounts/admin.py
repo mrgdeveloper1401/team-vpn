@@ -55,7 +55,7 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
         (_("Personal info"), {"fields": ("first_name", "last_name", "email", "mobile_phone", "account_type",
                                          "accounts_status", "volume", "volume_usage", "all_volume_usage",
                                          "number_of_login", "number_of_days", "volume_choice", "is_inf_volume",
-                                         "number_of_max_device", "fcm_token", "user_type")}),
+                                         "number_of_max_device", "fcm_token", "user_type", "created_by")}),
         (
             _("Permissions"),
             {
@@ -78,6 +78,7 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
     list_per_page = 20
     search_fields = ['username']
     ordering = ['-date_joined']
+    raw_id_fields = ['created_by']
 
     def save_model(self, request, obj, form, change):
         if change:
@@ -90,12 +91,14 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
         if obj.id is None:
             if not request.user.is_superuser:
                 obj.user_type = request.user.user_type
+        if not change:
+            obj.created_by = request.user
         return super().save_model(request, obj, form, change)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if not request.user.is_superuser:
-            qs = qs.filter(user_type=request.user.user_type)
+            qs = qs.filter(user_type=request.user.user_type, created_by=request.user)
         return qs
 
     def get_form(self, request, obj=None, **kwargs):
@@ -114,6 +117,7 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
                     'user_type',
                     'groups',
                     'user_permissions',
+                    "created_by"
                 ]
 
                 for field_name in fields_to_disable:

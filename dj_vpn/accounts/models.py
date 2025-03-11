@@ -6,9 +6,8 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.core.exceptions import PermissionDenied, ValidationError
 
-from cores.managers import SoftManager, UserSoftManager
 from dj_vpn.accounts.enums import AccountType, AccountStatus, VolumeChoices
-from dj_vpn.accounts.managers import DeleteQuerySet, OneDayLeftQuerySet, AllUserManager
+from dj_vpn.accounts.managers import DeleteQuerySet, OneDayLeftQuerySet
 from dj_vpn.cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 from dj_vpn.vpn.firebase_conf.firebase import send_notification
 
@@ -44,7 +43,8 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     user_type = models.CharField(
         choices=[("direct", _("مستقیم")), ("tunnel", _("تانل")), ("tunnel_direct", _("تانل و دایرکت"))],
         null=True, blank=True, max_length=14, help_text=_("you can choice --> tunnel - direct - tunnel_direct"))
-
+    created_by = models.ForeignKey('self', related_name="owner", on_delete=models.DO_NOTHING, blank=True,
+                                   null=True)
     REQUIRED_FIELDS = ['mobile_phone', "user_type"]
 
     # objects = UserSoftManager()
