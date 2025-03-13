@@ -5,11 +5,8 @@ WORKDIR /home/app
 COPY . /home/app
 
 RUN apk add --update --upgrade --no-cache --virtual .tmp python3  \
-    py3-pip  \
-    redis  \
-    celery  \
-    postgresql  \
-    nginx
+    py3-pip
+
 
 RUN pip install --upgrade pip && \
     pip install -r ./requirements/production.txt

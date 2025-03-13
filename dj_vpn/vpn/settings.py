@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import timedelta
 from pathlib import Path
 
 from decouple import config
@@ -115,64 +115,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR / "media")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.User"
-
-# with logging django
-log_dir = os.path.join(BASE_DIR / "general_log_django", datetime.now().strftime("%Y-%m-%d"))
-os.makedirs(log_dir, exist_ok=True)
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "color": {
-            "()": "colorlog.ColoredFormatter",
-            "format": "%(log_color)s%(levelname)s %(reset)s%(asctime)s %(module)s %(process)d %(thread)d %(message)s",
-            "datefmt": "%Y-%m-%d %H:%M:%S",
-        },
-    },
-    "filters": {
-        "require_debug_true": {
-            "()": "django.utils.log.RequireDebugTrue",
-        },
-    },
-    "handlers": {
-        "console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "formatter": "color",
-            "filters": ["require_debug_true"],
-        },
-        "info_file": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / "info_file.log")
-        },
-        "error_file": {
-            "level": "ERROR",
-            "class": "logging.FileHandler",
-            "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / "error_file.log")
-        },
-        "warning_file": {
-            "level": "WARN",
-            "class": "logging.FileHandler",
-            "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / "warning_file.log")
-        },
-        "critical_file": {
-            "level": "CRITICAL",
-            "class": "logging.FileHandler",
-            "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / "critical_file.log")
-        },
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console", "info_file", "warning_file", "critical_file", "error_file"],
-            "propagate": True,
-        }
-    }
-}
 
 # JET_PROJECT = 'vpn_4'
 # JET_TOKEN = config("JET_TOKEN")

@@ -1,6 +1,6 @@
 from dj_vpn.vpn.settings import *
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=str).split(" ")
+ALLOWED_HOSTS = ''.join(config("VPS_ALLOWD_HOSTS", cast=str).split(","))
 
 SECRET_KEY = config("PROD_SECRET_KEY", cast=str)
 
@@ -21,11 +21,11 @@ STORAGES = {
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "HOST": config("POSTDB_HOST", cast=str),
-        "PASSWORD": config("POSTDB_PASSWORD", cast=str),
-        "PORT": config("POSTDB_PORT", cast=str),
-        "USER": config("POSTDB_USER", cast=str),
-        "NAME": config("POSTDB_NAME", cast=str)
+        "HOST": config("VPS_POSTDB_HOST", cast=str),
+        "PASSWORD": config("VPS_POSTDB_PASSWORD", cast=str),
+        "PORT": config("VPS_POSTDB_PORT", cast=str),
+        "USER": config("VPS_POSTDB_USER", cast=str),
+        "NAME": config("VPS_POSTDB_NAME", cast=str)
     }
 }
 
@@ -65,7 +65,10 @@ DATABASES = {
 # }
 
 # django cors header settings
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "https://194.156.103.14"
+]
 
 # ssl config
 SESSION_COOKIE_SECURE = True
@@ -92,5 +95,5 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
 
-broker_url = config("BROCKER_URL", cast=str)
-result_backend = config("RESULT_BACKEND", cast=str)
+broker_url = config("VPS_BROCKER_URL", cast=str)
+result_backend = config("VPS_RESULT_BACKEND", cast=str)
