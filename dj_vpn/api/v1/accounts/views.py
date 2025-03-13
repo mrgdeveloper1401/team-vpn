@@ -122,7 +122,7 @@ class VolumeUsageApiView(views.APIView):
                     all_volume_usage=F("all_volume_usage") + serializer.validated_data['volume_usage'],
                 )
                 return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response("DISCONNECT", status=status.HTTP_400_BAD_REQUEST)
+            return Response("DISCONNECT", status=status.HTTP_400_BAD_REQUEST, content_type="text/plain")
         return Response("USER NOT FOUND", status=status.HTTP_400_BAD_REQUEST)
 
 
