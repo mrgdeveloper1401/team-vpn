@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3"
 
 services:
   django:
@@ -16,7 +16,7 @@ services:
       - 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - static_file:/home/app/staticfiles
+      - static_files:/home/app/staticfiles
     restart: always
     environment:
       POSTGRES_USER: ${VPS_POSTDB_USER}
@@ -27,7 +27,6 @@ services:
     container_name: vpn_redis
     image: redis:7.4-alpine
     restart: always
-    entrypoint: ['/home/app/redis_entrypoint.sh', "redis-server"]
 
   nginx:
     container_name: vpn_nginx
