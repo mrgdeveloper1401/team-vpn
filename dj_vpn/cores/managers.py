@@ -1,5 +1,6 @@
 from django.db.models import QuerySet, Manager, Q
 from django.utils import timezone
+from django.contrib.auth.models import UserManager
 
 
 class SoftQuerySet(QuerySet):
@@ -9,4 +10,9 @@ class SoftQuerySet(QuerySet):
 
 class SoftManager(Manager):
     def get_queryset(self):
-        return SoftQuerySet(self.model, using=self._db).filter(Q(is_deleted=False) | Q(deleted_at=None))
+        return SoftQuerySet(self.model, using=self._db).filter(Q(is_deleted=False) | Q(is_deleted=None))
+
+
+class UserSoftManager(UserManager):
+    def get_queryset(self):
+        return SoftQuerySet(self.model, using=self._db).filter(Q(is_deleted=False) | Q(is_deleted=None))

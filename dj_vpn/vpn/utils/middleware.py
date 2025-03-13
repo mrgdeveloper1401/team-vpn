@@ -1,9 +1,8 @@
 from django.http import JsonResponse
 from rest_framework import status
-from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from accounts.models import ContentDevice
+from dj_vpn.accounts.models import ContentDevice
 
 
 class CheckDeviceBlockMiddleware:
@@ -23,14 +22,5 @@ class CheckDeviceBlockMiddleware:
                 device = ContentDevice.objects.filter(device_number=device_number).last()
                 if device and device.is_blocked:
                     return JsonResponse({'detail': "your device is blocked"}, status=status.HTTP_403_FORBIDDEN)
-        response = self.get_response(request)
-        return response
-
-
-class CheckLoginMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
         response = self.get_response(request)
         return response

@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django.db import models
 
-from cores.managers import SoftManager
+from dj_vpn.cores.managers import SoftManager
 
 
 # Create your models here.
@@ -36,18 +36,3 @@ class SoftDeleteMixin(models.Model):
 
     class Meta:
         abstract = True
-
-
-# class Images(CreateMixin, UpdateMixin, SoftDeleteMixin):
-#     image = models.ImageField(upload_to='images/%Y/%m/%d', height_field="image_height", width_field="image_width")
-#     image_alt = models.CharField(max_length=255, help_text=_("توضیحی برای تصویر خود بگذارید"), blank=True, null=True)
-#     image_size = models.PositiveIntegerField(null=True, blank=True)
-#     image_width = models.PositiveIntegerField(null=True, blank=True)
-#     image_height = models.PositiveIntegerField(null=True, blank=True)
-#
-#     class Meta:
-#         db_table = 'images'
-#
-#     def save(self, *args, **kwargs):
-#         self.image_size = self.image.size
-#         return super().save(*args, **kwargs)

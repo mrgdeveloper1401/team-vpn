@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from main_settings.models import PublicNotification, UtilsApps
+from dj_vpn.main_settings.models import PublicNotification, UtilsApps
 
 
 class PublicNotificationSerializer(serializers.ModelSerializer):

@@ -1,12 +1,15 @@
 from django.contrib import admin
 from django.contrib.auth.forms import UserChangeForm, AdminUserCreationForm
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
+from django.core.exceptions import PermissionDenied, ValidationError
+# from guardian.admin import GuardedModelAdmin
+# from guardian.shortcuts import get_objects_for_user
 
-from .models import User, ContentDevice, PrivateNotification, RecycleUser, OneDayLeftUser
-from subscriptions.models import UserConfig
+from .models import User, ContentDevice, PrivateNotification, OneDayLeftUser
 from import_export.admin import ImportExportModelAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from . import forms
 # Register your models here.
 
 
@@ -29,34 +32,30 @@ class ContentDeviceInline(admin.TabularInline):
     extra = 1
 
 
-class UserConfigInline(admin.TabularInline):
-    model = UserConfig
-    extra = 1
-    raw_id_fields = ('config',)
-
-
 @admin.register(User)
-class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
-    list_display = ("username", "email", "is_staff", "is_active", "is_connected_user", "is_superuser", "date_joined",
-                    "start_premium", "volume", "volume_usage", "account_type", "accounts_status", "number_of_days",
-                    "number_of_max_device", "end_date_subscription", "remaining_volume_amount")
-    ordering = ('-date_joined',)
+class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
+    add_form = forms.UserAccountCreationForm
+    change_password_form = forms.UserAdminPasswordChangeForm
+    list_display = ("username", "is_staff", "is_active", "is_connected_user", "start_premium", "volume",
+                    "volume_usage", "account_type", "accounts_status", "number_of_days",
+                    "day_left", "number_of_max_device", "end_date_subscription", "remaining_volume_amount")
     add_fieldsets = (
         (
             None,
             {
                 "classes": ("wide",),
                 "fields": ("username", "usable_password", "password1", "password2", "volume", "volume_choice",
-                           "number_of_days", "start_premium", "number_of_max_device", "account_type", "accounts_status"),
+                           "number_of_days", "start_premium", "number_of_max_device", "account_type", "accounts_status",
+                           "user_type", "is_inf_volume", "is_staff", "groups", "user_permissions")
             },
         ),
     )
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "email", "mobile_phone", "account_type",
-                                         "accounts_status", "volume", "volume_usage", "volume_choice",
-                                         "number_of_login", "number_of_days",
-                                         "number_of_max_device", "fcm_token")}),
+                                         "accounts_status", "volume", "volume_usage", "all_volume_usage",
+                                         "number_of_login", "number_of_days", "volume_choice", "is_inf_volume",
+                                         "number_of_max_device", "fcm_token", "user_type", "created_by")}),
         (
             _("Permissions"),
             {
@@ -70,12 +69,69 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
                 ),
             },
         ),
-        (_("Important dates"), {"fields": ("last_login", "date_joined", "start_premium", "updated_at")}),
+        (_("Important dates"), {"fields": ("last_login", "date_joined", "start_premium", "updated_at", "birth_date")}),
     )
-    inlines = [ContentDeviceInline, UserConfigInline]
-    list_filter = ['is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter]
-    # list_editable = ['account_type', "accounts_status", "start_premium", 'volume']
-    readonly_fields = ['number_of_login', "updated_at"]
+    inlines = [ContentDeviceInline]
+    list_filter = ('is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter,
+                   "user_type")
+    readonly_fields = ["updated_at", "date_joined", "last_login", "account_type", "accounts_status",
+                       "all_volume_usage", 'number_of_login']
+    list_per_page = 20
+    search_fields = ['username']
+    ordering = ['-date_joined']
+    raw_id_fields = ['created_by']
+
+    def save_model(self, request, obj, form, change):
+        if change:
+            if not request.user.is_superuser:
+                request_user_type = request.user.user_type
+                get_user_type = form.cleaned_data.get("user_type")
+                if get_user_type != request_user_type:
+                    if not request.user.is_superuser:
+                        raise PermissionDenied("you not permission this field user_type")
+        if obj.id is None:
+            if not request.user.is_superuser:
+                obj.user_type = request.user.user_type
+        if not change:
+            obj.created_by = request.user
+        return super().save_model(request, obj, form, change)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if not request.user.is_superuser:
+            qs = qs.filter(user_type=request.user.user_type, created_by=request.user)
+        return qs
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        is_superuser = request.user.is_superuser
+
+        if not is_superuser:
+            if request.user.has_perm("accounts.change_user"):
+                fields_to_disable = [
+                    'is_superuser',
+                    'is_staff',
+                    'is_connected_user',
+                    'start_premium',
+                    'is_inf_volume',
+                    'fcm_token',
+                    'user_type',
+                    'groups',
+                    'user_permissions',
+                    "created_by"
+                ]
+
+                for field_name in fields_to_disable:
+                    if field_name in form.base_fields:
+                        form.base_fields[field_name].disabled = True
+        return form
+
+    def has_delete_permission(self, request, obj=None):
+        if not request.user.is_superuser:
+            if obj:
+                if obj.is_staff and request.user.is_staff:
+                    return False
+        return super().has_delete_permission(request, obj)
 
 
 @admin.register(ContentDevice)
@@ -99,17 +155,6 @@ class PrivateNotificationAdmin(ImportExportModelAdmin):
     search_fields = ['title', "user__username"]
     list_editable = ['is_active']
     ordering = ("-created_at",)
-
-
-@admin.register(RecycleUser)
-class RecycleUserAdmin(admin.ModelAdmin):
-    form = UserChangeForm
-    add_form = AdminUserCreationForm
-    actions = ['recovery_user']
-
-    @admin.action(description='Recover user')
-    def recovery_user(self, request, queryset):
-        queryset.update(is_deleted=False, deleted_at=None)
 
 
 @admin.register(OneDayLeftUser)

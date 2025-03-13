@@ -10,7 +10,7 @@ class AccountStatus(models.TextChoices):
     ACTIVE = "active"
     LIMIT = "limit"
     EXPIRED = "expired"
-    # NOTHING = "nothing"
+    NOTHING = "nothing"
 
 
 class VolumeChoices(models.TextChoices):

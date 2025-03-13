@@ -4,7 +4,7 @@ from django.contrib.auth.signals import user_logged_in
 from rest_framework.exceptions import PermissionDenied
 from axes.signals import user_locked_out
 
-from accounts.models import User
+from dj_vpn.accounts.models import User
 
 
 @receiver(user_locked_out)

@@ -1,9 +1,8 @@
-from vpn.settings import *
+from dj_vpn.vpn.settings import *
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=str).split(" ")
 
 SECRET_KEY = config("PROD_SECRET_KEY", cast=str)
-
 
 INSTALLED_APPS += [
     "corsheaders",
@@ -14,36 +13,32 @@ MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware", )
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware", )
 
 STORAGES = {
-    # ...
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
+    }
+}
+
+DATABASES = {
     "default": {
-        "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
-    },
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": config("POSTDB_HOST", cast=str),
+        "PASSWORD": config("POSTDB_PASSWORD", cast=str),
+        "PORT": config("POSTDB_PORT", cast=str),
+        "USER": config("POSTDB_USER", cast=str),
+        "NAME": config("POSTDB_NAME", cast=str)
+    }
 }
 
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.postgresql",
-#         "HOST": config("POSTDB_HOST", cast=str),
-#         "PASSWORD": config("POSTDB_PASSWORD", cast=str),
-#         "PORT": config("POSTDB_PORT", cast=str),
-#         "USER": config("POSTDB_USER", cast=str),
-#         "NAME": config("POSTDB_NAME", cast=str)
+#         "HOST": config("DOCKER_POSTGRES_HOST", cast=str),
+#         "PASSWORD": config("DOCKER_POSTGRES_PASSWORD", cast=str),
+#         "PORT": 5432,
+#         "USER": config("DOCKER_POSTGRES_USER", cast=str),
+#         "NAME": config("DOCKER_POSTGRES_DB", cast=str),
 #     }
 # }
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "HOST": "vpn_postgres",
-        "PASSWORD": "vpn.2025",
-        "PORT": 5432,
-        "USER": "vpn",
-        "NAME": "vpndb"
-    }
-}
 
 
 # DATABASES = {
@@ -54,6 +49,18 @@ DATABASES = {
 #         "PORT": config("PUB_POSTDB_PORT", cast=str),
 #         "USER": config("PUB_POSTDB_USER", cast=str),
 #         "NAME": config("PUB_POSTDB_NAME", cast=str)
+#     }
+# }
+
+# when test production model we can use these databases
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "postgres",
+#         "USER": "postgres",
+#         "PASSWORD": "postgres",
+#         "HOST": "localhost",
+#         "PORT": "5433",
 #     }
 # }
 
@@ -74,7 +81,6 @@ SECURE_REFERRER_POLICY = "strict-origin"
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-
 # aws config
 # AWS_ACCESS_KEY_ID = config("ARVAN_ACCESS_KEY", cast=str)
 # AWS_SECRET_ACCESS_KEY = config("ARVAN_SECRET_KET", cast=str)
@@ -88,5 +94,3 @@ SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
 
 broker_url = config("BROCKER_URL", cast=str)
 result_backend = config("RESULT_BACKEND", cast=str)
-
-

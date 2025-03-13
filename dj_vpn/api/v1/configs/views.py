@@ -1,10 +1,8 @@
 from rest_framework import viewsets, permissions, mixins
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
-from configs.models import Country, Config
-from subscriptions.models import UserConfig
-from vpn.utils.permissions import IsOwner
-from .serializers import CountrySerializer, ConfigSerializer, UserConfigurationSerializer
+from dj_vpn.configs.models import Country, Config
+from .serializers import CountrySerializer, ConfigSerializer, ConfigurationSerializer
 
 
 class CountryViewSet(viewsets.ModelViewSet):
@@ -41,9 +39,17 @@ class FreeConfigViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewse
     # pagination_class = CommonPagination
 
 
-class UserConfigViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-    serializer_class = UserConfigurationSerializer
+class ConfigListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    serializer_class = ConfigurationSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return UserConfig.objects.filter(user=self.request.user).select_related("config__country")
+        request_user_type = self.request.user.user_type
+        query = Config.objects.filter(is_active=True).select_related("country")
+        if request_user_type == "tunnel":
+            query = query.filter(config_type="tunnel")
+        elif request_user_type == "direct":
+            query = query.filter(config_type="direct")
+        else:
+            query = query.filter(config_type="tunnel_direct")
+        return query

@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
-from configs.models import Country, Config
-from subscriptions.models import UserConfig
+from dj_vpn.configs.models import Country, Config
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -24,12 +23,17 @@ class ConfigSerializer(serializers.ModelSerializer):
         exclude = ['is_deleted', "deleted_at", "created_at", "updated_at"]
 
 
-class UserConfigurationSerializer(serializers.ModelSerializer):
-    config = serializers.CharField()
-    en_country_name = serializers.CharField(source="config.country.en_country_name")
-    fa_country_name = serializers.CharField(source="config.country.fa_country_name")
-    country_code = serializers.CharField(source="config.country.country_code")
+class NestedCountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ['en_country_name', "fa_country_name", "country_code"]
+
+
+class ConfigurationSerializer(serializers.ModelSerializer):
+    en_country_name = serializers.CharField(source="country.en_country_name")
+    fa_country_name = serializers.CharField(source="country.fa_country_name")
+    country_code = serializers.CharField(source="country.country_code")
 
     class Meta:
-        model = UserConfig
-        fields = ["id", 'config', "en_country_name", "fa_country_name", "country_code"]
+        model = Config
+        fields = ['id', "en_country_name", "fa_country_name", "country_code", "config", "config_type"]

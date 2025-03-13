@@ -1,12 +1,17 @@
-from django.db.models import Manager, F, ExpressionWrapper, DateField
-from django.utils import timezone
+from django.db.models import Manager, F, ExpressionWrapper, DateField, Q
+from datetime import date, timedelta
 
-from accounts.enums import AccountType
+from dj_vpn.accounts.enums import AccountType
 
 
 class DeleteQuerySet(Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_deleted=True)
+
+
+class AllUserManager(Manager):
+    def get_queryset(self):
+        return super().get_queryset()
 
 
 class OneDayLeftQuerySet(Manager):
@@ -17,4 +22,4 @@ class OneDayLeftQuerySet(Manager):
                 output_field=DateField()
             )
         ).filter(account_type=AccountType.premium_user).
-                filter(end_date=timezone.localdate() + timezone.timedelta(days=1)))
+                filter(end_date=date.today() + timedelta(days=1)))

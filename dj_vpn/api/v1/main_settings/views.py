@@ -2,10 +2,10 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import mixins
 
-from main_settings.models import PublicNotification, UtilsApps
+from dj_vpn.main_settings.models import PublicNotification, UtilsApps
 from rest_framework import permissions
 
-from vpn.utils.paginations import CommonPagination
+from dj_vpn.vpn.utils.paginations import CommonPagination
 from .serializers import PublicNotificationSerializer, AppSettingsSerializer
 
 

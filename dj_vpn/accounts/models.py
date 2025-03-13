@@ -1,16 +1,16 @@
-from datetime import timedelta
-from django.utils import timezone
+from datetime import timedelta, date
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django.core.validators import ValidationError, MinValueValidator
-from django.core.exceptions import PermissionDenied
 
-from accounts.enums import AccountType, AccountStatus, VolumeChoices
-from accounts.managers import DeleteQuerySet, OneDayLeftQuerySet
-from accounts.validator import integer_device_number
-from cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
-from vpn.firebase_conf.firebase import send_notification
+from django.utils.translation import gettext_lazy as _
+from django.core.validators import MinValueValidator
+from django.core.exceptions import PermissionDenied, ValidationError
+
+from dj_vpn.cores.managers import UserSoftManager
+from dj_vpn.accounts.enums import AccountType, AccountStatus, VolumeChoices
+from dj_vpn.accounts.managers import OneDayLeftQuerySet
+from dj_vpn.cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
+from dj_vpn.vpn.firebase_conf.firebase import send_notification
 
 
 class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
@@ -24,19 +24,32 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                                                    "limit --> لیمیت یعنی کاربر حجمش تموم شده هست \n"
                                                    "expire --> یعنی کاربر روز کانفینگ ان تموم شده هست"))
     volume_choice = models.CharField(max_length=7, choices=VolumeChoices.choices, default=VolumeChoices.GB)
-    volume = models.PositiveIntegerField(blank=True, default=0)
+    volume = models.PositiveIntegerField(validators=[MinValueValidator(0)], help_text=_("کاربر چقدر حجم داشته باشد"),
+                                         default=0)
     volume_usage = models.FloatField(blank=True, default=0, help_text=_("حجم مصرفی میباشد که بر اساس مگابایت هست"),
                                      validators=[MinValueValidator(0)])
-    start_premium = models.DateField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک"),
-                                     default=timezone.localdate)
-    number_of_days = models.PositiveIntegerField(blank=True, null=True, help_text=_("تعداد روز"), default=0)
-    number_of_login = models.PositiveIntegerField(help_text=_("تعداد لاگین های کاربر"), editable=False, db_default=0)
+    is_inf_volume = models.BooleanField(default=False, help_text=_("ایا حجم کاربر نامحدود باشد!"))
+    all_volume_usage = models.FloatField(default=0, validators=[MinValueValidator(0)], editable=False,
+                                         help_text=_("کاربر تا الان چقدر حجم مصرف کرده!"))
+    start_premium = models.DateField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک اگر کاربر لاگین کند"
+                                                                        " اشتراک کاربر از همان روز شروع خواهد شد"))
+    number_of_days = models.PositiveIntegerField(help_text=_("تعداد روز"), null=True, default=0)
+    number_of_login = models.PositiveIntegerField(help_text=_("تعداد لاگین های کاربر"), editable=False, db_default=0,
+                                                  default=0)
     is_connected_user = models.BooleanField(default=False, help_text=_("این فیلد مشخص میکنه"
                                                                        " که کاربر ایا به کانفیگش متصل شده هست یا خیر"))
     number_of_max_device = models.PositiveIntegerField(default=1,
                                                        help_text=_("هر اکانت چند تا یوزر میتواند به ان متصل شود"))
     fcm_token = models.CharField(max_length=255, blank=True, null=True, help_text=_("fcm token"))
-    REQUIRED_FIELDS = ['mobile_phone']
+    user_type = models.CharField(
+        choices=[("direct", _("مستقیم")), ("tunnel", _("تانل")), ("tunnel_direct", _("تانل و دایرکت"))],
+        null=True, blank=True, max_length=14, help_text=_("you can choice --> tunnel - direct - tunnel_direct"))
+    created_by = models.ForeignKey('self', related_name="owner", on_delete=models.DO_NOTHING, blank=True,
+                                   null=True)
+    REQUIRED_FIELDS = ['mobile_phone', "user_type"]
+
+    objects = UserSoftManager()
+    # all_objects = AllUserManager()
 
     @property
     def end_date_subscription(self):
@@ -52,64 +65,74 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
             remaining = self.volume - self.volume_usage
         else:
             remaining = self.volume - (self.volume_usage / 1_000_000)
+        if self.is_inf_volume:
+            return "inf"
         return f'{remaining}, {self.volume_choice}'
 
+    @property
+    def day_left(self):
+        if self.account_type == AccountType.premium_user:
+            reminder_day = (self.end_date_subscription - date.today()).days
+            return max(reminder_day, 0)
+        return None
+
     def clean(self):
-        if self.volume is None:
-            raise ValidationError({'volume': _("volume not none")})
+        if self.volume > 0 and self.is_inf_volume:
+            raise ValidationError({"volume": _("volume and is_inf volume they can't be together")})
 
     def save(self, *args, **kwargs):
-        # if self.pk is None:
-        #     self.start_premium = timezone.now()
-        #   if admin volume_choice == GIG
-        if self.volume_choice == VolumeChoices.GB:
-            if (self.volume_usage / 1_000) == self.volume or (self.volume_usage / 1_000) > self.volume:
-                self.accounts_status = AccountStatus.LIMIT
-                self.account_type = AccountType.normal_user
-            if self.volume > self.volume_usage / 1_000:
+        # اگر کاربر لاگین کند برای بار اول تاریخ شروع اکانت مشخص خواهد شد
+        if self.number_of_login == 1 and not self.start_premium:
+            self.start_premium = date.today()
+
+        if self.start_premium:
+            if self.volume_choice == VolumeChoices.GB:
+                if self.volume_usage / 1_000 == self.volume:
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.LIMIT
+                if self.volume_usage / 1_000 < self.volume and self.number_of_login > 0:
+                    self.account_type = AccountType.premium_user
+                    self.accounts_status = AccountStatus.ACTIVE
+                if self.start_premium + timedelta(days=self.number_of_days) < date.today():
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.EXPIRED
+
+            if self.volume_choice == VolumeChoices.MG:
+                if self.volume_usage == self.volume:
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.LIMIT
+                if self.volume_usage < self.volume and self.number_of_login > 0:
+                    self.account_type = AccountType.premium_user
+                    self.accounts_status = AccountStatus.ACTIVE
+                if self.start_premium + timedelta(days=self.number_of_days) < date.today():
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.EXPIRED
+
+            if self.volume_choice == VolumeChoices.TRA:
+                if self.volume_usage / 1_000_000 == self.volume:
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.LIMIT
+                if self.volume_usage / 1_000_000 < self.volume and self.number_of_login > 0:
+                    self.account_type = AccountType.premium_user
+                    self.accounts_status = AccountStatus.ACTIVE
+                if self.start_premium + timedelta(days=self.number_of_days) < date.today():
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.EXPIRED
+            if self.is_inf_volume:
                 self.accounts_status = AccountStatus.ACTIVE
                 self.account_type = AccountType.premium_user
-            if self.end_date_subscription and self.end_date_subscription < timezone.localdate():
-                self.accounts_status = AccountStatus.EXPIRED
-                self.account_type = AccountType.normal_user
-        # if volume_choice == MEG
-        elif self.volume_choice == VolumeChoices.MG:
-            if self.volume_usage == self.volume or self.volume_usage > self.volume:
-                self.accounts_status = AccountStatus.LIMIT
-                self.account_type = AccountType.normal_user
-            if self.volume > self.volume_usage:
-                self.accounts_status = AccountStatus.ACTIVE
-                self.account_type = AccountType.premium_user
-            if self.end_date_subscription and self.end_date_subscription < timezone.localdate():
-                self.accounts_status = AccountStatus.EXPIRED
-                self.account_type = AccountType.normal_user
-        # if volume_choice = TERA
+
         else:
-            if (self.volume_usage / 1_000_000) == self.volume or (self.volume_usage / 1_000_000) > self.volume:
-                self.accounts_status = AccountStatus.LIMIT
-                self.account_type = AccountType.normal_user
-            if self.volume > self.volume_usage / 1_000_000:
-                self.accounts_status = AccountStatus.ACTIVE
-                self.account_type = AccountType.premium_user
-            if self.end_date_subscription and self.end_date_subscription < timezone.localdate():
-                self.accounts_status = AccountStatus.EXPIRED
-                self.account_type = AccountType.normal_user
-        # if self.pk is None:
-        #     self.accounts_status = AccountStatus.NOTHING
-        return super().save(*args, **kwargs)
+            self.account_type = AccountType.normal_user
+            self.accounts_status = AccountStatus.NOTHING
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'auth_user'
         ordering = ("-date_joined",)
 
 
-class RecycleUser(User):
-    objects = DeleteQuerySet()
-
-    class Meta:
-        proxy = True
-
-
+# one day left user show it
 class OneDayLeftUser(User):
     objects = OneDayLeftQuerySet()
 
@@ -120,10 +143,8 @@ class OneDayLeftUser(User):
 class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):
     device_model = models.CharField(max_length=255, help_text=_("مدل دستگاه"), blank=True, null=True)
     device_os = models.CharField(max_length=50, help_text=_("نسخه دستگاه"), blank=True, null=True)
-    # device_brand = models.CharField(max_length=50, help_text=_("برند گوشی"), blank=True, null=True)
-    device_number = models.CharField(max_length=255, help_text=_("سریال گوشی"), validators=[integer_device_number])
+    device_number = models.CharField(max_length=255, help_text=_("سریال گوشی"))
     ip_address = models.GenericIPAddressField(help_text=_("ادرس ای پی"))
-    # is_connected = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='user_device',
                              help_text=_("کاربر"))
     is_blocked = models.BooleanField(default=False, help_text=_("بلاک شدن"))
@@ -141,23 +162,9 @@ class ContentDevice(CreateMixin, UpdateMixin, SoftDeleteMixin):
         db_table = 'content_device'
 
 
-# class RequestLog(CreateMixin, UpdateMixin, SoftDeleteMixin):
-#     user = models.CharField(editable=False, max_length=255)
-#     path = models.CharField(max_length=255, editable=False)
-#     method = models.CharField(max_length=10, editable=False)
-#     status_code = models.BooleanField(editable=False)
-#     template_name = models.CharField(editable=False)
-#     logs = models.JSONField(editable=False)
-#
-#     class Meta:
-#         db_table = 'request_log'
-
-
 class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
     title = models.CharField(max_length=255, help_text=_("عنوان اعلانات"))
     body = models.TextField(help_text=_("متن اعلانات"))
-    # file = models.FileField(upload_to="notifications/%Y/%m/%d", null=True, blank=True,
-    #                         help_text=_("فایل برای اعلانات"))
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, help_text=_("گاربر"))
     is_active = models.BooleanField(default=True, help_text=_("قابل نمایش"))
 
@@ -170,7 +177,13 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
         except Exception as e:
             raise e
 
+    def clean(self):
+        if not self.user.fcm_token:
+            raise ValidationError({"user": _("User does not have an FCM token.")})
+        super().clean()
+
     def save(self, *args, **kwargs):
+        self.clean()
         self.send_to_user()
         super().save(*args, **kwargs)
 

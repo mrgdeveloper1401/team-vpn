@@ -1,7 +1,6 @@
-from vpn.settings import *
+from dj_vpn.vpn.settings import *
 
 SECRET_KEY = config("DEV_SECRET_KEY", cast=str)
-
 
 ALLOWED_HOSTS = []
 
@@ -56,8 +55,8 @@ INTERNAL_IPS = [
 
 SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
 
-CACHES["default"]["LOCATION"] = "redis://localhost:6380/2"
+CACHES["default"]["LOCATION"] = "redis://localhost:6379/2"
 
-broker_url = "redis://localhost:6380/0"
-result_backend = "redis://localhost:6380/1"
+broker_url = "redis://localhost:6379/0"
+result_backend = "redis://localhost:6379/1"
 

@@ -4,7 +4,7 @@ import django
 # import psycopg2 as postgresql
 # from decouple import config
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "vpn.envs.development")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "vpn.envs.vpn.envs.development")
 
 django.setup()
 
