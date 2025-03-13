@@ -10,10 +10,7 @@ debug_mode = config('DEBUG', default=False, cast=bool)
 
 def main():
     """Run administrative tasks."""
-    if debug_mode:
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dj_vpn.vpn.envs.development')
-    else:
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dj_vpn.vpn.envs.production')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dj_vpn.vpn.envs.production')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
