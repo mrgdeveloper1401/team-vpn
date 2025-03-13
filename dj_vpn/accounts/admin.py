@@ -6,7 +6,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 # from guardian.admin import GuardedModelAdmin
 # from guardian.shortcuts import get_objects_for_user
 
-from .models import User, ContentDevice, PrivateNotification, RecycleUser, OneDayLeftUser
+from .models import User, ContentDevice, PrivateNotification, OneDayLeftUser
 from import_export.admin import ImportExportModelAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from . import forms
@@ -155,17 +155,6 @@ class PrivateNotificationAdmin(ImportExportModelAdmin):
     search_fields = ['title', "user__username"]
     list_editable = ['is_active']
     ordering = ("-created_at",)
-
-
-@admin.register(RecycleUser)
-class RecycleUserAdmin(admin.ModelAdmin):
-    form = UserChangeForm
-    add_form = AdminUserCreationForm
-    actions = ['recovery_user']
-
-    @admin.action(description='Recover user')
-    def recovery_user(self, request, queryset):
-        queryset.update(is_deleted=False, deleted_at=None)
 
 
 @admin.register(OneDayLeftUser)

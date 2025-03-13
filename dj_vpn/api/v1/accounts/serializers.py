@@ -114,3 +114,12 @@ class VolumeUsageSerializer(serializers.Serializer):
     volume_usage = serializers.FloatField(
         help_text=_("حجم مصرفی به صورت مگابایت ارسال شود")
     )
+    username = serializers.CharField()
+
+    # def validate(self, attr):
+    #     try:
+    #         get_user = User.objects.get(username=attr.get("username"))
+    #     except User.DoesNotExist:
+    #         raise serializers.ValidationError({"username": "user not found"})
+    #     attr['user'] = get_user
+    #     return attr

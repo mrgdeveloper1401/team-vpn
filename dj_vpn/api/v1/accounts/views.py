@@ -108,19 +108,22 @@ class PrivateNotificationViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixi
 
 class VolumeUsageApiView(views.APIView):
     serializer_class = VolumeUsageSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        if request.user.accounts_status == AccountStatus.ACTIVE:
-            User.objects.filter(id=request.user.id).update(
-                volume_usage=F('volume_usage') + serializer.validated_data['volume_usage'],
-                all_volume_usage=F("all_volume_usage") + serializer.validated_data['volume_usage'],
-            )
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(ErrorResponse.USER_USAGE_LIMIT, status=status.HTTP_400_BAD_REQUEST)
+        user = User.objects.filter(username=serializer.validated_data['username']).only("username")
+        if user:
+            if user.first().accounts_status == AccountStatus.ACTIVE:
+                user.update(
+                    volume_usage=F('volume_usage') + serializer.validated_data['volume_usage'],
+                    all_volume_usage=F("all_volume_usage") + serializer.validated_data['volume_usage'],
+                )
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response("DISCONNECT", status=status.HTTP_400_BAD_REQUEST)
+        return Response("USER NOT FOUND", status=status.HTTP_400_BAD_REQUEST)
 
 
 class UpdateConnectionApiView(views.APIView):

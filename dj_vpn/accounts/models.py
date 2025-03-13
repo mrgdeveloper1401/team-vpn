@@ -6,8 +6,9 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.core.exceptions import PermissionDenied, ValidationError
 
+from dj_vpn.cores.managers import UserSoftManager
 from dj_vpn.accounts.enums import AccountType, AccountStatus, VolumeChoices
-from dj_vpn.accounts.managers import DeleteQuerySet, OneDayLeftQuerySet
+from dj_vpn.accounts.managers import OneDayLeftQuerySet
 from dj_vpn.cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 from dj_vpn.vpn.firebase_conf.firebase import send_notification
 
@@ -47,7 +48,7 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                                    null=True)
     REQUIRED_FIELDS = ['mobile_phone', "user_type"]
 
-    # objects = UserSoftManager()
+    objects = UserSoftManager()
     # all_objects = AllUserManager()
 
     @property
@@ -129,14 +130,6 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
     class Meta:
         db_table = 'auth_user'
         ordering = ("-date_joined",)
-
-
-# deleted user show it
-class RecycleUser(User):
-    objects = DeleteQuerySet()
-
-    class Meta:
-        proxy = True
 
 
 # one day left user show it
