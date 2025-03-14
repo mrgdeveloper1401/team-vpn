@@ -30,7 +30,7 @@ urlpatterns = [
 ] + api_url + swagger_urls + admin_api
 
 
-if DEBUG:
-    from debug_toolbar.toolbar import debug_toolbar_urls
-    urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
-    urlpatterns += debug_toolbar_urls()
+# if DEBUG:
+#     from debug_toolbar.toolbar import debug_toolbar_urls
+#     urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
+#     urlpatterns += debug_toolbar_urls()
