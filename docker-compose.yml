@@ -32,6 +32,9 @@ services:
 
   nginx:
     container_name: vpn_nginx
+    build:
+      context: nginx
+      dockerfile: Dockerfile
     restart: always
     image: nginx:1.27-alpine
     volumes:
