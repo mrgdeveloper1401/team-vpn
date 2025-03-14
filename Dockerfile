@@ -12,6 +12,7 @@ RUN pip install --upgrade pip && \
     pip install -r ./requirements/production.txt
 
 RUN adduser -D -H mg && \
+    ./manage.py collectstatic --noinput && \
     chown -R mg:mg /home/app && \
     chmod -R 755 /home/app && \
     pip install colorlog django-axes
