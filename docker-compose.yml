@@ -31,6 +31,8 @@ services:
     container_name: vpn_redis
     image: redis:7.4-alpine
     restart: always
+    depends_on:
+      - db
 
   nginx:
     container_name: vpn_nginx
@@ -46,6 +48,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    depends_on:
+      - django
 
 #  celery:
 #    container_name: vpn_celery
