@@ -3,7 +3,7 @@ version: "3"
 services:
   django:
     volumes:
-      - static_files:/home/app/staticfiles
+      - static_files:/home/app/dj_vpn/staticfiles
     ports:
       - "8000:8000"
     container_name: django_vpn
