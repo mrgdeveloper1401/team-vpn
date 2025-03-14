@@ -2,6 +2,8 @@ version: "3"
 
 services:
   django:
+    volumes:
+      - static_files:/home/app/staticfiles
     ports:
       - "8000:8000"
     container_name: django_vpn
@@ -20,7 +22,6 @@ services:
       - 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - static_files:/home/app/staticfiles
     restart: always
     environment:
       POSTGRES_USER: ${VPS_POSTDB_USER}
