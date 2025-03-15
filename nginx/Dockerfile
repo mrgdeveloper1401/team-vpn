@@ -5,5 +5,5 @@ RUN mkdir -p /vol/static && \
 
 VOLUME /vol/static
 
-COPY ./nginx-selfsigned.crt /etc/ssl/certs/nginx-selfsigned.crt
-COPY ./nginx-selfsigned.key /etc/ssl/private/nginx-selfsigned.key
+COPY ./fullchain.pem /etc/letsencrypt/live/apppanel.paradox.com.se/fullchain.pem
+COPY ./privkey.pem /etc/letsencrypt/live/apppanel.paradox.com.se/privkey.pem
