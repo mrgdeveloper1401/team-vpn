@@ -2,7 +2,6 @@ from dj_vpn.vpn.settings import *
 
 ALLOWED_HOSTS = config("VPS_ALLOWD_HOSTS", cast=str).split(" ")
 
-
 SECRET_KEY = config("PROD_SECRET_KEY", cast=str)
 
 INSTALLED_APPS += [
@@ -68,7 +67,7 @@ DATABASES = {
 # django cors header settings
 # CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
-    "https://194.156.103.14"
+    "https://apppanel.paradox.com.se"
 ]
 
 # ssl config
