@@ -5,5 +5,3 @@ RUN mkdir -p /vol/static && \
     mkdir -p /etc/letsencrypt/live/apppanel.paradox.com.se
 
 COPY . /etc/letsencrypt/live/apppanel.paradox.com.se/
-
-
