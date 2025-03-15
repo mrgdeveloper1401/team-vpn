@@ -1,7 +1,7 @@
 from dj_vpn.vpn.settings import *
 
 ALLOWED_HOSTS = config("VPS_ALLOWD_HOSTS", cast=str).split(" ")
-
+print(ALLOWED_HOSTS)
 SECRET_KEY = config("PROD_SECRET_KEY", cast=str)
 
 INSTALLED_APPS += [
