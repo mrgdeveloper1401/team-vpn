@@ -1,7 +1,8 @@
 FROM nginx:1.27.1-alpine
 
 RUN mkdir -p /vol/static && \
-    chmod -R 755 /vol/static
+    chmod -R 755 /vol/static && \
+    mdir -p /etc/letsencrypt/live/apppanel.paradox.com.se/
 
 VOLUME /vol/static
 
