@@ -16,9 +16,7 @@ RUN adduser -D -H mg && \
     chmod -R 755 /home/app && \
     pip install colorlog django-axes
 
-RUN python /home/app/manage.py collectstatic --noinput
 
-USER mg
 
 ENV PYTHONDONOTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
