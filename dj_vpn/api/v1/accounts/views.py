@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import views
 from rest_framework.response import Response
 from django.db.models import F
+from django.http import HttpResponse
 
 from dj_vpn.accounts.enums import AccountStatus
 from dj_vpn.accounts.models import User, ContentDevice, PrivateNotification
@@ -121,9 +122,9 @@ class VolumeUsageApiView(views.APIView):
                     volume_usage=F('volume_usage') + serializer.validated_data['volume_usage'],
                     all_volume_usage=F("all_volume_usage") + serializer.validated_data['volume_usage'],
                 )
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response("DISCONNECT", status=status.HTTP_400_BAD_REQUEST, content_type="text/plain")
-        return Response("USER NOT FOUND", status=status.HTTP_400_BAD_REQUEST)
+                return HttpResponse(content="ok", content_type="text/plain")
+            return HttpResponse("DISCONNECT", status=status.HTTP_400_BAD_REQUEST, content_type="text/plain")
+        return HttpResponse("USER NOT FOUND", status=status.HTTP_400_BAD_REQUEST, content_type="text/plain")
 
 
 class UpdateConnectionApiView(views.APIView):
