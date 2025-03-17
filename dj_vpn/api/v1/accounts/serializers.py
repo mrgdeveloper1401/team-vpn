@@ -4,7 +4,7 @@ from rest_framework.validators import ValidationError
 from rest_framework import serializers, generics
 from django.utils.translation import gettext_lazy as _
 
-from dj_vpn.accounts.enums import VolumeChoices, AccountType, AccountStatus
+from accounts.enums import VolumeChoices, AccountType, AccountStatus
 from dj_vpn.accounts.models import User, ContentDevice, PrivateNotification
 from dj_vpn.vpn.utils.status_code import ErrorResponse
 
@@ -112,7 +112,7 @@ class PrivateNotificationsSerializer(serializers.ModelSerializer):
 
 
 class VolumeUsageSerializer(serializers.Serializer):
-    volume_usage = serializers.FloatField(
+    volume_usage = serializers.CharField(
         help_text=_("حجم مصرفی به صورت مگابایت ارسال شود")
     )
     username = serializers.CharField()
