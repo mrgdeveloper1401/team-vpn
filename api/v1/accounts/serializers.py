@@ -1,10 +1,12 @@
 from django.contrib.auth.password_validation import validate_password
+from django.db.models import Count
 from rest_framework.validators import ValidationError
-from rest_framework import serializers
-# from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers, generics
+from django.utils.translation import gettext_lazy as _
 
-from accounts.models import User, ContentDevice, PrivateNotification
-from vpn.utils.status_code import ErrorResponse
+from accounts.enums import VolumeChoices, AccountType, AccountStatus
+from dj_vpn.accounts.models import User, ContentDevice, PrivateNotification
+from dj_vpn.vpn.utils.status_code import ErrorResponse
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -31,11 +33,24 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data)
 
 
-class ListUserProfileSerializer(serializers.ModelSerializer):
+class GetUserProfileSerializer(serializers.ModelSerializer):
+    day_left = serializers.SerializerMethodField()
+    end_date_subscription = serializers.SerializerMethodField()
+    remaining_volume_amount = serializers.SerializerMethodField()
+
+    def get_day_left(self, obj):
+        return obj.day_left
+
+    def get_end_date_subscription(self, obj):
+        return obj.end_date_subscription
+
+    def get_remaining_volume_amount(self, obj):
+        return obj.remaining_volume_amount
+
     class Meta:
         model = User
         exclude = ['password', "groups", "user_permissions", "is_superuser", "is_staff", "is_active", "deleted_at",
-                   "is_deleted"]
+                   "is_deleted", "last_login"]
 
 
 class UpdateUserProfileSerializer(serializers.ModelSerializer):
@@ -44,35 +59,40 @@ class UpdateUserProfileSerializer(serializers.ModelSerializer):
         fields = ["email", "mobile_phone", "first_name", "last_name", "birth_date"]
 
 
-class AdminUserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        exclude = ['groups', "user_permissions"]
-
-
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
-    password = serializers.CharField(min_length=8, style={'input_type': 'password'})
+    password = serializers.CharField(style={'input_type': 'password'})
     device_number = serializers.CharField()
     ip_address = serializers.IPAddressField()
+    device_model = serializers.CharField()
+    device_os = serializers.CharField()
+    fcm_token = serializers.CharField()
 
     def validate(self, attrs):
         try:
             device_number = attrs.get('device_number')
-            ip_address = attrs.get('ip_address')
-            if not device_number:
-                raise ValidationError(ErrorResponse.INVALID_INPUT)
-            if not ip_address:
-                raise ValidationError(ErrorResponse.INVALID_INPUT)
-            device = ContentDevice.objects.get(user__username=attrs["username"], device_number=device_number)
+            username = attrs.get("username")
+            device = ContentDevice.objects.get(user__username=username, device_number=device_number)
         except ContentDevice.DoesNotExist:
-            user = User.objects.get(username=attrs['username'])
-            del self.initial_data['username']
-            del self.initial_data['password']
-            ContentDevice.objects.create(**self.initial_data, user=user)
+            user = User.objects.filter(username=username).first()
+            if user:
+                data = attrs.copy()
+                del data['username']
+                del data['password']
+                del data['fcm_token']
+                if user.number_of_max_device > user.user_device.count():
+                    ContentDevice.objects.create(**data, user=user)
+                else:
+                    raise ValidationError(ErrorResponse.MAXIMUM_REACH)
+            else:
+                raise ValidationError(ErrorResponse.OBJECT_NOT_FOUND)
         else:
             if device.is_blocked:
                 raise ValidationError(ErrorResponse.LOGIN_BLOCKED)
+            for key, value in self.initial_data.items():
+                if hasattr(device, key):
+                    setattr(device, key, value)
+            device.save()
         return attrs
 
 
@@ -88,11 +108,31 @@ class ContentDeviceSerializer(serializers.ModelSerializer):
 class PrivateNotificationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PrivateNotification
-        exclude = ['is_deleted', "deleted_at"]
+        exclude = ['is_deleted', "deleted_at", "user"]
 
 
-# class LogoutSerializer(serializers.Serializer):
-#     refresh_token = serializers.CharField()
-#
-#     def save(self, **kwargs):
-#         pass
+class VolumeUsageSerializer(serializers.Serializer):
+    volume_usage = serializers.FloatField(
+        help_text=_("حجم مصرفی به صورت مگابایت ارسال شود")
+    )
+    username = serializers.CharField()
+
+    def validate(self, attrs):
+        user = generics.get_object_or_404(User, username=attrs['username'])
+
+        if user.volume_choice == VolumeChoices.GB:
+            if user.volume_usage / 1_000 > user.volume:
+                user.account_type = AccountType.normal_user
+                user.accounts_status = AccountStatus.LIMIT
+
+        if user.volume_choice == VolumeChoices.MG:
+            if user.volume_usage > user.volume:
+                user.account_type = AccountType.normal_user
+                user.accounts_status = AccountStatus.LIMIT
+
+        if user.volume_choice == VolumeChoices.TRA:
+            if user.volume_usage / 1_000_000 > user.volume:
+                user.account_type = AccountType.normal_user
+                user.accounts_status = AccountStatus.LIMIT
+        user.save()
+        return attrs
