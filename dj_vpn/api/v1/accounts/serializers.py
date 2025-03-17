@@ -1,9 +1,10 @@
 from django.contrib.auth.password_validation import validate_password
 from django.db.models import Count
 from rest_framework.validators import ValidationError
-from rest_framework import serializers
+from rest_framework import serializers, generics
 from django.utils.translation import gettext_lazy as _
 
+from accounts.enums import VolumeChoices, AccountType, AccountStatus
 from dj_vpn.accounts.models import User, ContentDevice, PrivateNotification
 from dj_vpn.vpn.utils.status_code import ErrorResponse
 
@@ -116,10 +117,22 @@ class VolumeUsageSerializer(serializers.Serializer):
     )
     username = serializers.CharField()
 
-    # def validate(self, attr):
-    #     try:
-    #         get_user = User.objects.get(username=attr.get("username"))
-    #     except User.DoesNotExist:
-    #         raise serializers.ValidationError({"username": "user not found"})
-    #     attr['user'] = get_user
-    #     return attr
+    def validate(self, attrs):
+        user = generics.get_object_or_404(User, username=attrs['username'])
+
+        if user.volume_choice == VolumeChoices.GB:
+            if user.volume_usage / 1_000 > user.volume:
+                user.account_type = AccountType.normal_user
+                user.accounts_status = AccountStatus.LIMIT
+
+        if user.volume_choice == VolumeChoices.MG:
+            if user.volume_usage > user.volume:
+                user.account_type = AccountType.normal_user
+                user.accounts_status = AccountStatus.LIMIT
+
+        if user.volume_choice == VolumeChoices.TRA:
+            if user.volume_usage / 1_000_000 > user.volume:
+                user.account_type = AccountType.normal_user
+                user.accounts_status = AccountStatus.LIMIT
+        user.save()
+        return attrs
