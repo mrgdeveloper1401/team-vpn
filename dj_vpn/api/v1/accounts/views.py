@@ -1,3 +1,4 @@
+import re
 from django.contrib.auth import authenticate
 from rest_framework import viewsets, status
 from rest_framework import mixins
@@ -117,10 +118,13 @@ class VolumeUsageApiView(views.APIView):
 
         user = User.objects.filter(username=serializer.validated_data['username']).only("username")
         if user:
+            number_list = re.findall(r'\d+', serializer.validated_data['volume_usage'])
+            number = int(number_list[0])
+
             if user.first().accounts_status == AccountStatus.ACTIVE:
                 user.update(
-                    volume_usage=F('volume_usage') + serializer.validated_data['volume_usage'],
-                    all_volume_usage=F("all_volume_usage") + serializer.validated_data['volume_usage'],
+                    volume_usage=F('volume_usage') + number,
+                    all_volume_usage=F("all_volume_usage") + number,
                 )
                 return HttpResponse(content="ok", content_type="text/plain")
             return HttpResponse("DISCONNECT", status=status.HTTP_400_BAD_REQUEST, content_type="text/plain")
