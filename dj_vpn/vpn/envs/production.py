@@ -29,10 +29,6 @@ STORAGES = {
 #     }
 # }
 
-DATABASES = {
-    pas
-}
-
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.postgresql",
