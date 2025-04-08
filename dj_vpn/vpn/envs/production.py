@@ -1,31 +1,36 @@
 from dj_vpn.vpn.settings import *
 
-ALLOWED_HOSTS = config("VPS_ALLOWD_HOSTS", cast=str).split(" ")
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=str).split(" ")
 SECRET_KEY = config("PROD_SECRET_KEY", cast=str)
 
 INSTALLED_APPS += [
     "corsheaders",
     "storages",
+    "whitenoise"
 ]
 
 MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware", )
-# MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware", )
+MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware", )
 
 STORAGES = {
     "staticfiles": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     }
 }
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "HOST": config("KU_POSTDB_HOST", cast=str),
+#         "PASSWORD": config("KU_POSTDB_PASSWORD", cast=str),
+#         "PORT": config("KU_POSTDB_PORT", cast=str),
+#         "USER": config("KU_POSTDB_USER", cast=str),
+#         "NAME": config("KU_POSTDB_NAME", cast=str)
+#     }
+# }
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "HOST": config("VPS_POSTDB_HOST", cast=str),
-        "PASSWORD": config("VPS_POSTDB_PASSWORD", cast=str),
-        "PORT": config("VPS_POSTDB_PORT", cast=str),
-        "USER": config("VPS_POSTDB_USER", cast=str),
-        "NAME": config("VPS_POSTDB_NAME", cast=str)
-    }
+    pas
 }
 
 # DATABASES = {
@@ -66,7 +71,7 @@ DATABASES = {
 # django cors header settings
 # CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
-    "https://apppanel.paradox.com.se"
+    "https://vpn-rayanhjt.kubarcloud.net"
 ]
 
 # ssl config
