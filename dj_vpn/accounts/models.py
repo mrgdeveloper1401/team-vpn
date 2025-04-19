@@ -215,3 +215,12 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
     class Meta:
         db_table = 'private_notification'
         ordering = ("-created_at",)
+
+
+class UserLoginLog(CreateMixin):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="user_login_log")
+    ip_address = models.GenericIPAddressField()
+    user_agent = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        db_table = 'user_login_log'

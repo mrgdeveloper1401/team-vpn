@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, SetUnusablePasswordMixin, SetPasswordMixin
 from django.contrib.auth.forms import AdminUserCreationForm
@@ -140,3 +141,15 @@ class UserAdminPasswordChangeForm(SetUnusablePasswordMixin, UserSetPasswordMixin
         if "set_usable_password" in data or "password1" in data and "password2" in data:
             return ["password"]
         return []
+
+
+class CustomAdminLoginForm(AdminAuthenticationForm):
+    def confirm_login_allowed(self, user):
+        super().confirm_login_allowed(user)  # بررسی‌های پیش‌فرض (مثل is_staff, is_active)
+
+        if user.is_superuser is False:
+            if user.account_type != "premium_user":
+                raise ValidationError(
+                    "فقط کاربران پرمیوم اجازه دسترسی به پنل ادمین رو دارند",
+                    code="invalid_login",
+                )
