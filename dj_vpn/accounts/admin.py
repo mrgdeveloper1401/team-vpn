@@ -1,16 +1,12 @@
 from django.contrib import admin
-from django.contrib.auth.forms import UserChangeForm, AdminUserCreationForm
-from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import PermissionDenied, ValidationError
-# from guardian.admin import GuardedModelAdmin
-# from guardian.shortcuts import get_objects_for_user
+from django.core.exceptions import PermissionDenied
 
-from .models import User, ContentDevice, PrivateNotification, OneDayLeftUser
-from import_export.admin import ImportExportModelAdmin
+from .forms import CustomAdminLoginForm
+from .models import User, ContentDevice, PrivateNotification, OneDayLeftUser, UserLoginLog
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+
 from . import forms
-# Register your models here.
 
 
 class NumberOfDaysFilter(admin.SimpleListFilter):
@@ -33,7 +29,7 @@ class ContentDeviceInline(admin.TabularInline):
 
 
 @admin.register(User)
-class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
+class UserAdmin(BaseUserAdmin):
     add_form = forms.UserAccountCreationForm
     change_password_form = forms.UserAdminPasswordChangeForm
     list_display = ("username", "is_staff", "is_active", "is_connected_user", "start_premium", "volume",
@@ -118,7 +114,7 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
                     'user_type',
                     'groups',
                     'user_permissions',
-                    "created_by"
+                    "created_by",
                 ]
 
                 for field_name in fields_to_disable:
@@ -135,7 +131,7 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
 
 
 @admin.register(ContentDevice)
-class ContentDeviceAdmin(ImportExportModelAdmin):
+class ContentDeviceAdmin(admin.ModelAdmin):
     list_display = ["id", 'user', "ip_address", "device_model", "is_blocked", "created_at"]
     raw_id_fields = ['user']
     list_select_related = ['user']
@@ -147,7 +143,7 @@ class ContentDeviceAdmin(ImportExportModelAdmin):
 
 
 @admin.register(PrivateNotification)
-class PrivateNotificationAdmin(ImportExportModelAdmin):
+class PrivateNotificationAdmin(admin.ModelAdmin):
     list_display = ['user', "title", "is_active", "created_at"]
     list_select_related = ['user']
     list_filter = ['is_active']
@@ -177,3 +173,23 @@ class OneDayLeftUserAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
     list_per_page = 20
+
+
+@admin.register(UserLoginLog)
+class UserLoginLogAdmin(admin.ModelAdmin):
+    list_display = ("user", "ip_address", "user_agent", "created_at")
+    list_select_related = ("user",)
+    search_fields = ("user__username",)
+    raw_id_fields = ("user",)
+    list_per_page = 20
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).only(
+            "user__username",
+            "ip_address",
+            "user_agent",
+            "created_at"
+        )
+
+
+admin.site.login_form = CustomAdminLoginForm
