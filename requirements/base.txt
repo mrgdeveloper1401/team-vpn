@@ -1,4 +1,4 @@
-django
+django==5.1.8
 pillow
 djangorestframework
 djangorestframework-simplejwt
@@ -20,3 +20,5 @@ django-celery-results
 flower
 firebase-admin
 pyfcm
+django-extensions
+aiosmtpd

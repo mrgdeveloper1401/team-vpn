@@ -1,5 +1,5 @@
 from django.contrib import admin
-from import_export.admin import ImportExportModelAdmin
+# from import_export.admin import ImportExportModelAdmin
 
 from . import models
 
@@ -15,7 +15,7 @@ from . import models
 
 
 @admin.register(models.Country)
-class CountryAdmin(ImportExportModelAdmin):
+class CountryAdmin(admin.ModelAdmin):
     list_display = ["id", 'en_country_name', "fa_country_name"]
     # raw_id_fields = ['country_image']
     # list_select_related = ['country_image']
@@ -26,7 +26,7 @@ class CountryAdmin(ImportExportModelAdmin):
 
 
 @admin.register(models.Config)
-class ConfigAdmin(ImportExportModelAdmin):
+class ConfigAdmin(admin.ModelAdmin):
     list_display = ["country", "created_at", "config_type", "is_active"]
     raw_id_fields = ["country"]
     list_select_related = ["country"]

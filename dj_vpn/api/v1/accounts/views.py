@@ -1,4 +1,6 @@
 import re
+from ipaddress import ip_address
+
 from django.contrib.auth import authenticate
 from rest_framework import viewsets, status
 from rest_framework import mixins
@@ -8,6 +10,7 @@ from rest_framework.response import Response
 from django.db.models import F
 from django.http import HttpResponse
 
+from dj_vpn.accounts.models import UserLoginLog
 from dj_vpn.accounts.enums import AccountStatus
 from dj_vpn.accounts.models import User, ContentDevice, PrivateNotification
 from dj_vpn.vpn.utils.create_refresh_token import get_token_refresh_token
@@ -78,6 +81,11 @@ class LoginApiView(views.APIView):
             )
             user.number_of_login += 1
             user.fcm_token = serializer.validated_data['fcm_token']
+            UserLoginLog.objects.create(
+                user=user,
+                ip_address=request.META.get("REMOTE_ADDR"),
+                user_agent=request.META.get("HTTP_USER_AGENT")
+            )
             user.save()
             return response
         return Response({"detail": "invalid input"}, status=status.HTTP_400_BAD_REQUEST)
