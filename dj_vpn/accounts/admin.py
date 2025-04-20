@@ -1,12 +1,11 @@
 from django.contrib import admin
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import PermissionDenied
-
-from .forms import CustomAdminLoginForm
-from .models import User, ContentDevice, PrivateNotification, OneDayLeftUser, UserLoginLog
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from . import forms
+from .models import User, ContentDevice, PrivateNotification, OneDayLeftUser, UserLoginLog
 
 
 class NumberOfDaysFilter(admin.SimpleListFilter):
@@ -46,8 +45,8 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
-    fieldsets = (
-        (None, {"fields": ("username", "password")}),
+    fieldsets = [
+        (None, {"fields": ["username", "password"]}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "email", "mobile_phone", "account_type",
                                          "accounts_status", "volume", "volume_usage", "all_volume_usage",
                                          "number_of_login", "number_of_days", "volume_choice", "is_inf_volume",
@@ -66,7 +65,7 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
         (_("Important dates"), {"fields": ("last_login", "date_joined", "start_premium", "updated_at", "birth_date")}),
-    )
+    ]
     inlines = [ContentDeviceInline]
     list_filter = ('is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter,
                    "user_type")
@@ -95,7 +94,7 @@ class UserAdmin(BaseUserAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if not request.user.is_superuser:
-            qs = qs.filter(user_type=request.user.user_type, created_by=request.user)
+            qs = qs.filter(Q(created_by=request.user) | Q(id=request.user.id))
         return qs
 
     def get_form(self, request, obj=None, **kwargs):
@@ -129,6 +128,19 @@ class UserAdmin(BaseUserAdmin):
                     return False
         return super().has_delete_permission(request, obj)
 
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj)
+        if obj and obj.id == request.user.id:
+            if 'password' in fields:
+                del fields['password']
+        return fields
+
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_superuser is False:
+            if obj and obj.id == request.user.id:
+                return False
+        return super().has_change_permission(request, obj)
+
 
 @admin.register(ContentDevice)
 class ContentDeviceAdmin(admin.ModelAdmin):
@@ -140,6 +152,7 @@ class ContentDeviceAdmin(admin.ModelAdmin):
     search_fields = ['user__username', "ip_address"]
     ordering = ("-created_at",)
     list_display_links = ['id', "user"]
+    list_per_page = 20
 
 
 @admin.register(PrivateNotification)
@@ -192,4 +205,4 @@ class UserLoginLogAdmin(admin.ModelAdmin):
         )
 
 
-admin.site.login_form = CustomAdminLoginForm
+admin.site.login_form = forms.CustomAdminLoginForm
