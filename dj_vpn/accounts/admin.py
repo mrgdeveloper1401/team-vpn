@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db import connection
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import PermissionDenied
@@ -72,9 +73,10 @@ class UserAdmin(BaseUserAdmin):
     readonly_fields = ["updated_at", "date_joined", "last_login", "account_type", "accounts_status",
                        "all_volume_usage", 'number_of_login']
     list_per_page = 20
-    search_fields = ['username']
-    ordering = ['-date_joined']
-    raw_id_fields = ['created_by']
+    search_fields = ('username',)
+    ordering = ('-date_joined',)
+    raw_id_fields = ('created_by',)
+    search_help_text = "برای جست و جو میتواندی از یوزرنیم کاربر استفاده کنید"
 
     def save_model(self, request, obj, form, change):
         if change:
@@ -92,7 +94,9 @@ class UserAdmin(BaseUserAdmin):
         return super().save_model(request, obj, form, change)
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
+        qs = super().get_queryset(request).defer(
+            "updated_at", "is_deleted", "deleted_at"
+        )
         if not request.user.is_superuser:
             qs = qs.filter(Q(created_by=request.user) | Q(id=request.user.id))
         return qs
@@ -144,31 +148,57 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(ContentDevice)
 class ContentDeviceAdmin(admin.ModelAdmin):
-    list_display = ["id", 'user', "ip_address", "device_model", "is_blocked", "created_at"]
-    raw_id_fields = ['user']
-    list_select_related = ['user']
-    list_filter = ['is_blocked']
-    list_editable = ['is_blocked']
-    search_fields = ['user__username', "ip_address"]
+    list_display = ("id", 'user', "ip_address", "device_model", "is_blocked", "created_at")
+    raw_id_fields = ('user',)
+    list_select_related = ('user',)
+    list_filter = ('is_blocked',)
+    list_editable = ('is_blocked',)
+    search_fields = ('user__username',)
     ordering = ("-created_at",)
-    list_display_links = ['id', "user"]
+    list_display_links =('id', "user")
     list_per_page = 20
+    search_help_text = "برای جست و جو میتواندی از یوزرنیم کاربر استفاده کنید"
+    actions = ("enable_is_block", "disable_is_block")
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).only(
+            "user__username", "device_model", "device_os", "device_number", "ip_address",
+            "is_blocked", "created_at", "updated_at"
+        )
+
+    @admin.action(description="enable is block")
+    def enable_is_block(self, request, queryset):
+        print(queryset)
+        queryset.update(is_blocked=True)
+
+    @admin.action(description="disable is block")
+    def disable_is_block(self, request, queryset):
+        queryset.update(is_blocked=False)
 
 
 @admin.register(PrivateNotification)
 class PrivateNotificationAdmin(admin.ModelAdmin):
-    list_display = ['user', "title", "is_active", "created_at"]
-    list_select_related = ['user']
-    list_filter = ['is_active']
-    raw_id_fields = ['user']
-    search_fields = ['title', "user__username"]
-    list_editable = ['is_active']
+    list_display = ('user', "title", "is_active", "created_at")
+    list_select_related = ('user',)
+    list_filter = ('is_active',)
+    raw_id_fields = ('user',)
+    search_fields = ('title', "user__username")
+    list_editable = ('is_active',)
     ordering = ("-created_at",)
+    search_help_text = "برای سرچ کردن میتوانید از فیلد های نام کاربری یوزر و عنوان نوتیفیکیشن استفاده کنید"
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).only(
+            "user__username",
+            "title",
+            "is_active",
+            "created_at"
+        )
 
 
 @admin.register(OneDayLeftUser)
 class OneDayLeftUserAdmin(admin.ModelAdmin):
-    list_display = ("username", "number_of_days", "end_date_subscription")
+    list_display = ("username", "number_of_days", "end_date_subscription", "account_type", "is_staff")
     fieldsets = [
         (None, {
             'fields': [
@@ -185,7 +215,20 @@ class OneDayLeftUserAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
     list_per_page = 20
+    search_fields = ("username",)
+    search_help_text = "برای جست و جو میتواندی از یوزرنیم کاربر استفاده کنید"
+    list_filter = ("is_staff",)
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).only(
+            "username",
+            "number_of_days",
+            "start_premium",
+            "account_type",
+            "is_staff"
+        )
 
 
 @admin.register(UserLoginLog)
@@ -195,6 +238,7 @@ class UserLoginLogAdmin(admin.ModelAdmin):
     search_fields = ("user__username",)
     raw_id_fields = ("user",)
     list_per_page = 20
+    search_help_text = "برای جست و جو میتواندی از یوزرنیم کاربر استفاده کنید"
 
     def get_queryset(self, request):
         return super().get_queryset(request).only(
