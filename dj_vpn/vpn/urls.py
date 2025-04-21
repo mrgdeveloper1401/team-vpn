@@ -11,11 +11,11 @@ api_url = [
     path('main_settings/', include("dj_vpn.api.v1.main_settings.urls", namespace='main_setting')),
 ]
 
-admin_api = [
-    path('admin_auth/', include("dj_vpn.api.v1_admin.accounts.urls", namespace='admin_auth')),
-    path('admin_config/', include("dj_vpn.api.v1_admin.configs.urls", namespace='admin_config')),
-    path('admin_settings/', include('dj_vpn.api.v1_admin.main_settings.urls', namespace='admin_main_settings')),
-]
+# admin_api = [
+#     path('admin_auth/', include("dj_vpn.api.v1_admin.accounts.urls", namespace='admin_auth')),
+#     path('admin_config/', include("dj_vpn.api.v1_admin.configs.urls", namespace='admin_config')),
+#     path('admin_settings/', include('dj_vpn.api.v1_admin.main_settings.urls', namespace='admin_main_settings')),
+# ]
 swagger_urls = [
     # YOUR PATTERNS
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -27,7 +27,7 @@ swagger_urls = [
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-] + api_url + swagger_urls + admin_api
+] + api_url + swagger_urls
 
 
 if DEBUG:

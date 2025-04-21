@@ -83,8 +83,8 @@ class LoginApiView(views.APIView):
             user.fcm_token = serializer.validated_data['fcm_token']
             UserLoginLog.objects.create(
                 user=user,
-                ip_address=request.META.get("REMOTE_ADDR"),
-                user_agent=request.META.get("HTTP_USER_AGENT")
+                ip_address=request.META.get("REMOTE_ADDR", "HTTP_X_FORWARDED_FOR"),
+                user_agent=request.META.get("HTTP_USER_AGENT", "")
             )
             user.save()
             return response
