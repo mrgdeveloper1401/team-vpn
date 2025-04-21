@@ -209,7 +209,7 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     def save(self, *args, **kwargs):
         self.clean()
-        self.send_to_user()
+        # self.send_to_user()
         super().save(*args, **kwargs)
 
     class Meta:

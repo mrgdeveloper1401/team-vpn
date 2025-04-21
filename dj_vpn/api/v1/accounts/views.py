@@ -69,6 +69,7 @@ class LoginApiView(views.APIView):
 
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
+        user_ip = serializer.validated_data['ip_address']
         device_number = request.data.get('device_number')
         user = authenticate(username=username, password=password, request=request)
 
@@ -83,7 +84,7 @@ class LoginApiView(views.APIView):
             user.fcm_token = serializer.validated_data['fcm_token']
             UserLoginLog.objects.create(
                 user=user,
-                ip_address=request.META.get("REMOTE_ADDR", "HTTP_X_FORWARDED_FOR"),
+                ip_address=user_ip,
                 user_agent=request.META.get("HTTP_USER_AGENT", "")
             )
             user.save()

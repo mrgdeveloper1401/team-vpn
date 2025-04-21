@@ -8,7 +8,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 api_url = [
     path('auth/', include("dj_vpn.api.v1.accounts.urls", namespace='accounts')),
     path('config/', include("dj_vpn.api.v1.configs.urls", namespace='configs')),
-    path('main_settings/', include("dj_vpn.api.v1.main_settings.urls", namespace='main_setting')),
+    # path('main_settings/', include("dj_vpn.api.v1.main_settings.urls", namespace='main_setting')),
 ]
 
 # admin_api = [
