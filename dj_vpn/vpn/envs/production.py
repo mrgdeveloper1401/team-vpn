@@ -3,7 +3,7 @@ from dj_vpn.vpn.settings import *
 # use in vps
 # ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=str).split(" ")
 
-# use in system local
+# for test use
 ALLOWED_HOSTS = ["*"]
 
 SECRET_KEY = config("PROD_SECRET_KEY", cast=str)
@@ -26,11 +26,11 @@ STORAGES = {
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "HOST": config("DOCKER_POSTGRES_HOST", cast=str),
-        "PASSWORD": config("DOCKER_POSTGRES_PASSWORD", cast=str),
+        "HOST": config("VPS_POSTDB_HOST", cast=str),
+        "PASSWORD": config("VPS_POSTDB_PASSWORD", cast=str),
         "PORT": config("VPS_POSTDB_PORT", cast=str),
-        "USER": config("DOCKER_POSTGRES_USER", cast=str),
-        "NAME": config("DOCKER_POSTGRES_DB", cast=str)
+        "USER": config("VPS_POSTDB_USER", cast=str),
+        "NAME": config("VPS_POSTDB_NAME", cast=str)
     }
 }
 
@@ -73,6 +73,7 @@ DATABASES = {
 # django cors header settings
 # if we can test and develop api this button we can set
 CORS_ALLOW_ALL_ORIGINS = True
+
 # CORS_ALLOWED_ORIGINS = [
 #     "https://apppanel.paradox.com.se"
 # ]
@@ -102,5 +103,5 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
 
-broker_url = config("DOCKER_BROKER_URL", cast=str)
-result_backend = config("DOCKER_RESULT_BACKEND", cast=str)
+broker_url = config("PROD_DOCKER_BROKER_URL", cast=str)
+result_backend = config("PROD_DOCKER_RESULT_BACKEND", cast=str)
