@@ -23,11 +23,11 @@
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="vpndb@localhost" uuid="21d7363d-0d82-4478-b7d5-166b5e095d27">
+    <data-source source="LOCAL" name="postgres@localhost" uuid="aa9ba38e-3c1a-420f-a33f-39af11157507">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5433/vpndb</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5433/postgres</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

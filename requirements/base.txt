@@ -9,10 +9,8 @@ psycopg2-binary
 drf-spectacular
 django-import-export
 colorlog
-djangorestframework
 django-axes
 django-ratelimit
-drf-spectacular
 drf-nested-routers
 celery[redis]
 django-celery-beat

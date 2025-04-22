@@ -13,14 +13,14 @@ DATABASES = {
         "USER": "postgres",
         "NAME": "vpndb"
     },
-    "second_db": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("PUB_POSTDB_NAME", cast=str),
-        "USER": config("PUB_POSTDB_USER", cast=str),
-        "PASSWORD": config("PUB_POSTDB_PASSWORD", cast=str),
-        "HOST": config("PUB_POSTDB_HOST", cast=str),
-        "PORT": config("PUB_POSTDB_PORT", cast=str),
-    }
+    # "second_db": {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": config("PUB_POSTDB_NAME", cast=str),
+    #     "USER": config("PUB_POSTDB_USER", cast=str),
+    #     "PASSWORD": config("PUB_POSTDB_PASSWORD", cast=str),
+    #     "HOST": config("PUB_POSTDB_HOST", cast=str),
+    #     "PORT": config("PUB_POSTDB_PORT", cast=str),
+    # }
 }
 
 # JET_TOKEN = config("JET_TOKEN", cast=str)
@@ -44,8 +44,8 @@ INTERNAL_IPS = [
 
 SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
 
-CACHES["default"]["LOCATION"] = "redis://localhost:6379/2"
+CACHES["default"]["LOCATION"] = "redis://localhost:6380/2"
 
-broker_url = "redis://localhost:6379/0"
-result_backend = "redis://localhost:6379/1"
+broker_url = "redis://localhost:6380/0"
+result_backend = "redis://localhost:6380/1"
 
