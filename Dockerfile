@@ -10,7 +10,8 @@ COPY . /home/app
 RUN apk update && \
     apk upgrade --no-cache && \
     pip install --upgrade pip && \
-    pip install -r ./requirements/production.txt
+    pip install -r ./requirements/production.txt && \
+    python manage.py collectstatic --noinput
 
 #test in local
 # RUN pip install --upgrade pip
