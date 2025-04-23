@@ -1,4 +1,4 @@
-FROM python:3.12-alpine
+FROM python:3.12.9-alpine
 
 # test in local
 #FROM dj:1.1.0
@@ -7,7 +7,7 @@ WORKDIR /home/app
 
 COPY . /home/app
 
-RUN apk update  && \
+RUN apk update && \
     upgrade
 
 RUN pip install --upgrade pip && \
