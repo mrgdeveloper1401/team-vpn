@@ -1,11 +1,13 @@
 from django.contrib import admin
-from django.db import connection
-from django.db.models import Q
+from django.db.models import ExpressionWrapper
+from django.db.models import Q, F, IntegerField
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from datetime import date
 
 from . import forms
+from .enums import AccountType
 from .models import User, ContentDevice, PrivateNotification, OneDayLeftUser, UserLoginLog
 
 
@@ -21,6 +23,28 @@ class NumberOfDaysFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'false':
             return queryset.filter(number_of_days__isnull=False)
+
+
+class DayLeftZeroFilter(admin.SimpleListFilter):
+    title = _("Day left")
+    parameter_name = 'day_left'
+
+    def lookups(self, request, model_admin):
+        return [
+            ("zero", _("zero reminder days")),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == 'zero':
+            return queryset.filter(
+                account_type=AccountType.premium_user,
+                start_premium__isnull = False,
+            ).annotate(
+                calcuate_day_left=ExpressionWrapper(
+                    date.today() - (F("start_premium") + F("number_of_days")),
+                    output_field=IntegerField()
+                )
+            ).filter(calcuate_day_left=0)
 
 
 class ContentDeviceInline(admin.TabularInline):
@@ -69,7 +93,7 @@ class UserAdmin(BaseUserAdmin):
     ]
     inlines = [ContentDeviceInline]
     list_filter = ('is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter,
-                   "user_type")
+                   "user_type", DayLeftZeroFilter)
     readonly_fields = ["updated_at", "date_joined", "last_login", "account_type", "accounts_status",
                        "all_volume_usage", 'number_of_login']
     list_per_page = 20
