@@ -7,7 +7,8 @@ WORKDIR /home/app
 
 COPY . /home/app
 
-RUN apk --update --upgrade
+RUN apk update  && \
+    upgrade
 
 RUN pip install --upgrade pip && \
     pip install -r ./requirements/production.txt
