@@ -8,7 +8,6 @@ DEBUG = config("DEBUG", cast=bool)
 
 settings_module = os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dj_vpn.vpn.envs.production")
 
-
 celery_app = Celery("vpn")
 
 celery_app.config_from_object(settings_module)
