@@ -1,7 +1,6 @@
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
-
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,6 +25,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "rest_framework",
     "rest_framework_simplejwt",
+    "fcm_django",
     # "rest_framework_simplejwt.token_blacklist",
     # "guardian",
 
@@ -227,3 +227,7 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     # 'guardian.backends.ObjectPermissionBackend',
 ]
+
+FCM_DJANGO_SETTINGS = {
+    "DEFAULT_FIREBASE_APP": None,
+}

@@ -20,3 +20,4 @@ firebase-admin
 pyfcm
 django-extensions
 aiosmtpd
+fcm-django
