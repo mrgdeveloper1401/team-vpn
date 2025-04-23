@@ -8,9 +8,8 @@ WORKDIR /home/app
 COPY . /home/app
 
 RUN apk update && \
-    upgrade
-
-RUN pip install --upgrade pip && \
+    apk upgrade --no-cache && \
+    pip install --upgrade pip && \
     pip install -r ./requirements/production.txt
 
 #test in local
