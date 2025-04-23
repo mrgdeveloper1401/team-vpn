@@ -94,8 +94,7 @@ class UserAdmin(BaseUserAdmin):
     inlines = [ContentDeviceInline]
     list_filter = ('is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter,
                    "user_type", DayLeftZeroFilter)
-    readonly_fields = ["updated_at", "date_joined", "last_login", "account_type", "accounts_status",
-                       "all_volume_usage", 'number_of_login']
+    readonly_fields = ("updated_at", "date_joined", "last_login", "all_volume_usage", 'number_of_login')
     list_per_page = 20
     search_fields = ('username',)
     ordering = ('-date_joined',)

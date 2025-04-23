@@ -94,11 +94,11 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.LIMIT
                 # check expire data
-                if self.start_premium + timedelta(days=self.number_of_days) < date.today():
+                elif self.start_premium + timedelta(days=self.number_of_days) < date.today():
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.EXPIRED
                 # check premium
-                if self.volume_usage / 1_000 > self.volume:
+                elif self.volume_usage / 1_000 > self.volume:
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.LIMIT
                 else:
@@ -111,11 +111,11 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.LIMIT
                 # check datetime
-                if self.start_premium + timedelta(days=self.number_of_days) < date.today():
+                elif self.start_premium + timedelta(days=self.number_of_days) < date.today():
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.EXPIRED
                 # check premium
-                if self.volume_usage > self.volume:
+                elif self.volume_usage > self.volume:
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.LIMIT
                 else:
@@ -128,11 +128,11 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.LIMIT
                 # check datetime premium
-                if self.start_premium + timedelta(days=self.number_of_days) < date.today():
+                elif self.start_premium + timedelta(days=self.number_of_days) < date.today():
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.EXPIRED
                 # check premium
-                if self.volume_usage / 1_000_000 > self.volume:
+                elif self.volume_usage / 1_000_000 > self.volume:
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.LIMIT
                 else:

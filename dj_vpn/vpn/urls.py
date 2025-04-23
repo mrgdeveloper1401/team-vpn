@@ -29,8 +29,8 @@ urlpatterns = [
 ] + api_url + swagger_urls
 
 
-# if DEBUG:
-#     from debug_toolbar.toolbar import debug_toolbar_urls
-#     from django.conf.urls.static import static
-#     urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
-#     urlpatterns += debug_toolbar_urls()
+if DEBUG:
+    from debug_toolbar.toolbar import debug_toolbar_urls
+    from django.conf.urls.static import static
+    urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
+    urlpatterns += debug_toolbar_urls()
