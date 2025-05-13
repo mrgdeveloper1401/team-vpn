@@ -1,25 +1,22 @@
-FROM python:3.12.9-alpine
-
-# test in local
-#FROM dj:1.1.0
+FROM python:3.12-alpine
 
 WORKDIR /home/app
 
 COPY . /home/app
 
-RUN apk update && \
-    apk upgrade --no-cache && \
-    pip install --upgrade pip && \
-    pip install -r ./requirements/production.txt
+RUN apk add --update --upgrade --no-cache --virtual .tmp python3  \
+    py3-pip
 
-#test in local
-# RUN pip install --upgrade pip
+
+RUN pip install --upgrade pip && \
+    pip install -r ./requirements/production.txt
 
 RUN adduser -D -H mg && \
     chown -R mg:mg /home/app && \
-    chmod -R 755 /home/app
+    chmod -R 755 /home/app && \
+    pip install colorlog django-axes
 
-USER mg
+
 
 ENV PYTHONDONOTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1

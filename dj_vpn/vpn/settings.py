@@ -135,18 +135,6 @@ LOGGING = {
         },
     },
     "handlers": {
-        "console": {
-            "level": "ERROR",
-            "class": "logging.StreamHandler",
-            "formatter": "color",
-            "filters": ["require_debug_true"],
-        },
-        "info_file": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / "info_file.log")
-        },
         "error_file": {
             "level": "ERROR",
             "class": "logging.FileHandler",
@@ -168,7 +156,7 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["console", "info_file", "warning_file", "critical_file", "error_file"],
+            "handlers": [ "warning_file", "critical_file", "error_file"],
             "propagate": True,
         }
     }

@@ -1,16 +1,17 @@
+version: "3"
+
 services:
   django:
-    ports:
-      - "8000:8000"
     volumes:
       - static_files:/home/app/dj_vpn/staticfiles
+    ports:
+      - "8000:8000"
     container_name: django_vpn
     build:
       context: .
       dockerfile: Dockerfile
     restart: always
-    env_file:
-      - ".env"
+    env_file: ".env"
     depends_on:
       - db
 
@@ -29,15 +30,10 @@ services:
 
   redis:
     container_name: vpn_redis
-    expose:
-      - 6379
+    image: redis:7.4-alpine
+    restart: always
     depends_on:
       - db
-#    ports:
-#      - "6380:6379"
-    image: redis:7.4.2-alpine
-    restart: always
-#    entrypoint: ["sh", "-c", '/home/app/redis_entrypoint.sh', "redis-server"]
 
   nginx:
     container_name: vpn_nginx
@@ -45,16 +41,25 @@ services:
       context: nginx
       dockerfile: Dockerfile
     restart: always
-    image: nginx:1.27.5-alpine
+    image: nginx:1.27-alpine
     volumes:
       - static_files:/vol/
       - ./nginx.conf:/etc/nginx/nginx.conf
     command: ["nginx", "-g", "daemon off;"]
     ports:
-#      - "8080:80"
       - "80:80"
+      - "443:443"
     depends_on:
       - django
+
+  celery:
+    container_name: vpn_celery
+    build:
+      context: .
+    restart: always
+    entrypoint: celery -A dj_vpn.vpn worker -l INFO
+    depends_on:
+      - redis
 
 volumes:
   postgres_data:
