@@ -1,10 +1,10 @@
 from dj_vpn.vpn.settings import *
 
 # use in vps
-# ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=str).split(" ")
+ALLOWED_HOSTS = config("VPS_ALLOWD_HOSTS", cast=str).split(" ")
 
 # for test use
-ALLOWED_HOSTS = ["*"]
+# ALLOWED_HOSTS = ["*"]
 
 SECRET_KEY = config("PROD_SECRET_KEY", cast=str)
 
@@ -72,11 +72,9 @@ DATABASES = {
 
 # django cors header settings
 # if we can test and develop api this button we can set
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
 
-# CORS_ALLOWED_ORIGINS = [
-#     "https://apppanel.paradox.com.se"
-# ]
+CORS_ALLOWED_ORIGINS = "".join(config("PROD_CORS_ORIGIN", cast=list)).split(",")
 
 # ssl config
 SESSION_COOKIE_SECURE = True
@@ -103,5 +101,5 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
 
-broker_url = config("PROD_DOCKER_BROKER_URL", cast=str)
-result_backend = config("PROD_DOCKER_RESULT_BACKEND", cast=str)
+CELERY_BROKER_URL = "redis://vpn_redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://vpn_redis:6379/1"

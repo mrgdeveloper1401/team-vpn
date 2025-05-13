@@ -55,7 +55,7 @@ ROOT_URLCONF = "dj_vpn.vpn.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -219,3 +219,14 @@ AUTHENTICATION_BACKENDS = [
 FCM_DJANGO_SETTINGS = {
     "DEFAULT_FIREBASE_APP": None,
 }
+
+# celery config
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Tehran'
+CELERY_WORKER_PREFETCH_MULTIPLIER=1
+CELERY_RESULT_EXPIRES=120
+CELERY_TASK_ALWAYS_EAGER=False
+BROKER_CONNECTION_RETRY_ON_STARTUP=True
+CELERY_TASK_ACKS_LATE=True

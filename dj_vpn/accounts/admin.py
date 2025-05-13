@@ -23,6 +23,7 @@ class NumberOfDaysFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'false':
             return queryset.filter(number_of_days__isnull=False)
+        return queryset
 
 
 class DayLeftZeroFilter(admin.SimpleListFilter):
@@ -64,7 +65,7 @@ class UserAdmin(BaseUserAdmin):
             None,
             {
                 "classes": ("wide",),
-                "fields": ("username", "usable_password", "password1", "password2", "volume", "volume_choice",
+                "fields": ("username", "password1", "password2", "volume", "volume_choice",
                            "number_of_days", "start_premium", "number_of_max_device", "account_type", "accounts_status",
                            "user_type", "is_inf_volume", "is_staff", "groups", "user_permissions")
             },
