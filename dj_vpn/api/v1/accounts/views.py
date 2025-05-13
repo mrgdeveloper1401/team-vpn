@@ -1,3 +1,6 @@
+import re
+from ipaddress import ip_address
+
 from django.contrib.auth import authenticate
 from rest_framework import viewsets, status
 from rest_framework import mixins
@@ -5,7 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import views
 from rest_framework.response import Response
 from django.db.models import F
+from django.http import HttpResponse
 
+from dj_vpn.accounts.models import UserLoginLog
 from dj_vpn.accounts.enums import AccountStatus
 from dj_vpn.accounts.models import User, ContentDevice, PrivateNotification
 from dj_vpn.vpn.utils.create_refresh_token import get_token_refresh_token
@@ -64,6 +69,7 @@ class LoginApiView(views.APIView):
 
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
+        user_ip = serializer.validated_data['ip_address']
         device_number = request.data.get('device_number')
         user = authenticate(username=username, password=password, request=request)
 
@@ -76,6 +82,11 @@ class LoginApiView(views.APIView):
             )
             user.number_of_login += 1
             user.fcm_token = serializer.validated_data['fcm_token']
+            UserLoginLog.objects.create(
+                user=user,
+                ip_address=user_ip,
+                user_agent=request.META.get("HTTP_USER_AGENT", "")
+            )
             user.save()
             return response
         return Response({"detail": "invalid input"}, status=status.HTTP_400_BAD_REQUEST)
@@ -116,14 +127,17 @@ class VolumeUsageApiView(views.APIView):
 
         user = User.objects.filter(username=serializer.validated_data['username']).only("username")
         if user:
+            number_list = re.findall(r'\d+', serializer.validated_data['volume_usage'])
+            number = int(number_list[0])
+
             if user.first().accounts_status == AccountStatus.ACTIVE:
                 user.update(
-                    volume_usage=F('volume_usage') + serializer.validated_data['volume_usage'],
-                    all_volume_usage=F("all_volume_usage") + serializer.validated_data['volume_usage'],
+                    volume_usage=F('volume_usage') + number,
+                    all_volume_usage=F("all_volume_usage") + number,
                 )
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response("DISCONNECT", status=status.HTTP_400_BAD_REQUEST)
-        return Response("USER NOT FOUND", status=status.HTTP_400_BAD_REQUEST)
+                return HttpResponse(content="ok", content_type="text/plain")
+            return HttpResponse("DISCONNECT", status=status.HTTP_400_BAD_REQUEST, content_type="text/plain")
+        return HttpResponse("USER NOT FOUND", status=status.HTTP_400_BAD_REQUEST, content_type="text/plain")
 
 
 class UpdateConnectionApiView(views.APIView):

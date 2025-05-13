@@ -71,58 +71,83 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
 
     @property
     def day_left(self):
-        if self.account_type == AccountType.premium_user:
-            reminder_day = (self.end_date_subscription - date.today()).days
-            return max(reminder_day, 0)
+        if self.start_premium is not None and self.number_of_days is not None:
+            if self.account_type == AccountType.premium_user:
+                reminder_day = (self.end_date_subscription - date.today()).days
+                return max(reminder_day, 0)
         return None
 
     def clean(self):
         if self.volume > 0 and self.is_inf_volume:
-            raise ValidationError({"volume": _("volume and is_inf volume they can't be together")})
+            raise ValidationError({"volume": _("volume and is_inf volume they can't be together,"
+                                               "you can set volume to 0 and is_inf equal true")})
 
     def save(self, *args, **kwargs):
         # اگر کاربر لاگین کند برای بار اول تاریخ شروع اکانت مشخص خواهد شد
         if self.number_of_login == 1 and not self.start_premium:
             self.start_premium = date.today()
 
-        if self.start_premium:
+        if self.start_premium is not None and self.number_of_days is not None:
             if self.volume_choice == VolumeChoices.GB:
+                # check if equal
                 if self.volume_usage / 1_000 == self.volume:
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.LIMIT
-                if self.volume_usage / 1_000 < self.volume and self.number_of_login > 0:
-                    self.account_type = AccountType.premium_user
-                    self.accounts_status = AccountStatus.ACTIVE
-                if self.start_premium + timedelta(days=self.number_of_days) < date.today():
+                # check expire data
+                elif self.start_premium + timedelta(days=self.number_of_days) < date.today():
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.EXPIRED
+                # check premium
+                elif self.volume_usage / 1_000 > self.volume:
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.LIMIT
+                else:
+                    self.account_type = AccountType.premium_user
+                    self.accounts_status = AccountStatus.ACTIVE
 
             if self.volume_choice == VolumeChoices.MG:
+                # check equal
                 if self.volume_usage == self.volume:
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.LIMIT
-                if self.volume_usage < self.volume and self.number_of_login > 0:
-                    self.account_type = AccountType.premium_user
-                    self.accounts_status = AccountStatus.ACTIVE
-                if self.start_premium + timedelta(days=self.number_of_days) < date.today():
+                # check datetime
+                elif self.start_premium + timedelta(days=self.number_of_days) < date.today():
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.EXPIRED
+                # check premium
+                elif self.volume_usage > self.volume:
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.LIMIT
+                else:
+                    self.account_type = AccountType.premium_user
+                    self.accounts_status = AccountStatus.ACTIVE
 
             if self.volume_choice == VolumeChoices.TRA:
+                # check equal
                 if self.volume_usage / 1_000_000 == self.volume:
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.LIMIT
-                if self.volume_usage / 1_000_000 < self.volume and self.number_of_login > 0:
-                    self.account_type = AccountType.premium_user
-                    self.accounts_status = AccountStatus.ACTIVE
-                if self.start_premium + timedelta(days=self.number_of_days) < date.today():
+                # check datetime premium
+                elif self.start_premium + timedelta(days=self.number_of_days) < date.today():
                     self.account_type = AccountType.normal_user
                     self.accounts_status = AccountStatus.EXPIRED
-            if self.is_inf_volume:
-                self.accounts_status = AccountStatus.ACTIVE
-                self.account_type = AccountType.premium_user
+                # check premium
+                elif self.volume_usage / 1_000_000 > self.volume:
+                    self.account_type = AccountType.normal_user
+                    self.accounts_status = AccountStatus.LIMIT
+                else:
+                    self.account_type = AccountType.premium_user
+                    self.accounts_status = AccountStatus.ACTIVE
 
         else:
+            self.account_type = AccountType.normal_user
+            self.accounts_status = AccountStatus.NOTHING
+
+        if self.is_inf_volume:
+            self.accounts_status = AccountStatus.ACTIVE
+            self.account_type = AccountType.premium_user
+
+        if self.volume == 0:
             self.account_type = AccountType.normal_user
             self.accounts_status = AccountStatus.NOTHING
         super().save(*args, **kwargs)
@@ -175,7 +200,7 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
         try:
             send_notification(self.user.fcm_token, self.title, self.body)
         except Exception as e:
-            raise e
+            raise ValidationError({"user": e})
 
     def clean(self):
         if not self.user.fcm_token:
@@ -190,3 +215,12 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
     class Meta:
         db_table = 'private_notification'
         ordering = ("-created_at",)
+
+
+class UserLoginLog(CreateMixin):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="user_login_log")
+    ip_address = models.GenericIPAddressField()
+    user_agent = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        db_table = 'user_login_log'
