@@ -1,7 +1,6 @@
 from datetime import timedelta, date
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -10,7 +9,7 @@ from dj_vpn.cores.managers import UserSoftManager
 from dj_vpn.accounts.enums import AccountType, AccountStatus, VolumeChoices
 from dj_vpn.accounts.managers import OneDayLeftQuerySet
 from dj_vpn.cores.models import CreateMixin, UpdateMixin, SoftDeleteMixin
-from dj_vpn.vpn.firebase_conf.firebase import send_notification
+from dj_vpn.accounts.tasks import send_public_notification
 
 
 class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
@@ -24,12 +23,12 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                                                    "limit --> لیمیت یعنی کاربر حجمش تموم شده هست \n"
                                                    "expire --> یعنی کاربر روز کانفینگ ان تموم شده هست"))
     volume_choice = models.CharField(max_length=7, choices=VolumeChoices.choices, default=VolumeChoices.GB)
-    volume = models.PositiveIntegerField(validators=[MinValueValidator(0)], help_text=_("کاربر چقدر حجم داشته باشد"),
+    volume = models.PositiveIntegerField(validators=(MinValueValidator(0),), help_text=_("کاربر چقدر حجم داشته باشد"),
                                          default=0)
     volume_usage = models.FloatField(blank=True, default=0, help_text=_("حجم مصرفی میباشد که بر اساس مگابایت هست"),
-                                     validators=[MinValueValidator(0)])
+                                     validators=(MinValueValidator(0),))
     is_inf_volume = models.BooleanField(default=False, help_text=_("ایا حجم کاربر نامحدود باشد!"))
-    all_volume_usage = models.FloatField(default=0, validators=[MinValueValidator(0)], editable=False,
+    all_volume_usage = models.FloatField(default=0, validators=(MinValueValidator(0),), editable=False,
                                          help_text=_("کاربر تا الان چقدر حجم مصرف کرده!"))
     start_premium = models.DateField(blank=True, null=True, help_text=_("تاریخ شروع اشتراک اگر کاربر لاگین کند"
                                                                         " اشتراک کاربر از همان روز شروع خواهد شد"))
@@ -42,11 +41,11 @@ class User(AbstractUser, UpdateMixin, SoftDeleteMixin):
                                                        help_text=_("هر اکانت چند تا یوزر میتواند به ان متصل شود"))
     fcm_token = models.CharField(max_length=255, blank=True, null=True, help_text=_("fcm token"))
     user_type = models.CharField(
-        choices=[("direct", _("مستقیم")), ("tunnel", _("تانل")), ("tunnel_direct", _("تانل و دایرکت"))],
+        choices=(("direct", _("مستقیم")), ("tunnel", _("تانل")), ("tunnel_direct", _("تانل و دایرکت"))),
         null=True, blank=True, max_length=14, help_text=_("you can choice --> tunnel - direct - tunnel_direct"))
     created_by = models.ForeignKey('self', related_name="owner", on_delete=models.DO_NOTHING, blank=True,
                                    null=True)
-    REQUIRED_FIELDS = ['mobile_phone', "user_type"]
+    REQUIRED_FIELDS = ('mobile_phone', "user_type")
 
     objects = UserSoftManager()
     # all_objects = AllUserManager()
@@ -191,16 +190,12 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
     title = models.CharField(max_length=255, help_text=_("عنوان اعلانات"))
     body = models.TextField(help_text=_("متن اعلانات"))
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, help_text=_("گاربر"))
-    is_active = models.BooleanField(default=True, help_text=_("قابل نمایش"))
 
     def __str__(self):
         return self.title
 
     def send_to_user(self):
-        try:
-            send_notification(self.user.fcm_token, self.title, self.body)
-        except Exception as e:
-            raise ValidationError({"user": e})
+        send_public_notification.apply_async(self.user.fcm_token, self.title, self.body)
 
     def clean(self):
         if not self.user.fcm_token:
@@ -224,3 +219,4 @@ class UserLoginLog(CreateMixin):
 
     class Meta:
         db_table = 'user_login_log'
+        ordering = ("-created_at",)

@@ -18,7 +18,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    "import_export",
     "django_celery_beat",
     "django_celery_results",
     "axes",

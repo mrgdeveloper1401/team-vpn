@@ -47,4 +47,5 @@ SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
 CACHES["default"]["LOCATION"] = "redis://localhost:6380/2"
 
 CELERY_BROKER_URL = "redis://localhost:6380/0"
-CELERY_RESULT_BACKEND = "redis://localhost:6380/1"
+CELERY_RESULT_BACKEND = "redis://localhost:6380/0"
+

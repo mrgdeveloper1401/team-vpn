@@ -14,7 +14,7 @@ class AdminUserChangeForm(forms.ModelForm):
 
     class Meta:
         model = user
-        fields = "__all__"
+        exclude = ("is_deleted", "deleted_at")
 
 
 class AdminUserCreationForm(SetUnusablePasswordMixin, UserCreationForm):
@@ -33,7 +33,7 @@ class UserAccountCreationForm(AdminUserCreationForm):
 
     class Meta(UserCreationForm):
         model = user
-        fields = '__all__'
+        exclude = ("is_deleted", "deleted_at")
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")

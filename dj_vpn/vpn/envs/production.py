@@ -103,3 +103,4 @@ SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
 
 CELERY_BROKER_URL = "redis://vpn_redis:6379/0"
 CELERY_RESULT_BACKEND = "redis://vpn_redis:6379/1"
+CACHES["default"]["LOCATION"] = "redis://vpn_redis:6379/2"

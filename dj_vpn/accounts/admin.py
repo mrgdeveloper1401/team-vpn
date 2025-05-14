@@ -52,6 +52,15 @@ class ContentDeviceInline(admin.TabularInline):
     model = ContentDevice
     extra = 1
 
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request).only(
+            "user__username", "device_model", "device_os", "device_number", "ip_address",
+            "is_blocked"
+        )
+        if not self.has_view_or_change_permission(request):
+            queryset = queryset.none()
+        return queryset
+
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
@@ -71,8 +80,8 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
-    fieldsets = [
-        (None, {"fields": ["username", "password"]}),
+    fieldsets = (
+        (None, {"fields": ("username", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "email", "mobile_phone", "account_type",
                                          "accounts_status", "volume", "volume_usage", "all_volume_usage",
                                          "number_of_login", "number_of_days", "volume_choice", "is_inf_volume",
@@ -91,8 +100,8 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
         (_("Important dates"), {"fields": ("last_login", "date_joined", "start_premium", "updated_at", "birth_date")}),
-    ]
-    inlines = [ContentDeviceInline]
+    )
+    inlines = (ContentDeviceInline,)
     list_filter = ('is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter,
                    "user_type", DayLeftZeroFilter)
     readonly_fields = ("updated_at", "date_joined", "last_login", "all_volume_usage", 'number_of_login')
@@ -100,7 +109,7 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('username',)
     ordering = ('-date_joined',)
     raw_id_fields = ('created_by',)
-    search_help_text = "برای جست و جو میتواندی از یوزرنیم کاربر استفاده کنید"
+    search_help_text = _("برای جست و جو میتواندی از یوزرنیم کاربر استفاده کنید")
 
     def save_model(self, request, obj, form, change):
         if change:
@@ -119,7 +128,7 @@ class UserAdmin(BaseUserAdmin):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request).defer(
-            "updated_at", "is_deleted", "deleted_at"
+            "is_deleted", "deleted_at"
         )
         if not request.user.is_superuser:
             qs = qs.filter(Q(created_by=request.user) | Q(id=request.user.id))
@@ -131,7 +140,7 @@ class UserAdmin(BaseUserAdmin):
 
         if not is_superuser:
             if request.user.has_perm("accounts.change_user"):
-                fields_to_disable = [
+                fields_to_disable = (
                     'is_superuser',
                     'is_staff',
                     'is_connected_user',
@@ -142,7 +151,7 @@ class UserAdmin(BaseUserAdmin):
                     'groups',
                     'user_permissions',
                     "created_by",
-                ]
+                )
 
                 for field_name in fields_to_disable:
                     if field_name in form.base_fields:
@@ -181,7 +190,7 @@ class ContentDeviceAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
     list_display_links =('id', "user")
     list_per_page = 20
-    search_help_text = "برای جست و جو میتواندی از یوزرنیم کاربر استفاده کنید"
+    search_help_text = _("برای جست و جو میتواندی از یوزرنیم کاربر استفاده کنید")
     actions = ("enable_is_block", "disable_is_block")
 
     def get_queryset(self, request):
@@ -202,20 +211,18 @@ class ContentDeviceAdmin(admin.ModelAdmin):
 
 @admin.register(PrivateNotification)
 class PrivateNotificationAdmin(admin.ModelAdmin):
-    list_display = ('user', "title", "is_active", "created_at")
+    list_display = ('user', "title", "created_at")
     list_select_related = ('user',)
-    list_filter = ('is_active',)
     raw_id_fields = ('user',)
     search_fields = ('title', "user__username")
-    list_editable = ('is_active',)
     ordering = ("-created_at",)
-    search_help_text = "برای سرچ کردن میتوانید از فیلد های نام کاربری یوزر و عنوان نوتیفیکیشن استفاده کنید"
+    search_help_text = _("برای سرچ کردن میتوانید از فیلد های نام کاربری یوزر و عنوان نوتیفیکیشن استفاده کنید")
+    list_per_page = 20
 
     def get_queryset(self, request):
         return super().get_queryset(request).only(
             "user__username",
             "title",
-            "is_active",
             "created_at"
         )
 
@@ -223,13 +230,13 @@ class PrivateNotificationAdmin(admin.ModelAdmin):
 @admin.register(OneDayLeftUser)
 class OneDayLeftUserAdmin(admin.ModelAdmin):
     list_display = ("username", "number_of_days", "end_date_subscription", "account_type", "is_staff")
-    fieldsets = [
+    fieldsets = (
         (None, {
-            'fields': [
+            'fields': (
                 'username', "number_of_days", "start_premium"
-            ],
+            ),
         }),
-    ]
+    )
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -263,6 +270,15 @@ class UserLoginLogAdmin(admin.ModelAdmin):
     raw_id_fields = ("user",)
     list_per_page = 20
     search_help_text = "برای جست و جو میتواندی از یوزرنیم کاربر استفاده کنید"
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
     def get_queryset(self, request):
         return super().get_queryset(request).only(

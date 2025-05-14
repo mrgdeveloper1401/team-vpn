@@ -135,15 +135,9 @@ class VolumeUsageApiView(views.APIView):
                     volume_usage=F('volume_usage') + number,
                     all_volume_usage=F("all_volume_usage") + number,
                 )
-<<<<<<< HEAD
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response("DISCONNECT", status=status.HTTP_400_BAD_REQUEST, content_type="text/plain")
         return Response("USER NOT FOUND", status=status.HTTP_400_BAD_REQUEST)
-=======
-                return HttpResponse(content="ok", content_type="text/plain")
-            return HttpResponse("DISCONNECT", status=status.HTTP_400_BAD_REQUEST, content_type="text/plain")
-        return HttpResponse("USER NOT FOUND", status=status.HTTP_400_BAD_REQUEST, content_type="text/plain")
->>>>>>> a8216060de05110df38da8ca25c503aa1325822e
 
 
 class UpdateConnectionApiView(views.APIView):
