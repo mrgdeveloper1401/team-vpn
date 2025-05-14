@@ -3,9 +3,9 @@ from firebase_admin import credentials, messaging
 from pathlib import Path
 
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-firebase_file = BASE_DIR / "team-vpn-702b2-firebase-adminsdk-ykycw-7d32345a5c.json"
+firebase_file = BASE_DIR / "vpn69.json"
 
 cred = credentials.Certificate(firebase_file)
 

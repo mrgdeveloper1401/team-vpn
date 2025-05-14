@@ -3,7 +3,7 @@ from celery import shared_task
 
 @shared_task
 def send_notif_one_day_left_user(fcm_token, title, body):
-    from dj_vpn.vpn.firebase_conf.firebase import send_notification
+    from dj_vpn.vpn.firebase import send_notification
     from dj_vpn.accounts.models import OneDayLeftUser
 
 
@@ -16,6 +16,6 @@ def send_notif_one_day_left_user(fcm_token, title, body):
 
 @shared_task
 def send_public_notification(fcm_token, title, body):
-    from dj_vpn.vpn.firebase_conf.firebase import send_notification
+    from dj_vpn.vpn.firebase import send_notification
 
     send_notification(fcm_token, title, body)
