@@ -5,11 +5,8 @@ WORKDIR /home/app
 COPY . /home/app
 
 RUN apk add --update --upgrade --no-cache --virtual .tmp python3  \
-    py3-pip  \
-    redis  \
-    celery  \
-    postgresql  \
-    nginx
+    py3-pip
+
 
 RUN pip install --upgrade pip && \
     pip install -r ./requirements/production.txt
@@ -19,7 +16,7 @@ RUN adduser -D -H mg && \
     chmod -R 755 /home/app && \
     pip install colorlog django-axes
 
-USER mg
+
 
 ENV PYTHONDONOTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1

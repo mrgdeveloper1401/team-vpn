@@ -1,4 +1,4 @@
-django
+django==5.1.8
 pillow
 djangorestframework
 djangorestframework-simplejwt
@@ -9,10 +9,8 @@ psycopg2-binary
 drf-spectacular
 django-import-export
 colorlog
-djangorestframework
 django-axes
 django-ratelimit
-drf-spectacular
 drf-nested-routers
 celery[redis]
 django-celery-beat
@@ -20,3 +18,6 @@ django-celery-results
 flower
 firebase-admin
 pyfcm
+django-extensions
+aiosmtpd
+fcm-django

@@ -1,7 +1,6 @@
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
-
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,7 +25,8 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "rest_framework",
     "rest_framework_simplejwt",
-    "rest_framework_simplejwt.token_blacklist",
+    "fcm_django",
+    # "rest_framework_simplejwt.token_blacklist",
     # "guardian",
 
     "dj_vpn.accounts.apps.AccountsConfig",
@@ -55,7 +55,7 @@ ROOT_URLCONF = "dj_vpn.vpn.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -135,18 +135,6 @@ LOGGING = {
         },
     },
     "handlers": {
-        "console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "formatter": "color",
-            "filters": ["require_debug_true"],
-        },
-        "info_file": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / "info_file.log")
-        },
         "error_file": {
             "level": "ERROR",
             "class": "logging.FileHandler",
@@ -168,7 +156,7 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["console", "info_file", "warning_file", "critical_file", "error_file"],
+            "handlers": [ "warning_file", "critical_file", "error_file"],
             "propagate": True,
         }
     }
@@ -227,3 +215,18 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     # 'guardian.backends.ObjectPermissionBackend',
 ]
+
+FCM_DJANGO_SETTINGS = {
+    "DEFAULT_FIREBASE_APP": None,
+}
+
+# celery config
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Tehran'
+CELERY_WORKER_PREFETCH_MULTIPLIER=1
+CELERY_RESULT_EXPIRES=120
+CELERY_TASK_ALWAYS_EAGER=False
+BROKER_CONNECTION_RETRY_ON_STARTUP=True
+CELERY_TASK_ACKS_LATE=True
