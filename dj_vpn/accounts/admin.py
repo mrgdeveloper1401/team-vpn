@@ -23,6 +23,29 @@ class NumberOfDaysFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'false':
             return queryset.filter(number_of_days__isnull=False)
+        return queryset
+
+
+class DayLeftZeroFilter(admin.SimpleListFilter):
+    title = _("Day left")
+    parameter_name = 'day_left'
+
+    def lookups(self, request, model_admin):
+        return [
+            ("zero", _("zero reminder days")),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == 'zero':
+            return queryset.filter(
+                account_type=AccountType.premium_user,
+                start_premium__isnull = False,
+            ).annotate(
+                calcuate_day_left=ExpressionWrapper(
+                    date.today() - (F("start_premium") + F("number_of_days")),
+                    output_field=IntegerField()
+                )
+            ).filter(calcuate_day_left=0)
 
 
 class DayLeftZeroFilter(admin.SimpleListFilter):
@@ -64,7 +87,7 @@ class UserAdmin(BaseUserAdmin):
             None,
             {
                 "classes": ("wide",),
-                "fields": ("username", "usable_password", "password1", "password2", "volume", "volume_choice",
+                "fields": ("username", "password1", "password2", "volume", "volume_choice",
                            "number_of_days", "start_premium", "number_of_max_device", "account_type", "accounts_status",
                            "user_type", "is_inf_volume", "is_staff", "groups", "user_permissions")
             },
@@ -94,8 +117,12 @@ class UserAdmin(BaseUserAdmin):
     inlines = [ContentDeviceInline]
     list_filter = ('is_active', "is_staff", "is_superuser", "account_type", "accounts_status", NumberOfDaysFilter,
                    "user_type", DayLeftZeroFilter)
+<<<<<<< HEAD
     readonly_fields = ["updated_at", "date_joined", "last_login", "account_type", "accounts_status",
                        "all_volume_usage", 'number_of_login']
+=======
+    readonly_fields = ("updated_at", "date_joined", "last_login", "all_volume_usage", 'number_of_login')
+>>>>>>> a8216060de05110df38da8ca25c503aa1325822e
     list_per_page = 20
     search_fields = ('username',)
     ordering = ('-date_joined',)
@@ -273,4 +300,8 @@ class UserLoginLogAdmin(admin.ModelAdmin):
         )
 
 
+<<<<<<< HEAD
 admin.site.login_form = forms.CustomAdminLoginForm
+=======
+admin.site.login_form = forms.CustomAdminLoginForm
+>>>>>>> a8216060de05110df38da8ca25c503aa1325822e

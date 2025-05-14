@@ -1,7 +1,6 @@
 import os
 from datetime import timedelta
 from pathlib import Path
-
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,7 +25,8 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "rest_framework",
     "rest_framework_simplejwt",
-    "rest_framework_simplejwt.token_blacklist",
+    "fcm_django",
+    # "rest_framework_simplejwt.token_blacklist",
     # "guardian",
 
     "dj_vpn.accounts.apps.AccountsConfig",
@@ -55,7 +55,7 @@ ROOT_URLCONF = "dj_vpn.vpn.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -116,6 +116,55 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.User"
 
+<<<<<<< HEAD
+=======
+# with logging django
+log_dir = os.path.join(BASE_DIR / "general_log_django", datetime.now().strftime("%Y-%m-%d"))
+os.makedirs(log_dir, exist_ok=True)
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "color": {
+            "()": "colorlog.ColoredFormatter",
+            "format": "%(log_color)s%(levelname)s %(reset)s%(asctime)s %(module)s %(process)d %(thread)d %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "filters": {
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
+    "handlers": {
+        "error_file": {
+            "level": "ERROR",
+            "class": "logging.FileHandler",
+            "formatter": "color",
+            "filename": os.path.join(BASE_DIR / log_dir / "error_file.log")
+        },
+        "warning_file": {
+            "level": "WARN",
+            "class": "logging.FileHandler",
+            "formatter": "color",
+            "filename": os.path.join(BASE_DIR / log_dir / "warning_file.log")
+        },
+        "critical_file": {
+            "level": "CRITICAL",
+            "class": "logging.FileHandler",
+            "formatter": "color",
+            "filename": os.path.join(BASE_DIR / log_dir / "critical_file.log")
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": [ "warning_file", "critical_file", "error_file"],
+            "propagate": True,
+        }
+    }
+}
+
+>>>>>>> a8216060de05110df38da8ca25c503aa1325822e
 # JET_PROJECT = 'vpn_4'
 # JET_TOKEN = config("JET_TOKEN")
 
@@ -169,3 +218,18 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     # 'guardian.backends.ObjectPermissionBackend',
 ]
+
+FCM_DJANGO_SETTINGS = {
+    "DEFAULT_FIREBASE_APP": None,
+}
+
+# celery config
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Tehran'
+CELERY_WORKER_PREFETCH_MULTIPLIER=1
+CELERY_RESULT_EXPIRES=120
+CELERY_TASK_ALWAYS_EAGER=False
+BROKER_CONNECTION_RETRY_ON_STARTUP=True
+CELERY_TASK_ACKS_LATE=True

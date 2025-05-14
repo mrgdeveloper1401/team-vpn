@@ -113,7 +113,11 @@ class PrivateNotificationsSerializer(serializers.ModelSerializer):
 
 class VolumeUsageSerializer(serializers.Serializer):
     volume_usage = serializers.CharField(
+<<<<<<< HEAD
         help_text=_("حجم مصرفی به صورت مگابایت ارسال شود")
+=======
+        help_text=_("حجم مصرفی به صورت مگابایت یا گیگابایت ارسال شود")
+>>>>>>> a8216060de05110df38da8ca25c503aa1325822e
     )
     username = serializers.CharField()
 

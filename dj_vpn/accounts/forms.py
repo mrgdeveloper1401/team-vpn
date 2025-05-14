@@ -2,7 +2,6 @@ from django import forms
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, SetUnusablePasswordMixin, SetPasswordMixin
-from django.contrib.auth.forms import AdminUserCreationForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
@@ -16,6 +15,16 @@ class AdminUserChangeForm(forms.ModelForm):
     class Meta:
         model = user
         fields = "__all__"
+
+
+class AdminUserCreationForm(SetUnusablePasswordMixin, UserCreationForm):
+
+    # usable_password = SetUnusablePasswordMixin.create_usable_password_field()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["password1"].required = False
+        self.fields["password2"].required = False
 
 
 class UserAccountCreationForm(AdminUserCreationForm):
@@ -152,4 +161,8 @@ class CustomAdminLoginForm(AdminAuthenticationForm):
                 raise ValidationError(
                     "فقط کاربران پرمیوم اجازه دسترسی به پنل ادمین رو دارند",
                     code="invalid_login",
+<<<<<<< HEAD
                 )
+=======
+                )
+>>>>>>> a8216060de05110df38da8ca25c503aa1325822e

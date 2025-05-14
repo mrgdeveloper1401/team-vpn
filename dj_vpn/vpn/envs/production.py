@@ -1,6 +1,15 @@
 from dj_vpn.vpn.settings import *
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = config("VPS_ALLOWD_HOSTS", cast=str).split(" ")
+=======
+# use in vps
+ALLOWED_HOSTS = config("VPS_ALLOWD_HOSTS", cast=str).split(" ")
+
+# for test use
+# ALLOWED_HOSTS = ["*"]
+
+>>>>>>> a8216060de05110df38da8ca25c503aa1325822e
 SECRET_KEY = config("PROD_SECRET_KEY", cast=str)
 
 INSTALLED_APPS += [
@@ -17,6 +26,7 @@ STORAGES = {
     }
 }
 
+# use docker in vps
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -28,6 +38,7 @@ DATABASES = {
     }
 }
 
+# use docker in my local system
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.postgresql",
@@ -39,19 +50,19 @@ DATABASES = {
 #     }
 # }
 
-
+# use port public in vps
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.postgresql",
-#         "HOST": config("PUB_POSTDB_HOST", cast=str),
-#         "PASSWORD": config("PUB_POSTDB_PASSWORD", cast=str),
-#         "PORT": config("PUB_POSTDB_PORT", cast=str),
-#         "USER": config("PUB_POSTDB_USER", cast=str),
-#         "NAME": config("PUB_POSTDB_NAME", cast=str)
+#         "HOST": config("PUB_KUBAR_POSTDB_HOST", cast=str),
+#         "PASSWORD": config("PUB_KUBAR_POSTDB_PASSWORD", cast=str),
+#         "PORT": config("PUB_KUBAR_POSTDB_PORT", cast=str),
+#         "USER": config("PUB_KUBAR_POSTDB_USER", cast=str),
+#         "NAME": config("PUB_KUBAR_POSTDB_NAME", cast=str)
 #     }
 # }
 
-# when test production model we can use these databases
+# use in the system, database postgresql
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.postgresql",
@@ -64,10 +75,17 @@ DATABASES = {
 # }
 
 # django cors header settings
+<<<<<<< HEAD
 # CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "https://apppanel.paradox.com.se"
 ]
+=======
+# if we can test and develop api this button we can set
+# CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = "".join(config("PROD_CORS_ORIGIN", cast=list)).split(",")
+>>>>>>> a8216060de05110df38da8ca25c503aa1325822e
 
 # ssl config
 SESSION_COOKIE_SECURE = True
@@ -94,5 +112,10 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
 
+<<<<<<< HEAD
 broker_url = config("VPS_BROCKER_URL", cast=str)
 result_backend = config("VPS_RESULT_BACKEND", cast=str)
+=======
+CELERY_BROKER_URL = "redis://vpn_redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://vpn_redis:6379/1"
+>>>>>>> a8216060de05110df38da8ca25c503aa1325822e

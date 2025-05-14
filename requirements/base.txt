@@ -9,10 +9,8 @@ psycopg2-binary
 drf-spectacular
 django-import-export
 colorlog
-djangorestframework
 django-axes
 django-ratelimit
-drf-spectacular
 drf-nested-routers
 celery[redis]
 django-celery-beat
@@ -22,3 +20,7 @@ firebase-admin
 pyfcm
 django-extensions
 aiosmtpd
+<<<<<<< HEAD
+=======
+fcm-django
+>>>>>>> a8216060de05110df38da8ca25c503aa1325822e

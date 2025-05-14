@@ -200,7 +200,7 @@ class PrivateNotification(CreateMixin, UpdateMixin, SoftDeleteMixin):
         try:
             send_notification(self.user.fcm_token, self.title, self.body)
         except Exception as e:
-            raise e
+            raise ValidationError({"user": e})
 
     def clean(self):
         if not self.user.fcm_token:
