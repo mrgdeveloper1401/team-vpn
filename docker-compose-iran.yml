@@ -1,0 +1,63 @@
+services:
+  django:
+    volumes:
+      - static_files:/home/app/dj_vpn/staticfiles
+    ports:
+      - "8000:8000"
+    container_name: django_vpn
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file: ".env"
+    depends_on:
+      - db
+
+  db:
+    container_name: vpn_postgres
+    image: docker.arvancloud.ir/postgres:16.8-alpine
+    expose:
+      - 5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    environment:
+      POSTGRES_USER: ${VPS_POSTDB_USER}
+      POSTGRES_DB: ${VPS_POSTDB_NAME}
+      POSTGRES_PASSWORD: ${VPS_POSTDB_PASSWORD}
+
+  redis:
+    container_name: vpn_redis
+    image: docker.arvancloud.ir/redis:7.4.2-alpine
+    restart: always
+    depends_on:
+      - db
+
+  nginx:
+    container_name: vpn_nginx
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    restart: always
+    image: docker.arvancloud.ir/nginx:1.27-alpine
+    volumes:
+      - static_files:/vol/
+    command: ["nginx", "-g", "daemon off;"]
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - django
+
+  celery:
+    container_name: vpn_celery
+    build:
+      context: .
+    restart: always
+    entrypoint: celery -A dj_vpn.vpn worker -l INFO
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:
+  static_files:

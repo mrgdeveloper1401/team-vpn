@@ -1,25 +1,11 @@
-FROM python:3.12-alpine
+FROM vpn69:1.0.0
 
 WORKDIR /home/app
 
 COPY . /home/app
 
-RUN apk add --update --upgrade --no-cache --virtual .tmp python3  \
-    py3-pip
-
-
-RUN pip install --upgrade pip && \
-    pip install -r ./requirements/production.txt
-
 RUN adduser -D -H mg && \
-    chown -R mg:mg /home/app && \
-    chmod -R 755 /home/app && \
-    pip install colorlog django-axes
-
-
-
-ENV PYTHONDONOTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+    chown -R mg:mg /home/app
 
 EXPOSE 8000
 

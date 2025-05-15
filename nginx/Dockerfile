@@ -1,4 +1,5 @@
-FROM nginx:1.27.1-alpine
+# FROM nginx:1.27.1-alpine
+FROM docker.arvancloud.ir/nginx
 
 RUN mkdir -p /etc/letsencrypt/live/apppanel.paradox.com.se
 
