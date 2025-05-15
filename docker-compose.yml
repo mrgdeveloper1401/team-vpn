@@ -1,7 +1,5 @@
 services:
   django:
-    volumes:
-      - static_files:/home/app/dj_vpn/staticfiles
     ports:
       - "8000:8000"
     container_name: django_vpn
@@ -39,9 +37,6 @@ services:
       context: nginx
       dockerfile: Dockerfile
     restart: always
-    image: nginx:1.27-alpine
-    volumes:
-      - static_files:/vol/
     command: ["nginx", "-g", "daemon off;"]
     ports:
       - "80:80"
@@ -60,4 +55,3 @@ services:
 
 volumes:
   postgres_data:
-  static_files:
