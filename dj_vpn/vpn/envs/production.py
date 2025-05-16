@@ -1,7 +1,7 @@
 from dj_vpn.vpn.settings import *
 
 # use in vps
-ALLOWED_HOSTS = config("VPS_ALLOWD_HOSTS", cast=str).split(" ")
+ALLOWED_HOSTS = ''.join(config("VPS_ALLOWED_HOSTS", cast=list)).split(",")
 
 # for test use
 # ALLOWED_HOSTS = ["*"]
