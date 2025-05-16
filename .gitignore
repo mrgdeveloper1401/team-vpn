@@ -278,5 +278,7 @@ vpn69.json
 vpn69-1.0.0.tar
 vpn69-1.0.0.tar.gz
 nginx/o.tggju0.ir
-nginx/privkey.pem
-nginx/fullchain.pem
+nginx/privkey1.pem
+nginx/fullchain1.pem
+nginx/cert1.pem
+nginx/chain1.pem
