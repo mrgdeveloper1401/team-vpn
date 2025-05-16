@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "rest_framework",
     "rest_framework_simplejwt",
+    "import_export",
     # "fcm_django",
     # "rest_framework_simplejwt.token_blacklist",
     # "guardian",

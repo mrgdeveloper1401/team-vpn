@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from datetime import date
+from import_export.admin import ImportExportModelAdmin
 
 from . import forms
 from .enums import AccountType
@@ -263,7 +264,7 @@ class OneDayLeftUserAdmin(admin.ModelAdmin):
 
 
 @admin.register(UserLoginLog)
-class UserLoginLogAdmin(admin.ModelAdmin):
+class UserLoginLogAdmin(ImportExportModelAdmin):
     list_display = ("user", "ip_address", "user_agent", "created_at")
     list_select_related = ("user",)
     search_fields = ("user__username",)
