@@ -1,7 +1,7 @@
-### PyCharm template
-# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
+
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
+# B
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
@@ -45,6 +45,7 @@
 cmake-build-*/
 
 # Mongo Explorer plugin
+B
 .idea/**/mongoSettings.xml
 
 # File-based project format
@@ -163,6 +164,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
+B
 docs/_build/
 
 # PyBuilder
@@ -183,6 +185,7 @@ ipython_config.py
 
 # pipenv
 #   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   B
 #   However, in case of collaboration, if having platform-specific dependencies or dependencies
 #   having no cross-platform support, pipenv may install dependencies that don't work, or not
 #   install all needed dependencies.
@@ -204,6 +207,7 @@ ipython_config.py
 .pdm.toml
 
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
+B
 __pypackages__/
 
 # Celery stuff
@@ -247,6 +251,7 @@ dmypy.json
 cython_debug/
 
 # PyCharm
+#  B
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
@@ -273,3 +278,5 @@ vpn69.json
 vpn69-1.0.0.tar
 vpn69-1.0.0.tar.gz
 nginx/o.tggju0.ir
+nginx/privkey.pem
+nginx/fullchain.pem
