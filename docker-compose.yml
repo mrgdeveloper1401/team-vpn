@@ -55,13 +55,13 @@ services:
     depends_on:
       - redis
 
-  pg_hero:
-    container_name: pg_hero
-    image: pghero:3.7.0
-    ports:
-      - "8080:80"
-    environment:
-      - DATABASE_URL=postgres://${VPS_POSTDB_USER}:${VPS_POSTDB_PASSWORD}@db:5432/${VPS_POSTDB_NAME}
+#  pg_hero:
+#    container_name: pg_hero
+#    image: pghero:3.7.0
+#    ports:
+#      - "8080:80"
+#    environment:
+#      - DATABASE_URL=postgres://${VPS_POSTDB_USER}:${VPS_POSTDB_PASSWORD}@db:5432/${VPS_POSTDB_NAME}
 
 volumes:
   postgres_data:
