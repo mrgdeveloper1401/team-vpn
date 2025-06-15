@@ -31,6 +31,13 @@ DATABASES = {
         "PORT": config("VPS_POSTDB_PORT", cast=str),
         "USER": config("VPS_POSTDB_USER", cast=str),
         "NAME": config("VPS_POSTDB_NAME", cast=str)
+    },
+    "OPTIONS": {
+        "pool": {
+            "min_size": 1,
+            "max_size": 2,
+            "timeout": 10
+        }
     }
 }
 
