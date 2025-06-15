@@ -13,8 +13,8 @@ INSTALLED_APPS += [
     "storages",
 ]
 
-MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware", )
-MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware", )
+MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware",)
+MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
 STORAGES = {
     "staticfiles": {
@@ -83,19 +83,19 @@ DATABASES = {
 
 CORS_ALLOWED_ORIGINS = "".join(config("PROD_CORS_ORIGIN", cast=list)).split(",")
 
-# ssl config
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = True
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_PRELOAD = True
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_BROWSER_XSS_FILTER = True
-X_FRAME_OPTIONS = "SAMEORIGIN"
-SECURE_REFERRER_POLICY = "strict-origin"
-USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# secure header config
+SESSION_COOKIE_SECURE = True # send cookie only https
+CSRF_COOKIE_SECURE = True # send csrf cookie only https
+SECURE_SSL_REDIRECT = True # redirect http into https
+SECURE_HSTS_SECONDS = 31536000 # time active http strict transport security
+SECURE_HSTS_PRELOAD = True # preload hsts, use browser before preload view site use https
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True # use hsts for all subdomain
+SECURE_CONTENT_TYPE_NOSNIFF = True # prevent sniffing mime
+SECURE_BROWSER_XSS_FILTER = True # active filter xss
+X_FRAME_OPTIONS = "SAMEORIGIN" # prevent show iframe tags, prevent attack clickjacking
+SECURE_REFERRER_POLICY = "strict-origin" # what send information in header
+USE_X_FORWARDED_HOST = True # suitable proxy pass
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https") # secure connection django in proxy pass
 
 # aws config
 # AWS_ACCESS_KEY_ID = config("ARVAN_ACCESS_KEY", cast=str)
@@ -107,7 +107,19 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # AWS_S3_ENDPOINT_URL = config("AWS_S3_DOMAIN", cast=str)
 
 SIMPLE_JWT["SIGNING_KEY"] = SECRET_KEY
+SIMPLE_JWT["ALGORITHM"] = config("VPS_JWT_ALGORITHM", cast=str, default="HS256")
+# inactive previous refresh token
+SIMPLE_JWT['ROTATE_REFRESH_TOKENS'] = config("ROTATE_REFRESH_TOKENS", cast=bool, default=True)
+# active black list token, possible disable token before expired
+SIMPLE_JWT['BLACKLIST_AFTER_ROTATION'] = config("BLACKLIST_AFTER_ROTATION", cast=bool, default=True)
+SIMPLE_JWT['AUTH_HEADER_TYPES'] = tuple(''.join(config("AUTH_HEADER_TYPES", cast=tuple, default=("Bearer",))).split(","))
+SIMPLE_JWT['AUTH_HEADER_NAME'] = config("AUTH_HEADER_NAME", cast=str, default="HTTP_AUTHORIZATION")
+SIMPLE_JWT['AUDIENCE'] = config("AUTH_AUDIENCE", cast=str, default="") # this url can use token
+SIMPLE_JWT["ISSUER"] = config("AUTH_ISSUER", cast=str, default="") # prevent use fake token, helpful identify microservice
+SIMPLE_JWT["LEEWAY"] = config("LEEWAY", cast=int, default=0) # Taking advantage of the time difference
 
-CELERY_BROKER_URL = "redis://vpn_redis:6379/0"
-CELERY_RESULT_BACKEND = "redis://vpn_redis:6379/1"
+print(SIMPLE_JWT)
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", cast=str)
+CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", cast=str)
+
 CACHES["default"]["LOCATION"] = "redis://vpn_redis:6379/2"
