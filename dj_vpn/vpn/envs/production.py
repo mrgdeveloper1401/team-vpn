@@ -118,7 +118,6 @@ SIMPLE_JWT['AUDIENCE'] = config("AUTH_AUDIENCE", cast=str, default="") # this ur
 SIMPLE_JWT["ISSUER"] = config("AUTH_ISSUER", cast=str, default="") # prevent use fake token, helpful identify microservice
 SIMPLE_JWT["LEEWAY"] = config("LEEWAY", cast=int, default=0) # Taking advantage of the time difference
 
-print(SIMPLE_JWT)
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", cast=str)
 CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", cast=str)
 
