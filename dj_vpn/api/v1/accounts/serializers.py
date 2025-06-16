@@ -1,9 +1,10 @@
 from django.contrib.auth.password_validation import validate_password
-from django.db.models import Count
 from rest_framework.validators import ValidationError
-from rest_framework import serializers, generics
+from rest_framework import serializers, generics, exceptions, status, response
 from django.utils.translation import gettext_lazy as _
 
+from api.custom_exceptions import ResponseError
+from api.validators import NumericValidator
 from dj_vpn.accounts.enums import VolumeChoices, AccountType, AccountStatus
 from dj_vpn.accounts.models import User, ContentDevice, PrivateNotification
 from dj_vpn.vpn.utils.status_code import ErrorResponse
@@ -113,26 +114,7 @@ class PrivateNotificationsSerializer(serializers.ModelSerializer):
 
 class VolumeUsageSerializer(serializers.Serializer):
     volume_usage = serializers.CharField(
-        help_text=_("حجم مصرفی به صورت مگابایت یا گیگابایت ارسال شود")
+        help_text=_("حجم مصرفی به صورت مگابایت ارسال شود"),
+        validators=[NumericValidator()]
     )
     username = serializers.CharField()
-
-    def validate(self, attrs):
-        user = generics.get_object_or_404(User, username=attrs['username'])
-
-        if user.volume_choice == VolumeChoices.GB:
-            if user.volume_usage / 1_000 > user.volume:
-                user.account_type = AccountType.normal_user
-                user.accounts_status = AccountStatus.LIMIT
-
-        if user.volume_choice == VolumeChoices.MG:
-            if user.volume_usage > user.volume:
-                user.account_type = AccountType.normal_user
-                user.accounts_status = AccountStatus.LIMIT
-
-        if user.volume_choice == VolumeChoices.TRA:
-            if user.volume_usage / 1_000_000 > user.volume:
-                user.account_type = AccountType.normal_user
-                user.accounts_status = AccountStatus.LIMIT
-        user.save()
-        return attrs

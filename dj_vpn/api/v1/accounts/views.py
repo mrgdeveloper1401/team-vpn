@@ -1,5 +1,3 @@
-import re
-from ipaddress import ip_address
 
 from django.contrib.auth import authenticate
 from rest_framework import viewsets, status
@@ -8,7 +6,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import views
 from rest_framework.response import Response
 from django.db.models import F
-from django.http import HttpResponse
 
 from dj_vpn.accounts.models import UserLoginLog
 from dj_vpn.accounts.enums import AccountStatus
@@ -19,6 +16,7 @@ from dj_vpn.vpn.utils.permissions import NotAuthenticated
 from . import serializers
 from .serializers import ContentDeviceSerializer, PrivateNotificationsSerializer, VolumeUsageSerializer
 from dj_vpn.vpn.utils.status_code import ErrorResponse
+from ...validators import calc_volume_usage
 
 
 class UserRegisterViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -119,24 +117,40 @@ class PrivateNotificationViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixi
 
 class VolumeUsageApiView(views.APIView):
     serializer_class = VolumeUsageSerializer
-    # permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = User.objects.filter(username=serializer.validated_data['username']).only("username")
-        if user:
-            number_list = re.findall(r'\d+', serializer.validated_data['volume_usage'])
-            number = int(number_list[0])
+        volume_usage = int(serializer.validated_data["volume_usage"])
+        username = serializer.validated_data['username']
 
-            if user.first().accounts_status == AccountStatus.ACTIVE:
+        user = User.objects.filter(username=username).only(
+            "username",
+            "volume_usage",
+            "volume",
+            "all_volume_usage",
+            "number_of_login",
+            "start_premium",
+            "number_of_days",
+            "is_inf_volume",
+            "volume_choice",
+            "accounts_status"
+        )
+
+        if user:
+            check_user_volume = calc_volume_usage(user.first())
+
+            if check_user_volume:
                 user.update(
-                    volume_usage=F('volume_usage') + number,
-                    all_volume_usage=F("all_volume_usage") + number,
+                    volume_usage=F('volume_usage') + volume_usage,
+                    all_volume_usage=F("all_volume_usage") + volume_usage,
                 )
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response("DISCONNECT", status=status.HTTP_400_BAD_REQUEST, content_type="text/plain")
+            else:
+                return Response("DISCONNECT", status=status.HTTP_400_BAD_REQUEST)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+            # return Response("DISCONNECT", status=status.HTTP_400_BAD_REQUEST)
         return Response("USER NOT FOUND", status=status.HTTP_400_BAD_REQUEST)
 
 
