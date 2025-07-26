@@ -125,7 +125,12 @@ if [[ ${name} == 1 ]]; then
     cd /etc/letsencrypt/archive/${directory}/
     echo "pwd is: " $pwd_dir
     echo "list dir is" $(ls)
-    cp * $pwd_dir/nginx/
+
+    echo
+    read  -p "enter path dir nginx" path_dir
+    cp * $path_dir
+    vi Dockerfile
+    vi nginx.conf
     echo
     echo "*******************************************************"
     echo

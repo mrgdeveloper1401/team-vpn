@@ -4,4 +4,4 @@ RUN mkdir -p /etc/letsencrypt/live/apppanel.zaracloudcenterr.ir
 
 COPY nginx.conf /etc/nginx/
 
-COPY . /etc/letsencrypt/live/apppanel.zaracloudcenterr.ir/
+COPY . /etc/letsencrypt/live/apppanel.zaracloudcenterr.ir-0002/
