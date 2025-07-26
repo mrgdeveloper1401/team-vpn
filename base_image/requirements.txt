@@ -21,10 +21,3 @@ pyfcm
 django-extensions
 aiosmtpd
 fcm-django
-django-debug-toolbar
-ipython
-gunicorn
-django-cors-headers
-whitenoise
-boto3
-django-storages

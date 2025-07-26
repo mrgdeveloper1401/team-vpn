@@ -1,12 +1,15 @@
 from dj_vpn.vpn.settings import *
+from decouple import Csv
 
 # use in vps
-ALLOWED_HOSTS = ''.join(config("VPS_ALLOWED_HOSTS", cast=list)).split(",")
+ALLOWED_HOSTS = config("PROD_ALLOWED_HOSTS", cast=Csv())
+# print(ALLOWED_HOSTS)
 
 # for test use
 # ALLOWED_HOSTS = ["*"]
 
 SECRET_KEY = config("PROD_SECRET_KEY", cast=str)
+# print(SECRET_KEY)
 
 INSTALLED_APPS += [
     "corsheaders",
@@ -35,7 +38,7 @@ DATABASES = {
     "OPTIONS": {
         "pool": {
             "min_size": 1,
-            "max_size": 3,
+            "max_size": 4,
             "timeout": 10
         }
     }
@@ -81,7 +84,8 @@ DATABASES = {
 # if we can test and develop api this button we can set
 # CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOWED_ORIGINS = "".join(config("PROD_CORS_ORIGIN", cast=list)).split(",")
+CORS_ALLOWED_ORIGINS = config("PROD_CORS_ORIGIN", cast=Csv())
+# print(CORS_ALLOWED_ORIGINS)
 
 # secure header config
 SESSION_COOKIE_SECURE = True # send cookie only https
@@ -92,7 +96,7 @@ SECURE_HSTS_PRELOAD = True # preload hsts, use browser before preload view site 
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True # use hsts for all subdomain
 SECURE_CONTENT_TYPE_NOSNIFF = True # prevent sniffing mime
 SECURE_BROWSER_XSS_FILTER = True # active filter xss
-X_FRAME_OPTIONS = "SAMEORIGIN" # prevent show iframe tags, prevent attack clickjacking
+X_FRAME_OPTIONS = "DENY" # prevent show iframe tags, prevent attack clickjacking
 SECURE_REFERRER_POLICY = "strict-origin" # what send information in header
 USE_X_FORWARDED_HOST = True # suitable proxy pass
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https") # secure connection django in proxy pass
@@ -117,6 +121,7 @@ SIMPLE_JWT['AUTH_HEADER_NAME'] = config("AUTH_HEADER_NAME", cast=str, default="H
 SIMPLE_JWT['AUDIENCE'] = config("AUTH_AUDIENCE", cast=str, default="") # this url can use token
 SIMPLE_JWT["ISSUER"] = config("AUTH_ISSUER", cast=str, default="") # prevent use fake token, helpful identify microservice
 SIMPLE_JWT["LEEWAY"] = config("LEEWAY", cast=int, default=0) # Taking advantage of the time difference
+# print(SIMPLE_JWT)
 
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", cast=str)
 CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", cast=str)

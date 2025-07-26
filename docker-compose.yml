@@ -15,15 +15,13 @@ services:
 
   db:
     container_name: vpn_postgres
-    image: postgres:16.6-alpine
+    image: postgres:16.9-alpine
     expose:
       - 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
     environment:
-      POSTGRES_USER: ${VPS_POSTDB_USER}
-      POSTGRES_DB: ${VPS_POSTDB_NAME}
       POSTGRES_PASSWORD: ${VPS_POSTDB_PASSWORD}
 
   redis:
