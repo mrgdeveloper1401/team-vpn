@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # color
 YELLOW="\033[1;33m"
@@ -36,7 +36,7 @@ echo $PS3
 echo
 options=("1)build-new" "2)re-build" "3)exit")
 
-for i in "${options[@]}"; do
+for i in ${options[@]}; do
     echo "$i"
 done
 
@@ -58,11 +58,11 @@ if [[ ${name} == 1 ]]; then
         echo "you type this package --> " $input_pkg
         package+=($input_pkg)
         update_upgrade
-        sudo apt install "${package[@]}" -y
+        sudo apt install ${package[@]} -y
         info_msg "install package succcess"
-     else
-         update_upgrade
-         sudo apt install "${package[@]}" -y
+    # else
+    #     update_upgrade
+    #     sudo apt install ${package[@]} -y
     fi
 
     echo
@@ -119,7 +119,8 @@ if [[ ${name} == 1 ]]; then
 
     # change directory certbot
     pwd_dir=$(pwd) # cast pwd command into variable pwd_dir
-    cd /etc/letsencrypt/archive/${domain_name}
+    read -p "enter directory for copy file... " directory
+    cd /etc/letsencrypt/archive/${directory}/
     cp * $pwd_dir/nginx/
     echo
     echo "*******************************************************"
