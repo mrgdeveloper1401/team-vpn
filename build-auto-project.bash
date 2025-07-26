@@ -119,6 +119,8 @@ if [[ ${name} == 1 ]]; then
 
     # change directory certbot
     pwd_dir=$(pwd) # cast pwd command into variable pwd_dir
+    echo "pwd is: " $pwd_dir
+    echo "list dir is" $(ls)
     read -p "enter directory for copy file... " directory
     cd /etc/letsencrypt/archive/${directory}/
     cp * $pwd_dir/nginx/
