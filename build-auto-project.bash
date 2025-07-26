@@ -123,6 +123,8 @@ if [[ ${name} == 1 ]]; then
     echo "list dir is" $(ls)
     read -p "enter directory for copy file... " directory
     cd /etc/letsencrypt/archive/${directory}/
+    echo "pwd is: " $pwd_dir
+    echo "list dir is" $(ls)
     cp * $pwd_dir/nginx/
     echo
     echo "*******************************************************"
