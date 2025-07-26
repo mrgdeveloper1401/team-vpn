@@ -122,7 +122,7 @@ if [[ ${name} == 1 ]]; then
     echo "pwd is: " $pwd_dir
     echo "list dir is" $(ls)
     read -p "enter directory for copy file... " directory
-    cd /etc/letsencrypt/archive/${directory}/
+    cd $directory
     echo "pwd is: " $pwd_dir
     echo "list dir is" $(ls)
 
@@ -134,6 +134,11 @@ if [[ ${name} == 1 ]]; then
     echo
     echo "*******************************************************"
     echo
+
+    read -p "enter directory main project contains docker-compose.yml file, if you dont want please enter: " dir
+    if [[ ${dir} ]]; then
+      cd $dir
+    fi
 
     echo "start build project ... "
     sudo docker-compose up --build
