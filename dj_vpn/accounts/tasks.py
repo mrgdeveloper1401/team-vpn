@@ -19,3 +19,8 @@ def send_public_notification(fcm_token, title, body):
     from dj_vpn.vpn.firebase import send_notification
 
     send_notification(fcm_token, title, body)
+
+
+@shared_task
+def auto_backup_database():
+    pass

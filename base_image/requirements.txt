@@ -21,3 +21,5 @@ pyfcm
 django-extensions
 aiosmtpd
 fcm-django
+gunicorn
+django-cors-headers
