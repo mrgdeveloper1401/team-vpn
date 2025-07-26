@@ -1,7 +1,7 @@
 from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 
-from accounts.enums import AccountStatus, VolumeChoices, AccountType
+from dj_vpn.accounts.enums import AccountStatus, VolumeChoices, AccountType
 
 
 class NumericValidator(RegexValidator):
