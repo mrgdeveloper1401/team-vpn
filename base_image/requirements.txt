@@ -24,3 +24,5 @@ fcm-django
 gunicorn
 django-cors-headers
 django-storages
+whitenoise
+boto3

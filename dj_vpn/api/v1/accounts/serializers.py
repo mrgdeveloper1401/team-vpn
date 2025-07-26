@@ -1,11 +1,9 @@
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.validators import ValidationError
-from rest_framework import serializers, generics, exceptions, status, response
+from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
-from api.custom_exceptions import ResponseError
-from api.validators import NumericValidator
-from dj_vpn.accounts.enums import VolumeChoices, AccountType, AccountStatus
+from dj_vpn.api.validators import NumericValidator
 from dj_vpn.accounts.models import User, ContentDevice, PrivateNotification
 from dj_vpn.vpn.utils.status_code import ErrorResponse
 
