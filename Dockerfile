@@ -5,7 +5,9 @@ WORKDIR /home/app
 COPY . /home/app
 
 RUN adduser -D -H mg && \
-    chown -R mg:mg /home/app
+    chown -R mg:mg /home/app && \
+    pip install drf-extensions && \
+    pip install ipython
 
 EXPOSE 8000
 
